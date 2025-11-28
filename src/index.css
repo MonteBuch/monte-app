@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Custom Font Import */
+/* @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap'); */
+
+body {
+  font-family: 'Nunito', sans-serif; /* Oder system-ui */
+  background-color: #fcfaf7;
+}
+
+/* Speiseplan – Save Button Animation */
+
+.save-button {
+  @apply rounded-full text-xs font-bold flex items-center justify-center px-4 py-2 transition-all duration-300;
+  min-width: 110px;
+  position: relative;
+  overflow: hidden;
+}
+
+.save-button__content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.save-button--idle {
+  background: #f4a51c;
+  color: #fff;
+}
+
+.save-button--idle:hover {
+  background: #e79612;
+}
+
+.save-button--disabled {
+  background: #e5e5e5 !important;
+  color: #a3a3a3 !important;
+  cursor: not-allowed;
+}
+
+.save-button--saving {
+  background: #f4a51c;
+  color: #fff;
+  width: 52px;
+  padding-inline: 0;
+}
+
+.save-button--saving .save-button__content {
+  gap: 0;
+}
+
+.save-button__spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  animation: save-spinner-rotate 0.6s linear infinite;
+}
+
+.save-button--saved {
+  background: #22c55e;
+  color: #fff;
+}
+
+.save-button--saved .save-button__content {
+  animation: save-success-pop 0.4s ease;
+}
+
+@keyframes save-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes save-success-pop {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Tageskarten Fade+Slide Animation */
+.daycard-anim {
+  animation: fadeSlideUp 0.35s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
