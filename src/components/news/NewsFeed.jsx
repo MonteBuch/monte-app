@@ -3,18 +3,13 @@ import React from "react";
 import { Calendar, Megaphone } from "lucide-react";
 
 /**
- * NewsFeed – zeigt Mitteilungen je nach Rolle und Zielgruppe an.
- * 
- * Design: Anlehnung an die Gruppenkarten.
- * - Jede Nachricht hat einen Header mit News‑Icon, farbigem Gruppen‑Chip und Datum.
- * - Der Gruppen‑Chip verwendet die Farben & Icons aus den Gruppen‑Definitionen.
- * - Globale Nachrichten erhalten den Chip „Alle“.
+ * NewsFeed – zeigt die Mitteilungen mit gruppenspezifischen Chips an.
+ * - Jede Karte hat einen gelben Rahmen zur Harmonisierung mit dem Meldungen‑Tab.
  */
 export default function NewsFeed({ user, news, groups }) {
   const safeNews = Array.isArray(news) ? news : [];
   const safeGroups = Array.isArray(groups) ? groups : [];
 
-  // Hilfsfunktion zum Datum formatieren
   const formatDate = (iso) => {
     if (!iso) return "";
     const d = new Date(iso);
@@ -38,7 +33,6 @@ export default function NewsFeed({ user, news, groups }) {
   return (
     <div className="space-y-4">
       {safeNews.map((n) => {
-        // Passende Gruppe suchen (für Farben & Icons)
         const group =
           n.groupId && Array.isArray(safeGroups)
             ? safeGroups.find((g) => g.id === n.groupId)
@@ -47,18 +41,15 @@ export default function NewsFeed({ user, news, groups }) {
         return (
           <div
             key={n.id}
-            className="bg-white p-5 rounded-2xl border border-stone-100 shadow-sm space-y-3"
+            className="bg-white p-5 rounded-2xl border border-amber-200 shadow-sm space-y-3"
           >
-            {/* Header mit News‑Icon, Gruppen‑Chip und Datum */}
+            {/* Kopfzeile: News‑Icon links, Gruppen‑Chip & Datum rechts */}
             <div className="flex justify-between items-start">
-              {/* Linke Seite: News‑Icon */}
               <div className="flex items-center gap-2">
                 <div className="bg-stone-100 text-stone-700 rounded-full p-2">
                   <Megaphone size={16} />
                 </div>
               </div>
-
-              {/* Rechte Seite: Gruppen‑Chip & Datum */}
               <div className="flex flex-col items-end gap-1">
                 {group ? (
                   <span
@@ -78,7 +69,6 @@ export default function NewsFeed({ user, news, groups }) {
                 </div>
               </div>
             </div>
-
             {/* Nachrichtentext */}
             <p className="text-sm text-stone-800 leading-snug">{n.text}</p>
           </div>
