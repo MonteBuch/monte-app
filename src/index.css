@@ -1,16 +1,20 @@
+@import "prosemirror-view/style/prosemirror.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Optional: Custom Font Import */
-/* @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap'); */
+/* =========================================================
+   GLOBAL
+========================================================= */
 
 body {
-  font-family: 'Nunito', sans-serif; /* Oder system-ui */
+  font-family: 'Nunito', sans-serif;
   background-color: #fcfaf7;
 }
 
-/* Speiseplan – Save Button Animation */
+/* =========================================================
+   SPEISEPLAN BUTTONS
+========================================================= */
 
 .save-button {
   @apply rounded-full text-xs font-bold flex items-center justify-center px-4 py-2 transition-all duration-300;
@@ -30,7 +34,6 @@ body {
   background: #f4a51c;
   color: #fff;
 }
-
 .save-button--idle:hover {
   background: #e79612;
 }
@@ -47,7 +50,6 @@ body {
   width: 52px;
   padding-inline: 0;
 }
-
 .save-button--saving .save-button__content {
   gap: 0;
 }
@@ -65,7 +67,6 @@ body {
   background: #22c55e;
   color: #fff;
 }
-
 .save-button--saved .save-button__content {
   animation: save-success-pop 0.4s ease;
 }
@@ -77,32 +78,118 @@ body {
 }
 
 @keyframes save-success-pop {
-  0% {
-    transform: scale(0.95);
-    opacity: 0.6;
-  }
-  70% {
-    transform: scale(1.03);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(0.95); opacity: 0.6; }
+  70% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); }
 }
 
-/* Tageskarten Fade+Slide Animation */
+/* =========================================================
+   TAGESKARTEN ANIMATION
+========================================================= */
+
 .daycard-anim {
   animation: fadeSlideUp 0.35s ease-out forwards;
   opacity: 0;
 }
 
 @keyframes fadeSlideUp {
-  0% {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================
+   TIPTAP / PROSEMIRROR – EDITOR STYLES
+========================================================= */
+
+.ProseMirror {
+  outline: none;
+  min-height: 140px;
+  cursor: text;
+}
+
+/* Absätze */
+.ProseMirror p {
+  margin: 0 0 0.25rem 0;
+}
+
+/* Listen */
+.ProseMirror ul {
+  list-style-type: disc;
+  margin-left: 1.25rem;
+  padding-left: 0;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  margin-left: 1.25rem;
+  padding-left: 0;
+}
+
+/* Überschrift */
+.ProseMirror h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0.25rem 0;
+}
+
+/* Links */
+.ProseMirror a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* Bilder */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* =========================================================
+   FEED-INHALTE (GESPEICHERTE NACHRICHTEN)
+========================================================= */
+
+.prose p {
+  margin: 0 0 0.35rem 0;
+}
+
+/* Listen im Feed */
+.prose ul {
+  list-style-type: disc;
+  margin-left: 1.25rem;
+  padding-left: 0;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  margin-left: 1.25rem;
+  padding-left: 0;
+}
+
+.prose li {
+  margin: 0.1rem 0;
+}
+
+/* Überschrift H2 im Feed */
+.prose h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0.3rem 0;
+}
+
+/* Links im Feed */
+.prose a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* Bilder im Feed */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  display: block;
+  margin-top: 0.25rem;
 }

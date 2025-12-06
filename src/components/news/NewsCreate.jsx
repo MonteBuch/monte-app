@@ -1,218 +1,411 @@
 // src/components/news/NewsCreate.jsx
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   Send,
+  Paperclip,
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Trash2,
   Megaphone,
-  Globe,
-  Droplets,
-  Flame,
-  Sun,
-  Flower2,
-  Wind,
-  Cloud,
-  Leaf,
-  TreePine,
-  Mountain,
-  Snowflake,
-  MoonStar,
-  Palette,
-  Brush,
-  Blocks,
-  Puzzle,
-  Music4,
-  Baby,
-  Smile,
-  UsersRound,
-  BookOpen,
-  Star,
-  Clover,
+  List as ListIcon,
+  ListOrdered,
+  Image as ImageIcon,
+  Minus as MinusIcon,
+  Type as TypeIcon,
 } from "lucide-react";
-import { StorageService } from "../../lib/storage";
 
-/**
- * NewsCreate – Eingabeformular für neue Mitteilungen.
- * • Farbiger Header mit Gruppenauswahl
- * • Dynamischer Button-Text („Mitteilung an … senden“)
- * • Korrekte Icons und Gruppennamen
- */
-export default function NewsCreate({ user, groups, onSubmit }) {
-  // Facility‑Gruppen laden (falls keine übergeben)
-  const facilityGroups =
-    Array.isArray(groups) && groups.length > 0
-      ? groups
-      : StorageService.getDefaultGroups();
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
+import Image from "@tiptap/extension-image";
+import { Mark } from "@tiptap/core";
 
-  // Standardziel: Team → eigene Stammgruppe, Admin → „Alle“
-  const initialTarget = useMemo(() => {
-    if (user.role === "team" && user.primaryGroup) {
-      return user.primaryGroup;
-    }
-    return "all";
-  }, [user]);
+// Eigene Underline-Mark
+const CustomUnderline = Mark.create({
+  name: "customUnderline",
 
-  const [text, setText] = useState("");
-  const [target, setTarget] = useState(initialTarget);
+  parseHTML() {
+    return [{ tag: "u" }, { style: "text-decoration", consuming: false }];
+  },
 
-  // Nachrichtenobjekt zusammenstellen und übergeben
-  const handleSubmit = () => {
-    if (!text.trim()) return;
-    const item = {
-      id: crypto.randomUUID(),
-      text: text.trim(),
-      createdBy: user.username,
-      groupId: target === "all" ? null : target,
-      target,
-      date: new Date().toISOString(),
+  renderHTML() {
+    return ["u", {}, 0];
+  },
+
+  addCommands() {
+    return {
+      toggleCustomUnderline:
+        () =>
+        ({ commands }) => {
+          return commands.toggleMark(this.name);
+        },
     };
-    onSubmit(item);
-    setText("");
-    setTarget(initialTarget);
-  };
+  },
+});
 
-  /**
-   * Wandelt einen gespeicherten Icon-Namen (z. B. "flame") in das passende
-   * Lucide-Icon um. Für standardmäßige Gruppen wird das React-Element
-   * unverändert übernommen.
-   */
-  const resolveIcon = (icon) => {
-    if (React.isValidElement(icon)) return icon;
-    const map = {
-      globe: <Globe size={16} />,
-      droplets: <Droplets size={16} />,
-      flame: <Flame size={16} />,
-      sun: <Sun size={16} />,
-      flower2: <Flower2 size={16} />,
-      wind: <Wind size={16} />,
-      cloud: <Cloud size={16} />,
-      leaf: <Leaf size={16} />,
-      "tree-pine": <TreePine size={16} />,
-      mountain: <Mountain size={16} />,
-      snowflake: <Snowflake size={16} />,
-      "moon-star": <MoonStar size={16} />,
-      palette: <Palette size={16} />,
-      brush: <Brush size={16} />,
-      blocks: <Blocks size={16} />,
-      puzzle: <Puzzle size={16} />,
-      "music-4": <Music4 size={16} />,
-      baby: <Baby size={16} />,
-      smile: <Smile size={16} />,
-      "users-round": <UsersRound size={16} />,
-      "book-open": <BookOpen size={16} />,
-      star: <Star size={16} />,
-      clover: <Clover size={16} />,
-    };
-    return map[icon] || <Megaphone size={16} />;
-  };
+export default function NewsCreate({
+  user,
+  groups,
+  selectedGroupId,
+  onGroupChange,
+  onSubmit,
+}) {
+  const [attachments, setAttachments] = useState([]);
 
-  /**
-   * Ermittelt eine helle Hintergrundfarbe + Textfarbe aus der Gruppenfarbe.
-   * Für Standardgruppen wird `light` verwendet, für dynamische Farben (z. B. bg-red-500)
-   * wird automatisch eine 50er-Nuance und der passende Textton gewählt.
-   */
+  const effectiveTarget =
+    selectedGroupId ?? (user.role === "team" && user.primaryGroup) ?? "all";
+
+  const selectedGroup =
+    effectiveTarget !== "all"
+      ? groups.find((g) => g.id === effectiveTarget)
+      : null;
+
+  // ------------------------- Farblogik -------------------------
   const computeLight = (group) => {
     if (!group) return "bg-stone-100 text-stone-800";
     if (group.light) return group.light;
-    const colorClass = group.color || "";
-    const parts = colorClass.split(" ");
-    const bg = parts.find((c) => c.startsWith("bg-"));
-    if (!bg || bg.includes("[#")) return "bg-stone-100 text-stone-800";
-    const comps = bg.split("-");
-    if (comps.length < 3) return "bg-stone-100 text-stone-800";
-    const colorName = comps[1];
-    return `bg-${colorName}-50 text-${colorName}-800`;
+
+    const col = group.color || "";
+    const match = col.match(/^bg-([a-zA-Z]+)-(\d{2,3})$/);
+
+    if (match) {
+      const name = match[1];
+      let level = parseInt(match[2], 10);
+
+      if (level >= 800) level = 200;
+      else if (level >= 600) level = 100;
+      else level = 50;
+
+      return `bg-${name}-${level} text-stone-900`;
+    }
+    return `${col} text-stone-900`;
   };
 
-  // Aktuell ausgewählte Gruppe
-  const selectedGroup =
-    target !== "all"
-      ? facilityGroups.find((g) => g.id === target)
-      : null;
-
-  // Farben & Icon für den Header (abhängig von Gruppe)
   const headerBg = selectedGroup
     ? computeLight(selectedGroup)
     : "bg-stone-100 text-stone-800";
+
   const iconBg = selectedGroup
     ? selectedGroup.color
     : "bg-stone-200 text-stone-700";
-  const headerIcon = selectedGroup
-    ? resolveIcon(selectedGroup.icon)
-    : <Megaphone size={16} />;
+
   const targetLabel =
-    target === "all"
+    effectiveTarget === "all"
       ? "Alle"
       : selectedGroup
       ? selectedGroup.name
       : "Alle";
 
+  // ------------------------- TIPTAP CONFIG -------------------------
+const [refresh, setRefresh] = useState(0);
+
+const editor = useEditor({
+  extensions: [
+    StarterKit.configure({
+      heading: { levels: [2] },
+      link: {
+        autolink: true,
+        openOnClick: true,
+      },
+    }),
+    CustomUnderline,
+    Image.configure({ inline: true }),
+    Placeholder.configure({
+      placeholder: "Kurze Info für Eltern oder Team...",
+    }),
+  ],
+  content: "",
+  onUpdate() {
+    setRefresh((x) => x + 1);
+  },
+  onSelectionUpdate() {
+    setRefresh((x) => x + 1);
+  },
+});
+
+  // ------------------------- FORMAT COMMANDS -------------------------
+const applyFormat = (command) => {
+  if (!editor) return;
+
+  const chain = editor.chain().focus();
+
+  switch (command) {
+    case "bold":
+      chain.toggleBold().run();
+      break;
+
+    case "italic":
+      chain.toggleItalic().run();
+      break;
+
+    case "underline":
+      chain.toggleCustomUnderline().run();
+      break;
+
+    case "bulletList":
+      chain.toggleBulletList().run();
+      break;
+
+    case "orderedList":
+      chain.toggleOrderedList().run();
+      break;
+
+    case "heading":
+      if (editor.isActive("heading", { level: 2 })) {
+        chain.setParagraph().run();
+      } else {
+        chain.setHeading({ level: 2 }).run();
+      }
+      break;
+
+    case "hr":
+      chain.setHorizontalRule().run();
+      break;
+
+    default:
+      return;
+  }
+
+  // 🔥 Sofort Toolbar-Hervorhebung aktualisieren
+  setRefresh((x) => x + 1);
+};
+
+  const isActive = (name, attrs = {}) =>
+    editor ? editor.isActive(name, attrs) : false;
+
+  // ------------------------- Image Upload -------------------------
+  const handleImageFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !editor) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      editor.chain().focus().setImage({ src: reader.result }).run();
+    };
+    reader.readAsDataURL(file);
+
+    e.target.value = "";
+  };
+
+  // ------------------------- Attachments -------------------------
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const mapped = files.map((file) => ({
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      data: URL.createObjectURL(file),
+    }));
+
+    setAttachments((prev) => [...prev, ...mapped]);
+    e.target.value = "";
+  };
+
+  const removeAttachment = (index) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // ------------------------- ABSENDEN -------------------------
+  const handleSubmit = () => {
+    if (!editor) return;
+    const html = editor.getHTML();
+    const plain = editor.getText().trim();
+
+    if (!plain) return;
+
+    const newItem = {
+      id: crypto.randomUUID(),
+      text: html,
+      date: new Date().toISOString(),
+      groupId: effectiveTarget === "all" ? null : effectiveTarget,
+      target: effectiveTarget === "all" ? "all" : "group",
+      attachments,
+      createdBy: user.username,
+    };
+
+    onSubmit(newItem);
+    editor.commands.setContent("");
+    setAttachments([]);
+  };
+
+  // ------------------------- UI -------------------------
   return (
     <div className="space-y-4">
-      {/* Farbiger Header mit Icon und Gruppenauswahl */}
+      {/* HEADER */}
       <div className={`p-5 rounded-3xl border shadow-sm ${headerBg}`}>
         <div className="flex items-center gap-3">
-          {/* Kreis mit Haupt-Icon */}
           <div className={`${iconBg} p-2 rounded-2xl shadow`}>
-            {headerIcon}
+            <Megaphone size={18} />
           </div>
           <div>
             <h3 className="text-lg font-bold">News</h3>
-            <p className="text-xs">
-              Neue Mitteilung an Eltern senden
-            </p>
+            <p className="text-xs">Neue Mitteilung an Eltern senden</p>
           </div>
         </div>
 
-        {/* Gruppenwahl: Alle + Gruppenchips */}
+        {/* Gruppenwahl */}
         <div className="mt-4 flex flex-wrap gap-2">
-          {/* Chip „Alle“ */}
           <button
-            type="button"
-            onClick={() => setTarget("all")}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
-              target === "all"
-                ? "bg-stone-800 text-white border-stone-900"
-                : "bg-stone-50 text-stone-600 border-stone-300 hover:bg-stone-100"
+            onClick={() => onGroupChange("all")}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${
+              effectiveTarget === "all"
+                ? "bg-stone-800 text-white"
+                : "bg-stone-50 text-stone-600 border-stone-300"
             }`}
           >
             Alle
           </button>
 
-          {/* Gruppenchips mit korrektem Icon */}
-          {facilityGroups.map((g) => (
+          {groups.map((g) => (
             <button
               key={g.id}
-              type="button"
-              onClick={() => setTarget(g.id)}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
-                target === g.id
+              onClick={() => onGroupChange(g.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${
+                effectiveTarget === g.id
                   ? `${g.color} border-transparent`
-                  : "bg-stone-50 text-stone-600 border-stone-300 hover:bg-stone-100"
+                  : "bg-stone-50 text-stone-600 border-stone-300"
               }`}
             >
-              {resolveIcon(g.icon)}
-              <span>{g.name}</span>
+              {g.name}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Textfeld */}
-      <div className="space-y-1">
-        <label className="text-xs uppercase text-stone-500 font-semibold">
-          Mitteilung
-        </label>
-        <textarea
-          className="w-full p-3 rounded-xl bg-stone-50 border border-stone-300 text-sm resize-none"
-          placeholder="Kurze Info für Eltern oder Team..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={3}
+      {/* EDITOR */}
+      <div className="rounded-2xl border border-stone-300 bg-white overflow-hidden">
+        {/* TOOLBAR */}
+        {editor && (
+          <div className="flex items-center gap-1 px-3 py-2 border-b bg-stone-50">
+
+            {/* BOLD */}
+            <button
+              onClick={() => applyFormat("bold")}
+              className={`p-1.5 rounded-md hover:bg-stone-200 ${
+                isActive("bold") ? "bg-stone-300" : ""
+              }`}
+            >
+              <Bold size={16} />
+            </button>
+
+            {/* ITALIC */}
+            <button
+              onClick={() => applyFormat("italic")}
+              className={`p-1.5 rounded-md hover:bg-stone-200 ${
+                isActive("italic") ? "bg-stone-300" : ""
+              }`}
+            >
+              <Italic size={16} />
+            </button>
+
+            {/* UNDERLINE */}
+            <button
+              onClick={() => applyFormat("underline")}
+              className={`p-1.5 rounded-md hover:bg-stone-200 ${
+                isActive("customUnderline") ? "bg-stone-300" : ""
+              }`}
+            >
+              <UnderlineIcon size={16} />
+            </button>
+
+            <span className="w-px h-5 bg-stone-300 mx-1" />
+
+            {/* BULLET LIST */}
+            <button
+              onClick={() => applyFormat("bulletList")}
+              className={`p-1.5 rounded-md hover:bg-stone-200 ${
+                isActive("bulletList") ? "bg-stone-300" : ""
+              }`}
+            >
+              <ListIcon size={16} />
+            </button>
+
+            {/* ORDERED LIST */}
+            <button
+              onClick={() => applyFormat("orderedList")}
+              className={`p-1.5 rounded-md hover:bg-stone-200 ${
+                isActive("orderedList") ? "bg-stone-300" : ""
+              }`}
+            >
+              <ListOrdered size={16} />
+            </button>
+
+            {/* HEADING */}
+            <button
+              onClick={() => applyFormat("heading")}
+              className={`p-1.5 rounded-md hover:bg-stone-200 ${
+                isActive("heading", { level: 2 }) ? "bg-stone-300" : ""
+              }`}
+            >
+              <TypeIcon size={16} />
+            </button>
+
+            {/* IMAGE */}
+            <label className="p-1.5 rounded-md hover:bg-stone-200 cursor-pointer">
+              <ImageIcon size={16} />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageFileChange}
+              />
+            </label>
+
+            {/* HR */}
+            <button
+              onClick={() => applyFormat("hr")}
+              className="p-1.5 rounded-md hover:bg-stone-200"
+            >
+              <MinusIcon size={16} />
+            </button>
+
+            <div className="flex-1" />
+
+            {/* ATTACHMENTS */}
+            <label className="p-1.5 rounded-md hover:bg-stone-200 cursor-pointer">
+              <Paperclip size={16} />
+              <input
+                type="file"
+                multiple
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </label>
+          </div>
+        )}
+
+        {/* EDITOR AREA */}
+        <EditorContent
+          editor={editor}
+          className="ProseMirror min-h-[140px] px-3 py-2 focus:outline-none text-sm"
         />
       </div>
 
-      {/* Senden-Button mit dynamischem Text */}
+      {/* ATTACHMENT LIST */}
+      {attachments.length > 0 && (
+        <div className="space-y-1 text-xs">
+          {attachments.map((att, idx) => (
+            <div
+              key={idx}
+              className="flex items-center justify-between bg-stone-50 border border-stone-200 rounded-xl p-2"
+            >
+              <span className="truncate">{att.name}</span>
+              <button
+                onClick={() => removeAttachment(idx)}
+                className="p-1 text-red-500 hover:text-red-700"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* SEND BUTTON */}
       <button
-        type="button"
         onClick={handleSubmit}
         className="w-full py-3 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 active:scale-95 flex items-center justify-center gap-2 text-sm"
       >
