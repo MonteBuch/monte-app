@@ -1,9 +1,11 @@
 // src/components/group/GroupArea.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { GripVertical } from "lucide-react";
 import { supabase } from "../../api/supabaseClient";
 import { getGroupById, getGroupStyles } from "../../utils/groupUtils";
 import { useGroups } from "../../context/GroupsContext";
-import { fetchListsByGroup } from "../../api/listApi";
+import { fetchListsByGroup, updateListPositions } from "../../api/listApi";
 
 import GroupChips from "./GroupChips";
 import ListCard from "./ListCard";
@@ -95,6 +97,37 @@ export default function GroupArea({ user }) {
     }
   };
 
+  // ───────────────────────────────────────────────────────────────
+  // DRAG & DROP HANDLER
+  // ───────────────────────────────────────────────────────────────
+  const handleDragEnd = async (result) => {
+    if (!result.destination) return;
+    if (result.source.index === result.destination.index) return;
+
+    // Reorder lists locally
+    const reordered = Array.from(lists);
+    const [removed] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, removed);
+
+    // Update local state immediately for responsiveness
+    setLists(reordered);
+
+    // Prepare position updates
+    const updates = reordered.map((list, index) => ({
+      id: list.id,
+      position: index,
+    }));
+
+    // Save to database
+    try {
+      await updateListPositions(updates);
+    } catch (error) {
+      console.error("Fehler beim Speichern der Reihenfolge:", error);
+      // Reload original order on error
+      loadLists();
+    }
+  };
+
   useEffect(() => {
     loadLists();
 
@@ -113,7 +146,13 @@ export default function GroupArea({ user }) {
         },
         (payload) => {
           console.log("Lists Realtime: INSERT");
-          setLists((prev) => [payload.new, ...prev]);
+          // Prüfe auf Duplikate bevor hinzugefügt wird
+          setLists((prev) => {
+            if (prev.some((l) => l.id === payload.new.id)) {
+              return prev; // Bereits vorhanden
+            }
+            return [payload.new, ...prev];
+          });
         }
       )
       .on(
@@ -278,14 +317,61 @@ export default function GroupArea({ user }) {
         />
       </div>
 
-      {/* LISTEN */}
-      <div className="space-y-3">
-        {lists.length === 0 ? (
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 text-center text-stone-500 text-sm">
-            Für diese Gruppe sind noch keine Listen angelegt.
-          </div>
-        ) : (
-          lists.map((list) => (
+      {/* NEUE LISTE BUTTON - oben für Team/Admin */}
+      {isStaff && (
+        <CreateList activeGroup={activeGroup} groupName={currentGroup.name} reload={loadLists} />
+      )}
+
+      {/* LISTEN mit Drag & Drop für Staff */}
+      {lists.length === 0 ? (
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 text-center text-stone-500 text-sm">
+          Für diese Gruppe sind noch keine Listen angelegt.
+        </div>
+      ) : isStaff ? (
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="lists">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="space-y-3"
+              >
+                {lists.map((list, index) => (
+                  <Draggable key={list.id} draggableId={list.id} index={index}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className={`flex items-stretch gap-2 ${snapshot.isDragging ? "z-50 opacity-90" : ""}`}
+                      >
+                        {/* Drag Handle */}
+                        <div
+                          {...provided.dragHandleProps}
+                          className="flex items-center justify-center w-6 cursor-grab active:cursor-grabbing text-stone-300 hover:text-stone-500 transition shrink-0"
+                        >
+                          <GripVertical size={18} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <ListCard
+                            list={list}
+                            user={user}
+                            group={currentGroup}
+                            isAdmin={isAdminView}
+                            reload={loadLists}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      ) : (
+        <div className="space-y-3">
+          {lists.map((list) => (
             <ListCard
               key={list.id}
               list={list}
@@ -294,12 +380,8 @@ export default function GroupArea({ user }) {
               isAdmin={isAdminView}
               reload={loadLists}
             />
-          ))
-        )}
-      </div>
-
-      {isStaff && (
-        <CreateList activeGroup={activeGroup} groupName={currentGroup.name} reload={loadLists} />
+          ))}
+        </div>
       )}
     </div>
   );

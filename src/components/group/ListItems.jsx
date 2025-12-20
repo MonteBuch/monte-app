@@ -233,7 +233,19 @@ export default function ListItems({
           );
         })
       ) : (
-        <p className="text-xs text-stone-400 py-1">Noch keine Einträge.</p>
+        // Platzhalter für leere Listen
+        !isDutyList ? (
+          <div className="flex flex-col items-center justify-center py-6 px-4 bg-stone-50 rounded-xl border border-dashed border-stone-200 text-center">
+            <p className="text-sm text-stone-500">Noch keine Einträge vorhanden</p>
+            {!isAdmin && (
+              <p className="text-xs text-stone-400 mt-1">
+                Füge unten den ersten Eintrag hinzu
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="text-xs text-stone-400 py-1">Noch keine Einträge.</p>
+        )
       )}
 
       {/* Ausgeblendete Termine Info */}
