@@ -298,3 +298,94 @@ mcp__supabase__deploy_edge_function({ name: "function-name", files: [...] });
 ### Constants
 - `FACILITY_ID` in `src/lib/constants.jsx` - Hardcoded für Single-Tenant
 - Firebase Project: `monte-app`
+
+---
+
+## Future: Multi-Tenancy Konzept
+
+Falls der Träger die App für mehrere Einrichtungen nutzen möchte, ist folgende Architektur geplant:
+
+### Übersicht
+
+```
+                    ┌─────────────────────────┐
+                    │   Superuser Dashboard   │
+                    │  (admin.monte-app.de)   │
+                    └───────────┬─────────────┘
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        ▼                       ▼                       ▼
+┌───────────────┐     ┌───────────────┐     ┌───────────────┐
+│    Kita A     │     │    Kita B     │     │    Kita C     │
+│ kita-a.app.de │     │ kita-b.app.de │     │ kita-c.app.de │
+└───────────────┘     └───────────────┘     └───────────────┘
+                                │
+                    ┌───────────▼───────────┐
+                    │   Supabase (shared)   │
+                    └───────────────────────┘
+```
+
+### Ansatz: Shared Database mit RLS-Isolation
+
+- Eine Supabase-Instanz für alle Einrichtungen
+- `facility_id` existiert bereits in allen relevanten Tabellen
+- Row-Level Security (RLS) isoliert Daten pro Einrichtung
+- Kostengünstig und einfach zu warten
+
+### Neues Rollen-Konzept
+
+| Rolle | Scope | Berechtigungen |
+|-------|-------|----------------|
+| **superuser** | Global | Facilities erstellen/löschen, Admins zuweisen |
+| **admin** | Eine Facility | Alles innerhalb der Facility |
+| **team** | Eine Facility | News, Listen, Absences verwalten |
+| **parent** | Eine Facility | Eigene Kinder verwalten |
+
+### Tenant-Identifikation via Subdomain
+
+```
+kita-buch.monte-app.de      → facility_id für "Buch"
+kita-mitte.monte-app.de     → facility_id für "Mitte"
+admin.monte-app.de          → Superuser Dashboard
+```
+
+App erkennt Subdomain beim Laden und setzt `facility_id` dynamisch.
+
+### Erforderliche Änderungen
+
+**Datenbank:**
+```sql
+-- Superuser-Flag
+ALTER TABLE profiles ADD COLUMN is_superuser BOOLEAN DEFAULT false;
+
+-- Slug für Subdomain-Routing
+ALTER TABLE facilities ADD COLUMN slug TEXT UNIQUE;
+```
+
+**RLS-Policies:** Erweitern um Superuser-Zugriff
+
+**Frontend:**
+- Subdomain-Detection statt hardcoded `FACILITY_ID`
+- Superuser-Dashboard (neue Komponente oder separate App)
+
+**Infrastructure:**
+- Vercel: Wildcard-Domain `*.monte-app.de`
+- Resend: Eine Domain oder pro Facility eigene
+- Firebase: Ein Projekt, FCM-Topics pro Facility
+
+### Aufwand-Einschätzung
+
+| Komponente | Aufwand |
+|------------|---------|
+| DB-Schema erweitern | Klein |
+| RLS-Policies anpassen | Mittel |
+| Subdomain-Routing | Mittel |
+| Superuser-Dashboard | Mittel-Groß |
+| Wildcard-DNS/Vercel | Klein |
+
+### Voraussetzung
+
+Klärung mit Träger über:
+- Kostenmodell pro Einrichtung
+- Wer verwaltet Superuser-Zugang
+- Datenschutz-Vereinbarungen pro Einrichtung
