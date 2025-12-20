@@ -24,7 +24,12 @@
       "Bash(npx cap:*)",
       "mcp__supabase__get_publishable_keys",
       "Bash(git config:*)",
-      "Bash(git remote set-url:*)"
+      "Bash(git remote set-url:*)",
+      "WebSearch",
+      "WebFetch(domain:resend.com)",
+      "Bash(nslookup:*)",
+      "WebFetch(domain:dns.google)",
+      "mcp__supabase__list_edge_functions"
     ]
   }
 }

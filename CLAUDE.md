@@ -19,7 +19,7 @@ npm run cap:open     # Open Android Studio
 npm run cap:run      # Run on Android device/emulator
 ```
 
-## Current State (as of 2025-12-19)
+## Current State (as of 2025-12-20)
 
 ### Migration Status: 100% Complete
 
@@ -142,7 +142,8 @@ src/
 - [x] Supabase Realtime subscriptions (News, Groups, GroupLists, Facilities)
 - [x] Performance optimizations (parallel loading, shared contexts)
 - [x] Email notification Edge Function (send-news-email)
-- [ ] **Resend Domain-Verifikation** - DNS NICHT KOMPLETT (siehe unten)
+- [x] Resend DNS-Records konfiguriert (SPF + DKIM)
+- [ ] **Resend Domain-Verifikation** - DNS korrekt, wartet auf Resend-Verifikation (Status: Pending)
 - [ ] **Email-Versand testen** - Nach Domain-Verifikation
 - [ ] Realtime in Supabase Dashboard aktivieren (Database → Replication)
 
@@ -171,13 +172,15 @@ src/
   - lists: Bei Listen-Erstellung → Eltern der Gruppe
   - absences: Bei Abwesenheitsmeldung → Team der Gruppe
   - food: Bei Speiseplan-Speicherung → Alle Eltern
-- [ ] **NÄCHSTER SCHRITT: Deployment für stabile Tests**
 - [ ] iOS Projekt (benötigt Mac)
-- [ ] App Store / Play Store Submission
+- [ ] **Play Store Submission** - Wartet auf Klärung mit Kita/Träger (DSGVO, Verantwortlichkeiten)
 
-### Phase 6: Production Infrastructure (PENDING)
+### Phase 6: Production Infrastructure (PARTIALLY COMPLETE)
 - [ ] Supabase production project (separate from dev)
-- [ ] Custom domain für Web-App
+- [x] **Web-App Deployment auf Vercel** - https://app.montessori-kinderhaus-buch.de
+- [x] Custom Domain konfiguriert (Strato CNAME → Vercel)
+- [x] Supabase Redirect-URL für Production eingetragen
+- [x] Facilities RLS Policy gefixt (öffentlich lesbar für Login-Seite)
 - [ ] Monitoring/Error tracking (Sentry)
 - [ ] Deployment documentation
 
@@ -185,57 +188,44 @@ src/
 
 ## NÄCHSTE OFFENE SCHRITTE
 
-### 1. Resend Domain-Verifikation (BLOCKIERT)
+### 1. Resend Domain-Verifikation (WARTET)
 
-**Problem:** Die DNS-Einstellungen bei Strato sind unvollständig.
+**Status:** DNS korrekt konfiguriert, wartet auf Resend-Verifikation (Status bei Resend: "Pending")
 
-**Aktuelle Situation:**
-- TXT-Records für DKIM wurden eingetragen
-- SPF-Record wurde eingetragen
-- **MX-Record für Subdomain `send` konnte NICHT angelegt werden** (Strato-Limitation)
-
-**Was bei Strato eingetragen wurde:**
+**DNS-Records bei Strato (korrekt eingetragen):**
 ```
 TXT  resend._domainkey  (DKIM-Schlüssel von Resend)
-TXT  @                  v=spf1 include:amazonses.com ~all
+TXT  (leer/root)        v=spf1 include:amazonses.com ~all
 ```
 
-**Was FEHLT:**
-```
-MX   send              feedback-smtp.eu-west-1.amazonses.com (Priorität 10)
-```
-
-**Lösung:**
-1. Bei Strato prüfen ob MX für Subdomains möglich ist (evtl. unter "Subdomain verwalten")
-2. Alternative: Bei Resend auf "DNS Only" Verifikation umstellen (ohne MX)
-3. Alternative: Anderen DNS-Provider nutzen (z.B. Cloudflare)
+**MX-Record:** Nicht erforderlich für Verifikation (nur für Bounce-Handling)
 
 **Nach Verifikation:**
-- In Supabase Edge Function Secrets `FROM_EMAIL` setzen
-- Test-Email senden
+- `FROM_EMAIL` Secret ist bereits gesetzt in Supabase Edge Function
+- Test-Email senden um Funktion zu prüfen
 
-### 2. Stabiles Deployment für Tests
-
-**Problem:** App läuft aktuell nur lokal (localhost:5173).
-
-**Optionen:**
-1. **Vercel/Netlify** - Einfachstes Deployment für Web-App
-2. **Supabase Hosting** - Falls verfügbar
-3. **Android APK** - Für Mobile-Tests ohne Play Store
-
-**Für Android-Tests:**
-```bash
-# In Android Studio: Build → Build Bundle(s) / APK(s) → Build APK(s)
-# APK liegt dann in: android/app/build/outputs/apk/debug/
-```
-
-### 3. Supabase Realtime aktivieren
+### 2. Supabase Realtime aktivieren
 
 Im Supabase Dashboard unter Database → Replication:
 - `news` aktivieren
 - `groups` aktivieren
 - `group_lists` aktivieren
 - `facilities` aktivieren
+
+### 3. Play Store Submission (WARTET)
+
+**Status:** Wartet auf Gespräch mit Kita/Träger
+
+**Zu klären:**
+- DSGVO / Datenschutz (AVV mit Supabase)
+- Wer ist App-Betreiber?
+- Wer verwaltet Play Store Account?
+- Privacy Policy URL
+
+**Technisch bereit:**
+- Google Developer Account erstellt
+- Android Projekt konfiguriert
+- Release-Build kann erstellt werden
 
 ---
 
@@ -244,14 +234,15 @@ Im Supabase Dashboard unter Database → Replication:
 ### send-news-email
 - Sendet Email-Benachrichtigungen für News
 - Nutzt Resend API
-- Secrets: `RESEND_API_KEY`, `FROM_EMAIL`
+- Secrets: `RESEND_API_KEY`, `FROM_EMAIL` (beide gesetzt)
+- `verify_jwt: false` für Tests (temporär)
 
 ### send-push-notification
 - Sendet Push-Benachrichtigungen via FCM V1 API
 - Unterstützt Kategorien: news, lists, absences, food
 - Respektiert notification_preferences
 - Secrets: `FIREBASE_SERVICE_ACCOUNT` (JSON)
-- `verify_jwt: false` für Tests (sollte für Produktion aktiviert werden)
+- `verify_jwt: false` für Tests
 
 ---
 
@@ -281,6 +272,17 @@ Im Supabase Dashboard unter Database → Replication:
 2. `npm run dev` zum Starten
 3. Prüfe "NÄCHSTE OFFENE SCHRITTE" oben
 
+### Production URLs
+- **Web-App:** https://app.montessori-kinderhaus-buch.de
+- **Vercel Dashboard:** https://vercel.com (monte-app-seven)
+- **Supabase:** https://supabase.com/dashboard (izpjmvgtrwxjmucebfyy)
+- **Resend:** https://resend.com/domains (montessori-kinderhaus-buch.de)
+
+### GitHub Repository
+- **URL:** https://github.com/MonteBuch/monte-app
+- **Account:** MonteBuch (mkbblisten@gmail.com)
+- Auto-Deploy bei Push zu main via Vercel
+
 ### Supabase MCP verfügbar
 ```javascript
 // Migration anwenden
@@ -295,4 +297,4 @@ mcp__supabase__deploy_edge_function({ name: "function-name", files: [...] });
 
 ### Constants
 - `FACILITY_ID` in `src/lib/constants.jsx` - Hardcoded für Single-Tenant
-- Firebase Project: `monte-app` (oder wie bei Setup benannt)
+- Firebase Project: `monte-app`
