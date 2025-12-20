@@ -58,16 +58,35 @@ const EMPTY_DAY = {
 };
 
 // --------------------------------------------
+// HELPER: Get reference date for meal plan
+// On Saturday (6) and Sunday (0), use next week
+// --------------------------------------------
+function getMealPlanReferenceDate() {
+  const today = new Date();
+  const dow = today.getDay(); // 0=So, 1=Mo, ..., 6=Sa
+
+  // Am Wochenende: zeige nächste Woche
+  if (dow === 0 || dow === 6) {
+    const daysUntilMonday = dow === 0 ? 1 : 2; // So→Mo=1, Sa→Mo=2
+    const nextMonday = new Date(today);
+    nextMonday.setDate(today.getDate() + daysUntilMonday);
+    return nextMonday;
+  }
+
+  return today;
+}
+
+// --------------------------------------------
 // HELPER: Get week range (Mon–Fri)
 // --------------------------------------------
 function getCurrentWeekRange() {
-  const today = new Date();
-  const dow = today.getDay(); // 0=So, 1=Mo …
+  const refDate = getMealPlanReferenceDate();
+  const dow = refDate.getDay(); // 0=So, 1=Mo …
 
   const mondayOffset = dow === 0 ? -6 : 1 - dow;
 
-  const monday = new Date(today);
-  monday.setDate(today.getDate() + mondayOffset);
+  const monday = new Date(refDate);
+  monday.setDate(refDate.getDate() + mondayOffset);
 
   const friday = new Date(monday);
   friday.setDate(monday.getDate() + 4);
@@ -84,12 +103,12 @@ function getCurrentWeekRange() {
 // HELPER: Get current week key (ISO format)
 // --------------------------------------------
 function getCurrentWeekKey() {
-  const today = new Date();
-  const year = today.getFullYear();
+  const refDate = getMealPlanReferenceDate();
+  const year = refDate.getFullYear();
 
   // ISO week calculation
   const jan1 = new Date(year, 0, 1);
-  const days = Math.floor((today - jan1) / (24 * 60 * 60 * 1000));
+  const days = Math.floor((refDate - jan1) / (24 * 60 * 60 * 1000));
   const weekNum = Math.ceil((days + jan1.getDay() + 1) / 7);
 
   return `${year}-W${weekNum.toString().padStart(2, "0")}`;

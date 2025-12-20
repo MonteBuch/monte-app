@@ -19,6 +19,27 @@ npm run cap:open     # Open Android Studio
 npm run cap:run      # Run on Android device/emulator
 ```
 
+## TO-DO Liste
+
+### 1. UAT (User Acceptance Testing) für Web/PWA Version
+**Status:** Geplant für nächste Session
+
+Vor dem Go-Live mit echten Nutzern muss ein umfassender UAT durchgeführt werden:
+- Alle Features systematisch durchtesten
+- Verschiedene Rollen testen (Eltern, Team, Admin)
+- Mobile Browser testen (iOS Safari, Android Chrome)
+- Edge Cases und Fehlerszenarien
+- Performance unter Last
+
+### 2. Resend Email-Verifikation abschließen
+- DNS ist korrekt, Status bei Resend prüfen
+- Test-Email senden nach Verifikation
+
+### 3. Supabase Realtime aktivieren
+- Dashboard → Database → Replication für relevante Tabellen
+
+---
+
 ## Current State (as of 2025-12-20)
 
 ### Migration Status: 100% Complete
@@ -184,9 +205,46 @@ src/
 - [ ] Monitoring/Error tracking (Sentry)
 - [ ] Deployment documentation
 
+### Recent Updates (2025-12-20)
+
+**Gruppen-Listen Verbesserungen:**
+- [x] Leere Mitbringlisten mit Platzhalter erlaubt
+- [x] Abstimmungen: Anonymität-Option bei Erstellung
+- [x] Abstimmungen: Teilnahme-Statistik (X von Y abgestimmt)
+- [x] Abstimmungen: Sichtbarkeit der Statistik für Eltern konfigurierbar
+- [x] Abstimmungen: Voter-Namen für Team/Admin bei nicht-anonymen Polls
+- [x] Drag & Drop für Listen-Reihenfolge (nur Team/Admin)
+- [x] "Neue Liste anlegen" Button nach oben verschoben
+- [x] Modal-basierte Listenerstellung mit verbesserter UX
+- [x] Dienstlisten (duty) mit wiederkehrenden Datum-Einträgen
+
+**Speiseplan Verbesserungen:**
+- [x] Automatischer Wochenwechsel am Samstag (zeigt nächste Woche)
+- [x] pg_cron Job für wöchentlichen Cleanup (Samstag 6:00 UTC)
+- [x] 24-Stunden-Schutz: Kürzlich bearbeitete Pläne werden nicht gelöscht
+- [x] Alte Einträge (>4 Wochen) werden automatisch bereinigt
+
+**Datenbank-Erweiterungen:**
+- [x] `group_lists.config` JSONB für Poll/Duty-Konfiguration
+- [x] `group_lists.position` für Sortierung
+- [x] `cleanup_old_meal_plans()` Funktion
+- [x] `cleanup_expired_duty_items()` Funktion
+- [x] pg_cron Extension aktiviert
+
+**PWA vs. Native App Features:**
+| Feature | PWA/Web | Native (Android) |
+|---------|---------|------------------|
+| Biometrik (Fingerabdruck) | - | Capacitor Plugin |
+| Push Notifications | - | FCM via Capacitor |
+| Offline-Caching | Workbox | Workbox |
+| Install to Home Screen | Browser Prompt | Play Store |
+
 ---
 
 ## NÄCHSTE OFFENE SCHRITTE
+
+### 0. UAT für Web/PWA Version (PRIORITÄT)
+Siehe TO-DO Liste oben. Systematischer Test aller Features vor Go-Live.
 
 ### 1. Resend Domain-Verifikation (WARTET)
 

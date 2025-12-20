@@ -29,7 +29,8 @@
       "WebFetch(domain:resend.com)",
       "Bash(nslookup:*)",
       "WebFetch(domain:dns.google)",
-      "mcp__supabase__list_edge_functions"
+      "mcp__supabase__list_edge_functions",
+      "mcp__supabase__list_extensions"
     ]
   }
 }
