@@ -1,7 +1,6 @@
 // src/components/group/GroupArea.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { GripVertical } from "lucide-react";
 import { supabase } from "../../api/supabaseClient";
 import { getGroupById, getGroupStyles } from "../../utils/groupUtils";
 import { useGroups } from "../../context/GroupsContext";
@@ -342,24 +341,16 @@ export default function GroupArea({ user }) {
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className={`flex items-stretch gap-2 ${snapshot.isDragging ? "z-50 opacity-90" : ""}`}
+                        className={snapshot.isDragging ? "z-50 opacity-90" : ""}
                       >
-                        {/* Drag Handle */}
-                        <div
-                          {...provided.dragHandleProps}
-                          className="flex items-center justify-center w-6 cursor-grab active:cursor-grabbing text-stone-300 hover:text-stone-500 transition shrink-0"
-                        >
-                          <GripVertical size={18} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <ListCard
-                            list={list}
-                            user={user}
-                            group={currentGroup}
-                            isAdmin={isAdminView}
-                            reload={loadLists}
-                          />
-                        </div>
+                        <ListCard
+                          list={list}
+                          user={user}
+                          group={currentGroup}
+                          isAdmin={isAdminView}
+                          reload={loadLists}
+                          dragHandleProps={provided.dragHandleProps}
+                        />
                       </div>
                     )}
                   </Draggable>

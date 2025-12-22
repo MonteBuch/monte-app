@@ -30,7 +30,9 @@
       "Bash(nslookup:*)",
       "WebFetch(domain:dns.google)",
       "mcp__supabase__list_edge_functions",
-      "mcp__supabase__list_extensions"
+      "mcp__supabase__list_extensions",
+      "WebFetch(domain:dmarcdkim.com)",
+      "WebFetch(domain:dmarc.wiki)"
     ]
   }
 }

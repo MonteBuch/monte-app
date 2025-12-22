@@ -5,6 +5,7 @@ import {
   ClipboardList,
   ListChecks,
   BarChart,
+  GripVertical,
 } from "lucide-react";
 
 import { supabase } from "../../api/supabaseClient";   // ⬅️ Neu
@@ -26,7 +27,7 @@ const LIST_META = {
   },
 };
 
-export default function ListCard({ list, isAdmin, user, group, reload }) {
+export default function ListCard({ list, isAdmin, user, group, reload, dragHandleProps }) {
   const meta = LIST_META[list.type] || LIST_META.bring;
 
   // ─────────────────────────────────────────────
@@ -54,6 +55,16 @@ export default function ListCard({ list, isAdmin, user, group, reload }) {
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
+          {/* Drag Handle - nur wenn dragHandleProps übergeben */}
+          {dragHandleProps && (
+            <div
+              {...dragHandleProps}
+              className="cursor-grab active:cursor-grabbing text-stone-300 hover:text-stone-500 transition -ml-1 mr-1"
+            >
+              <GripVertical size={18} />
+            </div>
+          )}
+
           <div className="bg-stone-100 text-stone-700 rounded-full p-2">
             {meta.icon}
           </div>
