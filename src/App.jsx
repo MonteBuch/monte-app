@@ -26,6 +26,12 @@ import {
   setupPushListeners,
   cleanupPushListeners,
 } from "./lib/pushNotifications";
+import {
+  startConnectionMonitor,
+  stopConnectionMonitor,
+  setStatusChangeCallback,
+  testConnection,
+} from "./lib/connectionMonitor";
 
 import AuthScreen from "./components/Auth/AuthScreen";
 import ForceReset from "./components/Auth/ForceReset";
@@ -276,6 +282,8 @@ function AppContent() {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   // Willkommensscreen anzeigen
   const [showWelcome, setShowWelcome] = useState(false);
+  // Verbindungsstatus für Debug/Anzeige
+  const [connectionIssue, setConnectionIssue] = useState(null);
   // Facility context
   const { facility } = useFacility();
 
@@ -439,6 +447,48 @@ function AppContent() {
 
     checkBirthdays();
   }, [user]);
+
+  // Connection Monitor starten wenn User eingeloggt ist
+  // WICHTIG: Nur einmal starten, nicht bei jedem User-State-Change
+  useEffect(() => {
+    // Nur starten wenn User existiert, und nur einmal
+    if (!user?.id) return;
+
+    // Callback für Verbindungsstatus-Änderungen
+    setStatusChangeCallback((event) => {
+      console.log("[App] Connection Event:", event);
+
+      // Bei kritischen Problemen Banner anzeigen
+      if (event.type === "network" && event.status === "offline") {
+        setConnectionIssue("Keine Internetverbindung");
+      } else if (event.type === "network" && event.status === "online") {
+        setConnectionIssue(null);
+      } else if (event.type === "session" && event.status === "expired") {
+        setConnectionIssue("Sitzung abgelaufen - bitte neu anmelden");
+      } else if (event.type === "realtime" && event.status === "CHANNEL_ERROR") {
+        setConnectionIssue("Verbindungsproblem - wird wiederhergestellt...");
+      } else if (event.type === "realtime" && event.status === "CLOSED") {
+        setConnectionIssue("Verbindung unterbrochen - Wiederverbindung läuft...");
+      } else if (event.type === "connection_lost" && event.status === "recovering") {
+        setConnectionIssue(`Verbindung verloren - Versuch ${event.attempt}/3...`);
+      } else if (event.type === "connection_lost" && event.status === "failed") {
+        setConnectionIssue(event.message || "Verbindung verloren. Bitte Seite neu laden.");
+      } else if (event.type === "connection_lost" && event.status === "recovered") {
+        setConnectionIssue(null);
+      } else if (event.type === "reconnect" && event.status === "success") {
+        setConnectionIssue(null);
+      }
+    });
+
+    // Monitor starten
+    startConnectionMonitor();
+
+    // Cleanup nur bei echtem Unmount (Logout), nicht bei Re-Renders
+    return () => {
+      // Nicht stoppen bei Re-Render, nur bei echtem Logout
+      // Der Monitor prüft selbst ob er bereits läuft
+    };
+  }, [user?.id]); // Nur user.id als Dependency, nicht das ganze user Objekt
 
   // Unbestätigte Antworten für Eltern prüfen (Badge in Navigation)
   useEffect(() => {
@@ -888,6 +938,36 @@ function AppContent() {
       <GroupsProvider>
         <div className="min-h-screen flex flex-col bg-[#fcfaf7] dark:bg-stone-900 transition-colors">
           <AppHeader user={user} facilityName={facility.display_name} facilityLogo={facility.logo_url} />
+
+          {/* Verbindungsproblem-Banner */}
+          {connectionIssue && (
+            <div className={`fixed top-14 left-0 right-0 z-50 text-white text-center py-2 px-4 text-sm font-medium shadow-lg ${
+              connectionIssue.includes("neu laden") ? "bg-red-500" : "bg-amber-500"
+            }`}>
+              {connectionIssue}
+              {connectionIssue.includes("neu laden") ? (
+                <button
+                  onClick={() => window.location.reload()}
+                  className="ml-3 bg-white text-red-600 px-3 py-1 rounded font-bold"
+                >
+                  Jetzt neu laden
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    testConnection().then((result) => {
+                      if (result.database?.ok) {
+                        setConnectionIssue(null);
+                      }
+                    });
+                  }}
+                  className="ml-3 underline"
+                >
+                  Prüfen
+                </button>
+              )}
+            </div>
+          )}
 
           <main className="flex-1 overflow-y-auto pt-20 pb-20">
           <div className="max-w-4xl mx-auto px-4 py-4">
