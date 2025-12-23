@@ -239,6 +239,103 @@ src/
 | Offline-Caching | Workbox | Workbox |
 | Install to Home Screen | Browser Prompt | Play Store |
 
+### V2 Features (2025-12-23)
+
+**Feature 1: Rückmeldung Abwesenheitsmeldung**
+- [x] Optionales Textfeld für alle Abwesenheitsmeldungen
+- [x] Team/Admin kann auf Meldungen reagieren (staff_response, staff_response_by)
+- [x] Eltern sehen Antwort in ihrer Meldung
+- [x] Badge für unbestätigte Antworten (response_acknowledged)
+- [x] Benachrichtigungsoption "absence_response" für Eltern
+
+**Feature 2: Kinderakten**
+- [x] Neuer Menüpunkt "Kinderakten" im Admin-Bereich
+- [x] Alle Kinder nach Gruppen sortiert
+- [x] Modal mit: Name, Gruppe, Geburtstag, Notizen, Abholberechtigte
+- [x] Team: nur Lesen, Admin: Lesen + Schreiben
+- [x] authorized_pickups Feld in children Tabelle
+
+**Feature 3: Terminübersicht**
+- [x] facility_events Tabelle für Jahresplanung
+- [x] CalendarView für Eltern/Team als Tab
+- [x] AdminCalendar für Admin im Admin-Menü
+- [x] Kategorien: closed, team, parent_event, celebration, info, other
+- [x] Kalendarische Darstellung mit Farbkodierung und Legende
+
+**Feature 4: Gruppenchat**
+- [x] Realtime Chat nur für Eltern
+- [x] Pro Gruppe ein Chat (basierend auf Kindern)
+- [x] Opt-in/opt-out pro Gruppe
+- [x] Antworten (Reply), Likes, Zeitstempel
+- [x] Team/Admin haben KEINEN Zugriff
+- [x] Badge für ungelesene Nachrichten
+- [x] Benachrichtigungsoption "chat" für Eltern
+
+**Feature 5: Tab-Management**
+- [x] "Mehr"-Menü als 5. Tab (Burger-Icon)
+- [x] Slide-out Seitenmenü
+- [x] user_tab_preferences Tabelle
+- [x] Drag & Drop zum Anpassen der Tab-Reihenfolge
+- [x] Speichern auf Benutzerebene
+- [x] Badges auch im Mehr-Menü sichtbar
+
+**Feature 6: Willkommensscreen**
+- [x] Welcome-Popup für neue User nach Registrierung
+- [x] Durchschaltbare Slides mit Tipps
+- [x] Rollenspezifische Inhalte (Eltern/Team/Admin)
+- [x] has_seen_welcome Flag in profiles
+- [x] Kann später erneut angezeigt werden (in Anpassungen)
+
+**Feature 7: News → Pinnwand**
+- [x] Umbenennung von "News" zu "Pinnwand"
+- [x] Modernisiertes Card-Design
+- [x] Bildergalerie mit Grid-Layout
+- [x] Lightbox für Vollbild-Ansicht
+- [x] "Weiterlesen" für lange Texte
+- [x] Like-Funktion für alle User (news_likes Tabelle)
+
+**Feature 8: Dark/Light Mode**
+- [x] theme_preference in profiles (light/dark/system)
+- [x] ThemeContext für App-weite Theme-Verwaltung
+- [x] Dark Mode CSS-Klassen (Tailwind)
+- [x] "Anpassungen" Menüpunkt im Profil
+- [x] Option zum erneuten Anzeigen des Willkommensscreens
+
+**Neue Datenbank-Tabellen (V2):**
+- `facility_events` - Jahresplanung/Termine
+- `group_chat_messages` - Chat-Nachrichten
+- `group_chat_participants` - Chat-Teilnahme
+- `group_chat_likes` - Likes auf Chat-Nachrichten
+- `user_tab_preferences` - Tab-Anordnung
+- `news_likes` - Likes auf Pinnwand-Beiträge
+
+**Neue Spalten (V2):**
+- `profiles.has_seen_welcome` - Welcome-Screen gesehen
+- `profiles.theme_preference` - Dark/Light Mode
+- `absences.staff_response` - Team-Antwort auf Meldung
+- `absences.staff_response_by` - Wer hat geantwortet
+- `absences.staff_response_at` - Wann geantwortet
+- `absences.response_acknowledged` - Eltern haben bestätigt
+- `children.authorized_pickups` - Abholberechtigte
+
+---
+
+## FUTURE ROADMAP
+
+### Gruppenbuch (Geplant)
+**Status:** Wartet auf Input von Kitaleitung
+
+Ein Feature zur Dokumentation des Gruppenalltags:
+- Tägliche Einträge durch Team
+- Fotos und Texte
+- Nur für Team/Admin sichtbar (oder Eltern-Version?)
+- Archivierung und Export
+
+**Zu klären:**
+- Wer soll Zugriff haben?
+- Welche Inhalte werden dokumentiert?
+- Datenschutz-Aspekte
+
 ---
 
 ## NÄCHSTE OFFENE SCHRITTE

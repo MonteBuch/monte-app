@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
+  darkMode: "class",
 
   // Wichtig: Alle dynamisch erzeugten Header-Farben hier safelisten
   safelist: [

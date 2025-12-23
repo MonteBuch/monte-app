@@ -5,6 +5,7 @@ import {
   Users,
   UtensilsCrossed,
   CalendarDays,
+  Calendar as CalendarIcon,
   User as UserIcon,
   Settings as SettingsIcon,
   Loader2,
@@ -12,11 +13,13 @@ import {
   CheckCircle,
   Sprout,
   MessageCircle,
+  Menu,
 } from "lucide-react";
 
 import { supabase } from "./api/supabaseClient";
 import { GroupsProvider } from "./context/GroupsContext";
 import { FacilityProvider, useFacility } from "./context/FacilityContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import {
   registerPushNotifications,
   removePushToken,
@@ -40,10 +43,16 @@ import ProfileChildren from "./components/profile/ProfileChildren";
 import ProfileNotifications from "./components/profile/ProfileNotifications";
 import ProfileFacility from "./components/profile/ProfileFacility";
 import ProfileSecurity from "./components/profile/ProfileSecurity";
+import ProfileCustomize from "./components/profile/ProfileCustomize";
+import AdminChildrenRecords from "./components/admin/AdminChildrenRecords";
+import CalendarView from "./components/calendar/CalendarView";
+import GroupChat from "./components/chat/GroupChat";
 
 import AdminArea from "./components/admin/AdminArea";
 import ErrorBoundary from "./components/ErrorBoundary";
 import InstallPrompt from "./components/ui/InstallPrompt";
+import MoreMenu, { ALL_TABS, DEFAULT_TABS } from "./components/ui/MoreMenu";
+import WelcomeScreen from "./components/ui/WelcomeScreen";
 import { hasTodayBirthdaysForUser } from "./lib/notificationTriggers";
 
 // --------------------------------------------------
@@ -60,7 +69,7 @@ const AppHeader = ({ user, facilityName, facilityLogo }) => {
   if (user.role === "admin") roleLabel = "Leitung";
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-stone-200">
+    <header className="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-stone-800 border-b border-stone-200 dark:border-stone-700 transition-colors">
       <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* Logo: Custom oder Default */}
@@ -82,11 +91,11 @@ const AppHeader = ({ user, facilityName, facilityLogo }) => {
           )}
 
           <div>
-            <p className="text-sm font-bold text-stone-900">
+            <p className="text-sm font-bold text-stone-900 dark:text-stone-100">
               {facilityName}
             </p>
             {displayName && (
-              <p className="text-xs text-stone-500 truncate max-w-[200px]">
+              <p className="text-xs text-stone-500 dark:text-stone-400 truncate max-w-[200px]">
                 {displayName}
               </p>
             )}
@@ -94,7 +103,7 @@ const AppHeader = ({ user, facilityName, facilityLogo }) => {
         </div>
 
         {roleLabel && (
-          <span className="px-3 py-1 rounded-full bg-black text-xs text-white font-semibold">
+          <span className="px-3 py-1 rounded-full bg-black dark:bg-stone-600 text-xs text-white font-semibold">
             {roleLabel}
           </span>
         )}
@@ -108,7 +117,7 @@ const NavButton = ({ icon, label, active, onClick, badge }) => (
     onClick={onClick}
     className={
       "flex flex-col items-center justify-center flex-1 py-1 gap-1 transition-colors " +
-      (active ? "text-amber-600" : "text-stone-500 hover:text-stone-700")
+      (active ? "text-amber-600 dark:text-amber-400" : "text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300")
     }
   >
     <div className="w-6 h-6 flex items-center justify-center relative">
@@ -123,51 +132,63 @@ const NavButton = ({ icon, label, active, onClick, badge }) => (
   </button>
 );
 
-const AppFooter = ({ activeTab, setActiveTab, isAdmin, hasBirthdays, hasUnacknowledgedResponses }) => {
+// Icon-Map für dynamisches Rendering
+const TAB_ICONS = {
+  news: Home,
+  group: Users,
+  food: UtensilsCrossed,
+  absence: CalendarDays,
+  calendar: CalendarIcon,
+  chat: MessageCircle,
+  profile: UserIcon,
+  admin: SettingsIcon,
+};
+
+const AppFooter = ({ activeTab, setActiveTab, user, badges, tabPrefs, onOpenMore }) => {
+  const role = user?.role || "parent";
+  const defaults = DEFAULT_TABS[role] || DEFAULT_TABS.parent;
+
+  // Verwende gespeicherte oder default Tabs
+  const mainTabs = tabPrefs?.main?.length > 0 ? tabPrefs.main : defaults.main;
+  const moreTabs = tabPrefs?.more?.length > 0 ? tabPrefs.more : defaults.more;
+
+  // Prüfen ob im More-Menü ein Tab mit Badge ist
+  const hasMoreBadge = moreTabs.some((tabId) => badges[tabId]);
+
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-stone-200">
+    <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-stone-800 border-t border-stone-200 dark:border-stone-700 transition-colors">
       <div className="max-w-4xl mx-auto px-2">
         <div className="flex justify-between">
+          {/* Dynamische Haupt-Tabs */}
+          {mainTabs.map((tabId) => {
+            const Icon = TAB_ICONS[tabId];
+            if (!Icon) return null;
+
+            // Prüfen ob Tab für Rolle verfügbar
+            if (tabId === "chat" && role !== "parent") return null;
+            if (tabId === "admin" && role !== "admin") return null;
+            if (tabId === "calendar" && role === "admin") return null;
+
+            return (
+              <NavButton
+                key={tabId}
+                icon={<Icon size={20} />}
+                label={ALL_TABS[tabId]?.label || tabId}
+                active={activeTab === tabId}
+                onClick={() => setActiveTab(tabId)}
+                badge={badges[tabId]}
+              />
+            );
+          })}
+
+          {/* Mehr-Button */}
           <NavButton
-            icon={<Home size={20} />}
-            label="News"
-            active={activeTab === "news"}
-            onClick={() => setActiveTab("news")}
+            icon={<Menu size={20} />}
+            label="Mehr"
+            active={false}
+            onClick={onOpenMore}
+            badge={hasMoreBadge ? <span className="w-2 h-2 rounded-full bg-amber-500" /> : null}
           />
-          <NavButton
-            icon={<Users size={20} />}
-            label="Gruppe"
-            active={activeTab === "group"}
-            onClick={() => setActiveTab("group")}
-            badge={hasBirthdays ? <Cake size={10} /> : null}
-          />
-          <NavButton
-            icon={<UtensilsCrossed size={20} />}
-            label="Essen"
-            active={activeTab === "food"}
-            onClick={() => setActiveTab("food")}
-          />
-          <NavButton
-            icon={<CalendarDays size={20} />}
-            label="Meldungen"
-            active={activeTab === "absence"}
-            onClick={() => setActiveTab("absence")}
-            badge={hasUnacknowledgedResponses ? <MessageCircle size={10} /> : null}
-          />
-          <NavButton
-            icon={<UserIcon size={20} />}
-            label="Profil"
-            active={activeTab === "profile"}
-            onClick={() => setActiveTab("profile")}
-          />
-          {isAdmin && (
-            <NavButton
-              icon={<SettingsIcon size={20} />}
-              label="Admin"
-              active={activeTab === "admin"}
-              onClick={() => setActiveTab("admin")}
-            />
-          )}
         </div>
       </div>
     </footer>
@@ -189,6 +210,8 @@ async function loadUserProfile(userId) {
       primary_group,
       facility_id,
       must_reset_password,
+      has_seen_welcome,
+      theme_preference,
       children (
         id,
         first_name,
@@ -210,6 +233,8 @@ async function loadUserProfile(userId) {
     primaryGroup: profile.primary_group,
     facilityId: profile.facility_id,
     mustResetPassword: profile.must_reset_password || false,
+    hasSeenWelcome: profile.has_seen_welcome || false,
+    themePreference: profile.theme_preference || "light",
     children: (profile.children || []).map(c => ({
       id: c.id,
       name: c.first_name,
@@ -241,8 +266,16 @@ function AppContent() {
   const [hasBirthdays, setHasBirthdays] = useState(false);
   // Unbestätigte Antworten-Badge für Eltern
   const [hasUnacknowledgedResponses, setHasUnacknowledgedResponses] = useState(false);
+  // Ungelesene Chat-Nachrichten Badge für Eltern
+  const [hasUnreadChat, setHasUnreadChat] = useState(false);
   // Email-Bestätigung erfolgreich (zeigt Meldung statt Auto-Login)
   const [emailConfirmed, setEmailConfirmed] = useState(false);
+  // Tab-Präferenzen für dynamisches Menü
+  const [tabPrefs, setTabPrefs] = useState(null);
+  // Mehr-Menü offen/geschlossen
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  // Willkommensscreen anzeigen
+  const [showWelcome, setShowWelcome] = useState(false);
   // Facility context
   const { facility } = useFacility();
 
@@ -468,6 +501,137 @@ function AppContent() {
     };
   }, [user]);
 
+  // Ungelesene Chat-Nachrichten für Eltern prüfen (Badge in Navigation)
+  useEffect(() => {
+    if (!user || user.role !== "parent") {
+      setHasUnreadChat(false);
+      return;
+    }
+
+    async function checkUnreadChat() {
+      try {
+        // Alle aktiven Chat-Teilnahmen des Users laden
+        const { data: participations, error: partError } = await supabase
+          .from("group_chat_participants")
+          .select("group_id, last_read_at, activated_at")
+          .eq("user_id", user.id)
+          .eq("is_active", true);
+
+        if (partError) throw partError;
+
+        if (!participations || participations.length === 0) {
+          setHasUnreadChat(false);
+          return;
+        }
+
+        // Für jede Teilnahme prüfen ob es ungelesene Nachrichten gibt
+        let hasUnread = false;
+        for (const part of participations) {
+          const { count, error } = await supabase
+            .from("group_chat_messages")
+            .select("id", { count: "exact", head: true })
+            .eq("group_id", part.group_id)
+            .gt("created_at", part.last_read_at || part.activated_at);
+
+          if (!error && count > 0) {
+            hasUnread = true;
+            break;
+          }
+        }
+
+        setHasUnreadChat(hasUnread);
+      } catch (err) {
+        console.error("Ungelesene Chat-Nachrichten Check fehlgeschlagen:", err);
+        setHasUnreadChat(false);
+      }
+    }
+
+    checkUnreadChat();
+
+    // Custom Event Listener für manuelle Aktualisierung
+    const handleRefresh = () => checkUnreadChat();
+    window.addEventListener("refreshChatBadge", handleRefresh);
+
+    // Realtime-Subscription für neue Chat-Nachrichten
+    const channel = supabase
+      .channel("chat-messages-badge")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "group_chat_messages",
+        },
+        () => {
+          checkUnreadChat();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      window.removeEventListener("refreshChatBadge", handleRefresh);
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  // Tab-Präferenzen laden
+  useEffect(() => {
+    if (!user) {
+      setTabPrefs(null);
+      return;
+    }
+
+    async function loadTabPrefs() {
+      try {
+        const { data, error } = await supabase
+          .from("user_tab_preferences")
+          .select("main_tabs, more_tabs")
+          .eq("user_id", user.id)
+          .single();
+
+        if (data && !error) {
+          setTabPrefs({
+            main: data.main_tabs || [],
+            more: data.more_tabs || [],
+          });
+        } else {
+          // Keine gespeicherten Präferenzen - defaults werden verwendet
+          setTabPrefs(null);
+        }
+      } catch (err) {
+        // Ignorieren - defaults werden verwendet
+        setTabPrefs(null);
+      }
+    }
+
+    loadTabPrefs();
+
+    // Event Listener für Änderungen aus dem MoreMenu
+    const handlePrefsChanged = () => loadTabPrefs();
+    window.addEventListener("tabPreferencesChanged", handlePrefsChanged);
+
+    return () => {
+      window.removeEventListener("tabPreferencesChanged", handlePrefsChanged);
+    };
+  }, [user]);
+
+  // Willkommensscreen anzeigen, wenn User neu ist
+  useEffect(() => {
+    if (user && !user.hasSeenWelcome) {
+      // Kurze Verzögerung, damit App erst vollständig lädt
+      const timer = setTimeout(() => {
+        setShowWelcome(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
+
+  const handleWelcomeComplete = () => {
+    setShowWelcome(false);
+    // User-Objekt aktualisieren
+    setUser((prev) => ({ ...prev, hasSeenWelcome: true }));
+  };
+
   const handleLogin = async (loggedInUser) => {
     // Session wird von Supabase Auth gemanaged
     // Hier nur State setzen für sofortige UI-Reaktion
@@ -621,6 +785,14 @@ function AppContent() {
             onUpdateUser={handleUserUpdate}
           />
         );
+      case "children-records":
+        return (
+          <AdminChildrenRecords
+            user={user}
+            readOnly={user.role === "team"}
+            onBack={() => setProfileView("home")}
+          />
+        );
       case "notifications":
         return (
           <ProfileNotifications
@@ -642,6 +814,17 @@ function AppContent() {
             onBack={() => setProfileView("home")}
             onUpdateUser={handleUserUpdate}
             onDeleteAccount={handleDeleteAccount}
+          />
+        );
+      case "customize":
+        return (
+          <ProfileCustomize
+            user={user}
+            onBack={() => setProfileView("home")}
+            onShowWelcome={() => {
+              setProfileView("home");
+              setShowWelcome(true);
+            }}
           />
         );
       default:
@@ -680,6 +863,12 @@ function AppContent() {
     } else {
       mainContent = <AbsenceReport user={user} />;
     }
+  } else if (activeTab === "calendar") {
+    // Kalender/Terminübersicht für Eltern und Team
+    mainContent = <CalendarView />;
+  } else if (activeTab === "chat" && user.role === "parent") {
+    // Gruppenchat nur für Eltern
+    mainContent = <GroupChat user={user} />;
   } else if (activeTab === "profile") {
     mainContent = renderProfileContent();
   } else if (activeTab === "admin" && isAdmin) {
@@ -695,11 +884,12 @@ function AppContent() {
   // ------------------------------------------
 
   return (
-    <GroupsProvider>
-      <div className="min-h-screen flex flex-col bg-[#fcfaf7]">
-        <AppHeader user={user} facilityName={facility.display_name} facilityLogo={facility.logo_url} />
+    <ThemeProvider userId={user?.id}>
+      <GroupsProvider>
+        <div className="min-h-screen flex flex-col bg-[#fcfaf7] dark:bg-stone-900 transition-colors">
+          <AppHeader user={user} facilityName={facility.display_name} facilityLogo={facility.logo_url} />
 
-        <main className="flex-1 overflow-y-auto pt-20 pb-20">
+          <main className="flex-1 overflow-y-auto pt-20 pb-20">
           <div className="max-w-4xl mx-auto px-4 py-4">
             <ErrorBoundary>{mainContent}</ErrorBoundary>
           </div>
@@ -708,14 +898,39 @@ function AppContent() {
         <AppFooter
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          isAdmin={isAdmin}
-          hasBirthdays={hasBirthdays}
-          hasUnacknowledgedResponses={hasUnacknowledgedResponses}
+          user={user}
+          badges={{
+            group: hasBirthdays ? <Cake size={10} /> : null,
+            absence: hasUnacknowledgedResponses ? <span className="w-2 h-2 rounded-full bg-amber-500" /> : null,
+            chat: hasUnreadChat ? <span className="w-2 h-2 rounded-full bg-amber-500" /> : null,
+          }}
+          tabPrefs={tabPrefs}
+          onOpenMore={() => setMoreMenuOpen(true)}
+        />
+
+        {/* Mehr-Menü (Slide-out) */}
+        <MoreMenu
+          isOpen={moreMenuOpen}
+          onClose={() => setMoreMenuOpen(false)}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          user={user}
+          badges={{
+            group: hasBirthdays ? <Cake size={10} /> : null,
+            absence: hasUnacknowledgedResponses ? <span className="w-2 h-2 rounded-full bg-amber-500" /> : null,
+            chat: hasUnreadChat ? <span className="w-2 h-2 rounded-full bg-amber-500" /> : null,
+          }}
         />
 
         <InstallPrompt />
-      </div>
-    </GroupsProvider>
+
+        {/* Willkommensscreen für neue User */}
+        {showWelcome && (
+          <WelcomeScreen user={user} onComplete={handleWelcomeComplete} />
+        )}
+        </div>
+      </GroupsProvider>
+    </ThemeProvider>
   );
 }
 

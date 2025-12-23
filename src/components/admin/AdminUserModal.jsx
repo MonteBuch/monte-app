@@ -30,8 +30,6 @@ export default function AdminUserModal({ user, groups = [], onCancel, onSave }) 
         id,
         name: "",
         group: defaultGroup,
-        birthday: "",
-        notes: "",
       },
     ]);
   };
@@ -150,35 +148,10 @@ export default function AdminUserModal({ user, groups = [], onCancel, onSave }) 
                     </select>
                   </div>
 
-                  {/* Geburtstag */}
-                  <div className="space-y-1">
-                    <label className="text-xs text-stone-500">
-                      Geburtstag (optional)
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full p-2 rounded-lg border border-stone-300 bg-white text-sm"
-                      value={c.birthday || ""}
-                      onChange={(e) =>
-                        updateChild(c.id, "birthday", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  {/* Hinweise */}
-                  <div className="space-y-1">
-                    <label className="text-xs text-stone-500">
-                      Hinweise / Allergien (optional)
-                    </label>
-                    <textarea
-                      className="w-full p-2 rounded-lg border border-stone-300 bg-white text-sm resize-none"
-                      rows={2}
-                      value={c.notes || ""}
-                      onChange={(e) =>
-                        updateChild(c.id, "notes", e.target.value)
-                      }
-                    />
-                  </div>
+                  {/* Hinweis auf Kinderakten */}
+                  <p className="text-[11px] text-stone-400 mt-2">
+                    Geburtstag, Hinweise und Abholberechtigte werden in den Kinderakten verwaltet.
+                  </p>
                 </div>
 
                 {/* Delete child */}

@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 
 import AdminHome from "./AdminHome";
 import AdminUsers from "./AdminUsers";
+import AdminChildrenRecords from "./AdminChildrenRecords";
+import AdminCalendar from "./AdminCalendar";
 import AdminInvites from "./AdminInvites";
 import AdminFacility from "./AdminFacility";
 import AdminGroups from "./AdminGroups";
@@ -28,6 +30,12 @@ export default function AdminArea({ user, onBack }) {
 
       case "users":
         return <AdminUsers onBack={goBack} />;
+
+      case "children-records":
+        return <AdminChildrenRecords user={user} readOnly={false} />;
+
+      case "calendar":
+        return <AdminCalendar user={user} onBack={goBack} />;
 
       case "invites":
         return <AdminInvites user={user} onBack={goBack} />;

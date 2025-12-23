@@ -9,6 +9,8 @@ import {
   Cake,
   LogOut,
   User as UserIcon,
+  FileText,
+  Palette,
 } from "lucide-react";
 import ProfileSection from "./ProfileSection";
 import { supabase } from "../../api/supabaseClient";
@@ -158,6 +160,16 @@ export default function ProfileHome({ user, onNavigate, onLogout }) {
       </div>
       {/* === END IDENTITY HEADER === */}
 
+      {/* Team: Kinderakten (nur Ansicht) */}
+      {isTeam && (
+        <ProfileSection
+          icon={<FileText size={20} />}
+          title="Kinderakten"
+          subtitle="Stammdaten aller Kinder (Ansicht)"
+          onClick={() => onNavigate("children-records")}
+        />
+      )}
+
       {/* Eltern: Kinderverwaltung */}
       {isParent && (
         <ProfileSection
@@ -188,6 +200,14 @@ export default function ProfileHome({ user, onNavigate, onLogout }) {
         icon={<Info size={20} />}
         title="Einrichtungsinfo & Kontakt"
         onClick={() => onNavigate("facility")}
+      />
+
+      {/* Anpassungen (Theme, Willkommens-Tour) */}
+      <ProfileSection
+        icon={<Palette size={20} />}
+        title="Anpassungen"
+        subtitle="Design & Einführung"
+        onClick={() => onNavigate("customize")}
       />
 
       {/* Sicherheit */}

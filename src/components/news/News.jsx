@@ -332,20 +332,20 @@ export default function News({ user }) {
 
   return (
     <div className="space-y-6">
-      {/* === HEADER (PARENT VIEW) - UI Review Update === */}
+      {/* === HEADER (PARENT VIEW) - Pinnwand === */}
       {user.role === "parent" && (
         <div
           className="p-5 rounded-3xl shadow-sm border border-stone-200"
           style={{ backgroundColor: "#f8f9fa" }}
         >
           <div className="flex items-center gap-3">
-            <div className="bg-stone-400 p-2 rounded-2xl text-white shadow">
+            <div className="bg-amber-500 p-2 rounded-2xl text-white shadow">
               <Home size={18} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-stone-800">News</h2>
+              <h2 className="text-lg font-bold text-stone-800">Pinnwand</h2>
               <p className="text-xs text-stone-600">
-                Wichtige Infos aus dem Kinderhaus
+                Neuigkeiten aus dem Kinderhaus
               </p>
             </div>
           </div>

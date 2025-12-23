@@ -36,7 +36,7 @@ export default function ProfileNotifications({ user, onBack }) {
 
   let categories;
   if (user.role === "parent") {
-    categories = ["news", "lists", "food", "absence_response"];
+    categories = ["news", "lists", "food", "absence_response", "chat"];
   } else if (user.role === "team") {
     categories = ["absences", "lists", "birthdays"];
   } else {
@@ -79,6 +79,7 @@ export default function ProfileNotifications({ user, onBack }) {
         : "Abwesenheiten",
     birthdays: "Geburtstage in meiner Gruppe",
     absence_response: "Rückmeldung zu Abwesenheitsmeldungen",
+    chat: "Neue Nachrichten im Gruppenchat",
   };
 
   const optionText = {

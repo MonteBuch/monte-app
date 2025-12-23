@@ -7,6 +7,8 @@ import {
   FolderOpen,
   Link2,
   Mail,
+  FileText,
+  Calendar,
 } from "lucide-react";
 import ProfileSection from "../profile/ProfileSection";
 
@@ -23,6 +25,22 @@ export default function AdminHome({ onNavigate }) {
         title="Benutzerverwaltung"
         subtitle="Eltern, Team & Admins verwalten"
         onClick={() => onNavigate("users")}
+      />
+
+      {/* Kinderakten */}
+      <ProfileSection
+        icon={<FileText size={20} />}
+        title="Kinderakten"
+        subtitle="Stammdaten & Abholberechtigte"
+        onClick={() => onNavigate("children-records")}
+      />
+
+      {/* Terminübersicht / Jahresplanung */}
+      <ProfileSection
+        icon={<Calendar size={20} />}
+        title="Terminübersicht"
+        subtitle="Jahresplanung & wichtige Termine"
+        onClick={() => onNavigate("calendar")}
       />
 
       {/* Einladungslinks (NEU - empfohlen) */}
