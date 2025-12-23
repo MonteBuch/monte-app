@@ -11,6 +11,7 @@ import {
   Cake,
   CheckCircle,
   Sprout,
+  MessageCircle,
 } from "lucide-react";
 
 import { supabase } from "./api/supabaseClient";
@@ -122,7 +123,7 @@ const NavButton = ({ icon, label, active, onClick, badge }) => (
   </button>
 );
 
-const AppFooter = ({ activeTab, setActiveTab, isAdmin, hasBirthdays }) => {
+const AppFooter = ({ activeTab, setActiveTab, isAdmin, hasBirthdays, hasUnacknowledgedResponses }) => {
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-stone-200">
       <div className="max-w-4xl mx-auto px-2">
@@ -151,6 +152,7 @@ const AppFooter = ({ activeTab, setActiveTab, isAdmin, hasBirthdays }) => {
             label="Meldungen"
             active={activeTab === "absence"}
             onClick={() => setActiveTab("absence")}
+            badge={hasUnacknowledgedResponses ? <MessageCircle size={10} /> : null}
           />
           <NavButton
             icon={<UserIcon size={20} />}
@@ -237,6 +239,8 @@ function AppContent() {
   const [profileView, setProfileView] = useState("home");
   // Geburtstags-Badge für Team-User
   const [hasBirthdays, setHasBirthdays] = useState(false);
+  // Unbestätigte Antworten-Badge für Eltern
+  const [hasUnacknowledgedResponses, setHasUnacknowledgedResponses] = useState(false);
   // Email-Bestätigung erfolgreich (zeigt Meldung statt Auto-Login)
   const [emailConfirmed, setEmailConfirmed] = useState(false);
   // Facility context
@@ -401,6 +405,67 @@ function AppContent() {
     }
 
     checkBirthdays();
+  }, [user]);
+
+  // Unbestätigte Antworten für Eltern prüfen (Badge in Navigation)
+  useEffect(() => {
+    if (!user || user.role !== "parent") {
+      setHasUnacknowledgedResponses(false);
+      return;
+    }
+
+    async function checkUnacknowledgedResponses() {
+      try {
+        // Alle Kinder-IDs des Elternteils
+        const childIds = (user.children || []).map(c => c.id);
+        if (childIds.length === 0) {
+          setHasUnacknowledgedResponses(false);
+          return;
+        }
+
+        // Prüfen ob es unbestätigte Antworten gibt
+        const { count, error } = await supabase
+          .from("absences")
+          .select("id", { count: "exact", head: true })
+          .in("child_id", childIds)
+          .not("staff_response", "is", null)
+          .eq("response_acknowledged", false);
+
+        if (error) throw error;
+
+        setHasUnacknowledgedResponses(count > 0);
+      } catch (err) {
+        console.error("Unbestätigte Antworten Check fehlgeschlagen:", err);
+        setHasUnacknowledgedResponses(false);
+      }
+    }
+
+    checkUnacknowledgedResponses();
+
+    // Custom Event Listener für manuelle Aktualisierung (z.B. nach Bestätigung)
+    const handleRefresh = () => checkUnacknowledgedResponses();
+    window.addEventListener("refreshAbsenceBadge", handleRefresh);
+
+    // Realtime-Subscription für Änderungen
+    const channel = supabase
+      .channel("absence-responses")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "absences",
+        },
+        () => {
+          checkUnacknowledgedResponses();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      window.removeEventListener("refreshAbsenceBadge", handleRefresh);
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const handleLogin = async (loggedInUser) => {
@@ -645,6 +710,7 @@ function AppContent() {
           setActiveTab={setActiveTab}
           isAdmin={isAdmin}
           hasBirthdays={hasBirthdays}
+          hasUnacknowledgedResponses={hasUnacknowledgedResponses}
         />
 
         <InstallPrompt />

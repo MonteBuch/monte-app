@@ -447,3 +447,34 @@ Klärung mit Träger über:
 - Kostenmodell pro Einrichtung
 - Wer verwaltet Superuser-Zugang
 - Datenschutz-Vereinbarungen pro Einrichtung
+
+## Validation Strategy
+
+**ALWAYS** work iteratively and validate your work after finishing each task by
+following these steps in order:
+
+### Quick Validation Steps (run for each task)
+
+1. **Linting**: `npm run lint` - Check for syntax and style issues
+2. **Type checking**: `npm run typecheck` - Ensure TypeScript correctness
+3. **Specific tests**: Run only relevant Playwright tests for changed
+   functionality. If you implemented new functionality, write tests for it and
+   run them.
+
+### Complete Validation (run only after all tasks are complete)
+
+4. **Build**: `npm run build` - Full production build verification
+5. **Complete test suite**: `npm run test` - All Playwright end-to-end tests
+
+### Testing Guidelines
+
+- **ALWAYS** write tests for new functionality - this is required for validation
+- Write realistic e2e tests from a user perspective focusing on actual
+  interactions
+- **NEVER** write trivial tests that only assert component visibility
+- Focus on meaningful user workflows and business logic
+- If existing tests fail that are not part of the current task, **STOP** and ask
+  for guidance
+- Do NOT auto-fix unrelated test failures
+- If tests fail without a clear reason, use playwright mcp to debug the test in
+  a real browser

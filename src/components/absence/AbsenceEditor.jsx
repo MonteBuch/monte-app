@@ -71,7 +71,7 @@ export default function AbsenceEditor({
       dateFrom,
       dateTo: type === "range" ? dateTo : null,
       reason,
-      otherText: reason === "sonstiges" ? otherText.trim() : "",
+      otherText: otherText.trim() || "",
       createdAt: initialData?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       status: initialData?.status || "new",
@@ -208,20 +208,19 @@ export default function AbsenceEditor({
           <ReasonButton value="sonstiges" label="Sonstiges" />
         </div>
 
-        {reason === "sonstiges" && (
-          <div className="mt-2">
-            <label className="text-xs text-stone-600 mb-1 block">
-              Sonstiger Grund (optional)
-            </label>
-            <textarea
-              rows={2}
-              value={otherText}
-              onChange={(e) => setOtherText(e.target.value)}
-              className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm resize-none"
-              placeholder="Kurz den Grund ergänzen …"
-            />
-          </div>
-        )}
+        {/* Hinweis-Feld - immer sichtbar */}
+        <div className="mt-2">
+          <label className="text-xs text-stone-600 mb-1 block">
+            Hinweis (optional)
+          </label>
+          <textarea
+            rows={2}
+            value={otherText}
+            onChange={(e) => setOtherText(e.target.value)}
+            className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm resize-none"
+            placeholder="Zusätzliche Informationen für das Team …"
+          />
+        </div>
       </div>
 
       {/* Aktionen */}

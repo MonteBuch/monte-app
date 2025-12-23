@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "../../api/supabaseClient";
 import { FACILITY_ID } from "../../lib/constants";
 import { getGroupById, getGroupStyles } from "../../utils/groupUtils";
-import { CheckCircle, Undo2, Trash2, CalendarDays, Loader2 } from "lucide-react";
+import { CheckCircle, Undo2, Trash2, CalendarDays, Loader2, MessageSquare, X } from "lucide-react";
 
 const REASON_STYLES = {
   krankheit: "bg-amber-100 text-amber-900",
@@ -24,6 +24,11 @@ export default function AdminAbsenceDashboard({ user }) {
   const [activeTab, setActiveTab] = useState("new");
   const [entries, setEntries] = useState([]);
   const [allAbsences, setAllAbsences] = useState([]);
+
+  // Antwort-Modal State
+  const [respondingTo, setRespondingTo] = useState(null);
+  const [responseText, setResponseText] = useState("");
+  const [sendingResponse, setSendingResponse] = useState(false);
 
   // Gruppen laden
   useEffect(() => {
@@ -104,6 +109,12 @@ export default function AdminAbsenceDashboard({ user }) {
         otherText: a.other_text,
         status: a.status,
         createdAt: a.created_at,
+        createdBy: a.created_by,
+        // Neue Felder für Team-Antwort
+        staffResponse: a.staff_response,
+        staffResponseAt: a.staff_response_at,
+        staffResponseBy: a.staff_response_by,
+        responseAcknowledged: a.response_acknowledged,
       }));
 
       setAllAbsences(formatted);
@@ -178,6 +189,45 @@ export default function AdminAbsenceDashboard({ user }) {
     }
   };
 
+  // Antwort auf Abwesenheitsmeldung senden
+  const sendResponse = async () => {
+    if (!respondingTo || !responseText.trim()) return;
+
+    setSendingResponse(true);
+    try {
+      const { error } = await supabase
+        .from("absences")
+        .update({
+          staff_response: responseText.trim(),
+          staff_response_at: new Date().toISOString(),
+          staff_response_by: user.id,
+          response_acknowledged: false,
+          response_acknowledged_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", respondingTo.id);
+
+      if (error) throw error;
+
+      // TODO: Push-Notification an Eltern senden
+      // sendAbsenceResponsePushNotification(respondingTo, responseText);
+
+      setRespondingTo(null);
+      setResponseText("");
+      loadAbsences();
+    } catch (err) {
+      console.error("Antwort senden fehlgeschlagen:", err);
+      alert("Fehler beim Senden: " + err.message);
+    } finally {
+      setSendingResponse(false);
+    }
+  };
+
+  const openResponseModal = (entry) => {
+    setRespondingTo(entry);
+    setResponseText(entry.staffResponse || "");
+  };
+
   const newEntries = entries
     .filter((e) => e.status === "new")
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -250,19 +300,50 @@ export default function AdminAbsenceDashboard({ user }) {
             <span
               className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${reasonStyle}`}
             >
-              {e.reason === "sonstiges"
-                ? e.otherText || "Sonstiges"
-                : e.reason.charAt(0).toUpperCase() + e.reason.slice(1)}
+              {e.reason.charAt(0).toUpperCase() + e.reason.slice(1)}
             </span>
+
+            {/* Hinweis der Eltern anzeigen */}
+            {e.otherText && (
+              <p className="text-xs text-stone-600 bg-stone-50 p-2 rounded-lg mt-1">
+                <span className="font-medium">Hinweis:</span> {e.otherText}
+              </p>
+            )}
 
             <p className="text-[10px] text-stone-400 mt-1">
               Eingereicht am{" "}
               {new Date(e.createdAt).toLocaleString("de-DE")}
             </p>
+
+            {/* Team-Antwort anzeigen wenn vorhanden */}
+            {e.staffResponse && (
+              <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-[10px] font-semibold text-amber-800 mb-1">
+                  Eure Antwort{e.responseAcknowledged ? " (gelesen)" : ""}:
+                </p>
+                <p className="text-xs text-amber-900">{e.staffResponse}</p>
+                <p className="text-[10px] text-amber-600 mt-1">
+                  {new Date(e.staffResponseAt).toLocaleString("de-DE")}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col items-end gap-2">
             <div className="flex gap-2">
+              {/* Antworten-Button */}
+              <button
+                onClick={() => openResponseModal(e)}
+                className={`p-2 rounded-lg ${
+                  e.staffResponse
+                    ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                    : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                }`}
+                title={e.staffResponse ? "Antwort bearbeiten" : "Antworten"}
+              >
+                <MessageSquare size={16} />
+              </button>
+
               {e.status === "new" ? (
                 <button
                   onClick={() => markRead(e.id)}
@@ -435,6 +516,84 @@ export default function AdminAbsenceDashboard({ user }) {
           ) : (
             readEntries.map((e) => renderCard(e, true))
           )}
+        </div>
+      )}
+
+      {/* Antwort-Modal */}
+      {respondingTo && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white p-6 rounded-2xl max-w-md w-full border border-stone-200 shadow-xl space-y-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-bold text-stone-800 text-lg">
+                  Antwort an Eltern
+                </h3>
+                <p className="text-sm text-stone-500">
+                  Für {respondingTo.childName}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setRespondingTo(null);
+                  setResponseText("");
+                }}
+                className="p-1 text-stone-400 hover:text-stone-600"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="bg-stone-50 p-3 rounded-xl text-sm text-stone-600">
+              <p className="font-medium text-stone-700 mb-1">Meldung:</p>
+              <p>{dateLabel(respondingTo)} – {respondingTo.reason.charAt(0).toUpperCase() + respondingTo.reason.slice(1)}</p>
+              {respondingTo.otherText && (
+                <p className="mt-1 text-stone-500">Hinweis: {respondingTo.otherText}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-stone-700 block mb-2">
+                Eure Nachricht an die Eltern:
+              </label>
+              <textarea
+                rows={4}
+                value={responseText}
+                onChange={(e) => setResponseText(e.target.value)}
+                className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm resize-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                placeholder="z.B. Gute Besserung! Bitte informiert uns über den weiteren Verlauf..."
+              />
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={() => {
+                  setRespondingTo(null);
+                  setResponseText("");
+                }}
+                className="flex-1 py-2 rounded-xl bg-stone-200 text-stone-700 font-semibold hover:bg-stone-300"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={sendResponse}
+                disabled={!responseText.trim() || sendingResponse}
+                className={`flex-1 py-2 rounded-xl font-bold flex items-center justify-center gap-2 ${
+                  responseText.trim() && !sendingResponse
+                    ? "bg-amber-500 text-white hover:bg-amber-600"
+                    : "bg-stone-300 text-stone-500 cursor-not-allowed"
+                }`}
+              >
+                {sendingResponse ? (
+                  <Loader2 className="animate-spin" size={18} />
+                ) : (
+                  <>
+                    <MessageSquare size={16} />
+                    Senden
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

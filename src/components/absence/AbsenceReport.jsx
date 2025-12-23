@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Trash2, Pencil, Loader2, CalendarDays, AlertCircle } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Trash2, Pencil, Loader2, CalendarDays, AlertCircle, MessageSquare, CheckCircle } from "lucide-react";
 import AbsenceEditor from "./AbsenceEditor";
 import { supabase } from "../../api/supabaseClient";
 import { FACILITY_ID } from "../../lib/constants";
@@ -120,6 +120,10 @@ export default function AbsenceReport({ user }) {
         otherText: a.other_text,
         status: a.status,
         createdAt: a.created_at,
+        // Neue Felder für Team-Antwort
+        staffResponse: a.staff_response,
+        staffResponseAt: a.staff_response_at,
+        responseAcknowledged: a.response_acknowledged,
       }));
 
       setEntries(formatted);
@@ -200,6 +204,32 @@ export default function AbsenceReport({ user }) {
       alert("Fehler beim Löschen: " + err.message);
     }
   };
+
+  // Antwort der Kita bestätigen
+  const acknowledgeResponse = async (id) => {
+    try {
+      const { error } = await supabase
+        .from("absences")
+        .update({
+          response_acknowledged: true,
+          response_acknowledged_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+
+      if (error) throw error;
+      loadAbsences();
+
+      // Badge in Navigation aktualisieren
+      window.dispatchEvent(new CustomEvent("refreshAbsenceBadge"));
+    } catch (err) {
+      console.error("Bestätigung fehlgeschlagen:", err);
+    }
+  };
+
+  // Anzahl unbestätigter Antworten für Badge
+  const unacknowledgedCount = useMemo(() => {
+    return entries.filter(e => e.staffResponse && !e.responseAcknowledged).length;
+  }, [entries]);
 
   const child = children.find((c) => c.id === activeChildId) || children[0] || null;
 
@@ -329,20 +359,35 @@ export default function AbsenceReport({ user }) {
             const reasonMeta = getReasonMeta(e.reason);
             const submittedAt = new Date(e.createdAt).toLocaleString("de-DE");
 
+            const hasUnacknowledgedResponse = e.staffResponse && !e.responseAcknowledged;
+
             return (
               <div
                 key={e.id}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100"
+                className={`bg-white p-4 rounded-2xl shadow-sm border ${
+                  hasUnacknowledgedResponse
+                    ? "border-amber-300 ring-2 ring-amber-100"
+                    : "border-stone-100"
+                }`}
               >
                 <div className="flex justify-between items-start gap-3">
-                  <div className="space-y-2">
-                    <div>
-                      <p className="text-sm font-semibold text-stone-900">
-                        {e.childName || child.name}
-                      </p>
-                      <p className="text-xs text-stone-600 mt-0.5">
-                        {dateLabel(e)}
-                      </p>
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-stone-900">
+                          {e.childName || child.name}
+                        </p>
+                        <p className="text-xs text-stone-600 mt-0.5">
+                          {dateLabel(e)}
+                        </p>
+                      </div>
+                      {/* Badge für unbestätigte Antwort */}
+                      {hasUnacknowledgedResponse && (
+                        <span className="flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-[10px] font-bold">
+                          <MessageSquare size={12} />
+                          Nachricht der Kita
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
@@ -351,12 +396,53 @@ export default function AbsenceReport({ user }) {
                       >
                         {reasonMeta.label}
                       </span>
-                      {e.reason === "sonstiges" && e.otherText && (
-                        <span className="text-xs text-stone-600">
-                          {e.otherText}
-                        </span>
-                      )}
                     </div>
+
+                    {/* Hinweis anzeigen (immer, nicht nur bei sonstiges) */}
+                    {e.otherText && (
+                      <p className="text-xs text-stone-600 bg-stone-50 p-2 rounded-lg">
+                        <span className="font-medium">Hinweis:</span> {e.otherText}
+                      </p>
+                    )}
+
+                    {/* Antwort der Kita anzeigen */}
+                    {e.staffResponse && (
+                      <div className={`mt-2 p-3 rounded-xl ${
+                        e.responseAcknowledged
+                          ? "bg-stone-50 border border-stone-200"
+                          : "bg-amber-50 border border-amber-200"
+                      }`}>
+                        <div className="flex items-start gap-2">
+                          <MessageSquare size={14} className={e.responseAcknowledged ? "text-stone-500" : "text-amber-600"} />
+                          <div className="flex-1">
+                            <p className={`text-[10px] font-semibold mb-1 ${
+                              e.responseAcknowledged ? "text-stone-600" : "text-amber-800"
+                            }`}>
+                              Rückmeldung der Kita:
+                            </p>
+                            <p className={`text-sm ${
+                              e.responseAcknowledged ? "text-stone-700" : "text-amber-900"
+                            }`}>
+                              {e.staffResponse}
+                            </p>
+                            <p className="text-[10px] text-stone-400 mt-1">
+                              {new Date(e.staffResponseAt).toLocaleString("de-DE")}
+                            </p>
+
+                            {/* Bestätigen-Button */}
+                            {!e.responseAcknowledged && (
+                              <button
+                                onClick={() => acknowledgeResponse(e.id)}
+                                className="mt-2 flex items-center gap-1 px-3 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-semibold hover:bg-amber-600 transition"
+                              >
+                                <CheckCircle size={14} />
+                                Zur Kenntnis genommen
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col items-end gap-2">
