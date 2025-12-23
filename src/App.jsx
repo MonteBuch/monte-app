@@ -587,7 +587,7 @@ function AppContent() {
           .from("user_tab_preferences")
           .select("main_tabs, more_tabs")
           .eq("user_id", user.id)
-          .single();
+          .maybeSingle(); // maybeSingle statt single - gibt null zurück wenn kein Datensatz
 
         if (data && !error) {
           setTabPrefs({

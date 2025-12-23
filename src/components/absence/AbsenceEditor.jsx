@@ -1,5 +1,24 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getGroupById, getGroupStyles } from "../../utils/groupUtils";
+
+// Außerhalb der Komponente definiert, um Neuerstellung bei jedem Render zu vermeiden
+function ReasonButton({ value, label, reason, setReason }) {
+  const active = reason === value;
+
+  return (
+    <button
+      type="button"
+      onClick={() => setReason(value)}
+      className={`w-full px-4 py-3 rounded-2xl text-sm font-semibold border transition ${
+        active
+          ? "bg-amber-100 text-amber-900 border-amber-500 shadow-sm"
+          : "bg-stone-50 text-stone-700 border-stone-300 hover:bg-stone-100"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
 
 export default function AbsenceEditor({
   mode = "create",
@@ -78,24 +97,6 @@ export default function AbsenceEditor({
     };
 
     onSave(payload);
-  };
-
-  const ReasonButton = ({ value, label }) => {
-    const active = reason === value;
-
-    return (
-      <button
-        type="button"
-        onClick={() => setReason(value)}
-        className={`w-full px-4 py-3 rounded-2xl text-sm font-semibold border transition ${
-          active
-            ? "bg-amber-100 text-amber-900 border-amber-500 shadow-sm"
-            : "bg-stone-50 text-stone-700 border-stone-300 hover:bg-stone-100"
-        }`}
-      >
-        {label}
-      </button>
-    );
   };
 
   if (!child) return null;
@@ -202,10 +203,10 @@ export default function AbsenceEditor({
         </p>
 
         <div className="grid grid-cols-2 gap-2">
-          <ReasonButton value="krankheit" label="Krank" />
-          <ReasonButton value="urlaub" label="Urlaub" />
-          <ReasonButton value="termin" label="Termin" />
-          <ReasonButton value="sonstiges" label="Sonstiges" />
+          <ReasonButton value="krankheit" label="Krank" reason={reason} setReason={setReason} />
+          <ReasonButton value="urlaub" label="Urlaub" reason={reason} setReason={setReason} />
+          <ReasonButton value="termin" label="Termin" reason={reason} setReason={setReason} />
+          <ReasonButton value="sonstiges" label="Sonstiges" reason={reason} setReason={setReason} />
         </div>
 
         {/* Hinweis-Feld - immer sichtbar */}

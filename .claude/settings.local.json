@@ -33,7 +33,8 @@
       "mcp__supabase__list_extensions",
       "WebFetch(domain:dmarcdkim.com)",
       "WebFetch(domain:dmarc.wiki)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(npm run lint:fix:*)"
     ]
   }
 }

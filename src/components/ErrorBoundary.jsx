@@ -50,7 +50,7 @@ export default class ErrorBoundary extends React.Component {
             <RefreshCw className="w-4 h-4" />
             Erneut versuchen
           </button>
-          {process.env.NODE_ENV === "development" && this.state.error && (
+          {import.meta.env.DEV && this.state.error && (
             <details className="mt-6 text-left bg-stone-100 rounded-lg p-4">
               <summary className="cursor-pointer text-sm font-medium text-stone-700">
                 Technische Details

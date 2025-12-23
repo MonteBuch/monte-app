@@ -78,7 +78,11 @@ export default function News({ user }) {
         (payload) => {
           console.log("News Realtime: INSERT");
           const newItem = mapNewsRow(payload.new);
-          setAllNews((prev) => [newItem, ...prev]);
+          // Prüfen ob News bereits existiert (vermeidet Duplikate bei eigenem Insert)
+          setAllNews((prev) => {
+            if (prev.some((n) => n.id === newItem.id)) return prev;
+            return [newItem, ...prev];
+          });
         }
       )
       .on(
