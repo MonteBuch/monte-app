@@ -19,13 +19,17 @@ function log(message, data = null) {
 // Verbindungsstatus
 let isOnline = navigator.onLine;
 let lastActivityTime = Date.now();
+let lastSuccessfulRequest = Date.now();
 let realtimeStatus = "DISCONNECTED";
 let monitorChannel = null;
 let heartbeatInterval = null;
+let healthCheckInterval = null;
 let onStatusChange = null;
 let isMonitorRunning = false;
 let reconnectAttempts = 0;
+let consecutiveFailures = 0;
 const MAX_RECONNECT_ATTEMPTS = 3;
+const MAX_CONSECUTIVE_FAILURES = 2;
 
 // Status-Callback registrieren
 export function setStatusChangeCallback(callback) {
@@ -45,6 +49,24 @@ export function getConnectionStatus() {
 // Aktivität registrieren (bei jeder DB-Interaktion aufrufen)
 export function recordActivity() {
   lastActivityTime = Date.now();
+}
+
+// Erfolgreiche Anfrage registrieren
+export function recordSuccessfulRequest() {
+  lastSuccessfulRequest = Date.now();
+  consecutiveFailures = 0;
+}
+
+// Fehlgeschlagene Anfrage registrieren
+export function recordFailedRequest(error) {
+  consecutiveFailures++;
+  log(`Fehlgeschlagene Anfrage (${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES}):`, error?.message);
+
+  // Bei zu vielen aufeinanderfolgenden Fehlern: Verbindungsproblem melden
+  if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+    log("Zu viele aufeinanderfolgende Fehler - Verbindungsproblem erkannt");
+    handleConnectionLost();
+  }
 }
 
 // Netzwerk-Status überwachen
@@ -280,6 +302,45 @@ function startHeartbeat() {
   }, 30000);
 }
 
+// Proaktiver Health-Check: Alle 60 Sekunden wenn Tab aktiv
+function startHealthCheck() {
+  healthCheckInterval = setInterval(async () => {
+    // Nur prüfen wenn Tab sichtbar und online
+    if (document.visibilityState !== "visible" || !isOnline) return;
+
+    // Nur prüfen wenn länger als 30s seit letztem erfolgreichen Request
+    const timeSinceSuccess = Date.now() - lastSuccessfulRequest;
+    if (timeSinceSuccess < 30000) return;
+
+    log("Proaktiver Health-Check...");
+
+    try {
+      const start = Date.now();
+      const { error } = await supabase
+        .from("facilities")
+        .select("id")
+        .limit(1)
+        .single();
+
+      if (error) {
+        log("Health-Check fehlgeschlagen:", error.message);
+        recordFailedRequest(error);
+      } else {
+        const latency = Date.now() - start;
+        log(`Health-Check OK (${latency}ms)`);
+        recordSuccessfulRequest();
+      }
+    } catch (e) {
+      log("Health-Check Exception:", e.message);
+
+      // Bei AbortError (Timeout) oder TypeError (Netzwerk): Verbindungsproblem
+      if (e.name === "AbortError" || e.name === "TypeError") {
+        recordFailedRequest(e);
+      }
+    }
+  }, 60000); // Alle 60 Sekunden
+}
+
 // Test-Funktion für manuelle Verbindungsprüfung
 export async function testConnection() {
   log("=== Manuelle Verbindungsprüfung ===");
@@ -289,32 +350,69 @@ export async function testConnection() {
     timestamp: new Date().toISOString(),
   };
 
-  // 1. Auth-Session prüfen
+  // Timeout-Wrapper für alle Promises
+  const withTimeout = (promise, ms, label) => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) =>
+        setTimeout(() => {
+          log(`TIMEOUT bei ${label} nach ${ms}ms`);
+          reject(new Error(`Timeout: ${label}`));
+        }, ms)
+      )
+    ]);
+  };
+
+  // 1. Auth-Session prüfen (mit 5s Timeout)
   try {
-    const { data, error } = await supabase.auth.getSession();
+    log("Prüfe Auth-Session...");
+    const { data, error } = await withTimeout(
+      supabase.auth.getSession(),
+      5000,
+      "getSession"
+    );
     results.session = error ? { error: error.message } : {
       valid: !!data.session,
-      userId: data.session?.user?.id
+      userId: data.session?.user?.id,
+      expiresAt: data.session?.expires_at
     };
+    log("Auth-Session OK:", results.session);
   } catch (e) {
-    results.session = { error: e.message };
+    results.session = { error: e.message, timeout: e.message.includes("Timeout") };
+    log("Auth-Session FEHLER:", e.message);
   }
 
-  // 2. Einfache DB-Abfrage
+  // 2. Einfache DB-Abfrage (mit 5s Timeout)
   try {
+    log("Prüfe Datenbank...");
     const start = Date.now();
-    const { data, error } = await supabase
-      .from("facilities")
-      .select("id")
-      .limit(1)
-      .single();
+    const { data, error } = await withTimeout(
+      supabase.from("facilities").select("id").limit(1).single(),
+      5000,
+      "DB-Query"
+    );
 
-    results.database = error ? { error: error.message } : {
-      ok: true,
-      latency: Date.now() - start
-    };
+    if (error) {
+      results.database = { error: error.message };
+      recordFailedRequest(error);
+    } else {
+      results.database = { ok: true, latency: Date.now() - start };
+      recordSuccessfulRequest();
+    }
+    log("Datenbank OK:", results.database);
   } catch (e) {
-    results.database = { error: e.message };
+    results.database = { error: e.message, timeout: e.message.includes("Timeout") };
+    log("Datenbank FEHLER:", e.message);
+    recordFailedRequest(e);
+
+    // Bei Timeout oder AbortError: Verbindung ist definitiv kaputt
+    if (e.message.includes("Timeout") || e.name === "AbortError") {
+      onStatusChange?.({
+        type: "connection_lost",
+        status: "failed",
+        message: "Verbindung hängt. Bitte Seite neu laden."
+      });
+    }
   }
 
   // 3. Realtime-Status
@@ -337,12 +435,15 @@ export function startConnectionMonitor() {
 
   isMonitorRunning = true;
   reconnectAttempts = 0;
+  consecutiveFailures = 0;
+  lastSuccessfulRequest = Date.now();
   log("Connection Monitor gestartet");
 
   setupNetworkListeners();
   setupRealtimeMonitor();
   setupAuthMonitor();
   startHeartbeat();
+  startHealthCheck();
 
   // Initial testen
   setTimeout(testConnection, 2000);
@@ -358,6 +459,10 @@ export function stopConnectionMonitor() {
     clearInterval(heartbeatInterval);
     heartbeatInterval = null;
   }
+  if (healthCheckInterval) {
+    clearInterval(healthCheckInterval);
+    healthCheckInterval = null;
+  }
   if (monitorChannel) {
     supabase.removeChannel(monitorChannel);
     monitorChannel = null;
@@ -369,7 +474,28 @@ export function stopConnectionMonitor() {
 if (typeof window !== "undefined") {
   window.connectionMonitor = {
     test: testConnection,
-    status: getConnectionStatus,
+    status: () => ({
+      ...getConnectionStatus(),
+      consecutiveFailures,
+      lastSuccessfulRequest: new Date(lastSuccessfulRequest).toLocaleTimeString("de-DE"),
+      timeSinceSuccess: Math.round((Date.now() - lastSuccessfulRequest) / 1000) + "s",
+      realtimeStatus,
+    }),
     reconnect: reconnectRealtime,
+    forceCheck: async () => {
+      log("Erzwungener Health-Check...");
+      try {
+        const { error } = await supabase.from("facilities").select("id").limit(1).single();
+        if (error) {
+          recordFailedRequest(error);
+          return { ok: false, error: error.message };
+        }
+        recordSuccessfulRequest();
+        return { ok: true };
+      } catch (e) {
+        recordFailedRequest(e);
+        return { ok: false, error: e.message };
+      }
+    },
   };
 }
