@@ -6,7 +6,7 @@ const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 // Request-Timeout: 15 Sekunden für normale Requests
 const REQUEST_TIMEOUT = 15000;
 
-// Custom fetch mit Timeout
+// Custom fetch mit Timeout und frischen Verbindungen
 const fetchWithTimeout = (url, options = {}) => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => {
@@ -14,9 +14,21 @@ const fetchWithTimeout = (url, options = {}) => {
     controller.abort();
   }, REQUEST_TIMEOUT);
 
-  return fetch(url, {
+  // Cache-Busting Parameter hinzufügen um Browser-Connection-Reuse zu verhindern
+  const urlWithTimestamp = new URL(url);
+  urlWithTimestamp.searchParams.set('_t', Date.now().toString());
+
+  return fetch(urlWithTimestamp.toString(), {
     ...options,
     signal: controller.signal,
+    // Keine gecachten Responses verwenden
+    cache: 'no-store',
+    // Neue Headers für frische Verbindung
+    headers: {
+      ...options.headers,
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+    },
   }).finally(() => clearTimeout(timeoutId));
 };
 
