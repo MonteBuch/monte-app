@@ -36,7 +36,9 @@
       "Bash(npm run lint)",
       "Bash(npm run lint:fix:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nFix connection monitor timeout - health checks now timeout after 10s\n\n- Added proper withTimeout wrapper that cleans up on success\n- Health checks now have 10 second timeout\n- Session checks now have 10 second timeout\n- On timeout, banner immediately shows \"Verbindung hängt\"\n- Health check interval reduced to 30s for faster detection\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nFix connection monitor timeout - health checks now timeout after 10s\n\n- Added proper withTimeout wrapper that cleans up on success\n- Health checks now have 10 second timeout\n- Session checks now have 10 second timeout\n- On timeout, banner immediately shows \"Verbindung hängt\"\n- Health check interval reduced to 30s for faster detection\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push)",
+      "Bash(git commit:*)"
     ]
   }
 }
