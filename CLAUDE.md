@@ -38,9 +38,35 @@ Vor dem Go-Live mit echten Nutzern muss ein umfassender UAT durchgeführt werden
 ### 3. Supabase Realtime aktivieren
 - Dashboard → Database → Replication für relevante Tabellen
 
+### 4. Connection-Timeout Issue (OFFEN - Beobachtung)
+**Status:** Teilweise gelöst, weiter beobachten
+
+Das Problem: Supabase-Requests hängen manchmal ohne Response (weder Erfolg noch Fehler).
+
+**Was bereits implementiert wurde:**
+- `connectionMonitor.js` - Proaktive Health-Checks alle 30 Sekunden
+- `cache: 'no-store'` im Supabase fetch - Verhindert stale Connections
+- Auto-Reload nach 10 Minuten Tab-Inaktivität
+- Timeout-Wrapper für alle kritischen Requests (10 Sekunden)
+- Banner-Anzeige bei Verbindungsproblemen
+
+**Beobachtungen:**
+- Problem tritt sporadisch auf, besonders nach Tab im Hintergrund
+- Normale Nutzung funktioniert stabil (45+ Minuten ohne Probleme)
+- Möglicherweise Netzwerk/Firewall/NAT-bezogen
+
+**Offene Fragen:**
+- Tritt es auch bei <5 Minuten Inaktivität auf?
+- Auto-Timeout nach 10 Minuten als Feature? (wie viele Apps)
+- Replikationstrigger identifizieren
+
+### 5. Leaked Password Protection aktivieren (manuell)
+- Supabase Dashboard → Authentication → Providers → Email
+- "Leaked password protection" aktivieren
+
 ---
 
-## Current State (as of 2025-12-20)
+## Current State (as of 2025-12-24)
 
 ### Migration Status: 100% Complete
 
@@ -205,7 +231,24 @@ src/
 - [ ] Monitoring/Error tracking (Sentry)
 - [ ] Deployment documentation
 
-### Recent Updates (2025-12-20)
+### Recent Updates (2025-12-24)
+
+**Connection & PWA Stabilität:**
+- [x] Connection Monitor mit proaktiven Health-Checks (30s Intervall)
+- [x] Timeout-Wrapper für alle kritischen Supabase-Requests (10s)
+- [x] Auto-Reload nach 10+ Minuten Tab-Inaktivität
+- [x] `cache: 'no-store'` für frische TCP-Verbindungen
+- [x] PWA Update-Banner (registerType: 'prompt')
+- [x] UpdatePrompt Komponente für manuelle Updates
+- [x] Verbesserte Cache-Strategie (StaleWhileRevalidate für Assets)
+
+**Security & Performance Optimierungen:**
+- [x] 5 Funktionen mit `SET search_path = ''` (Security DEFINER)
+- [x] Alle RLS-Policies optimiert: `auth.uid()` → `(select auth.uid())`
+- [x] Multiple permissive Policies konsolidiert
+- [x] Absences-Tabelle: 10 Policies → 4 konsolidiert
+
+### Updates (2025-12-20)
 
 **Gruppen-Listen Verbesserungen:**
 - [x] Leere Mitbringlisten mit Platzhalter erlaubt
