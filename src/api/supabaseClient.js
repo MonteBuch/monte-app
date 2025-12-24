@@ -14,21 +14,17 @@ const fetchWithTimeout = (url, options = {}) => {
     controller.abort();
   }, REQUEST_TIMEOUT);
 
-  // Cache-Busting Parameter hinzufügen um Browser-Connection-Reuse zu verhindern
-  const urlWithTimestamp = new URL(url);
-  urlWithTimestamp.searchParams.set('_t', Date.now().toString());
+  // Headers zusammenführen (bestehende Headers behalten!)
+  const existingHeaders = options.headers || {};
+  const newHeaders = new Headers(existingHeaders);
+  newHeaders.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  newHeaders.set('Pragma', 'no-cache');
 
-  return fetch(urlWithTimestamp.toString(), {
+  return fetch(url, {
     ...options,
     signal: controller.signal,
-    // Keine gecachten Responses verwenden
     cache: 'no-store',
-    // Neue Headers für frische Verbindung
-    headers: {
-      ...options.headers,
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-    },
+    headers: newHeaders,
   }).finally(() => clearTimeout(timeoutId));
 };
 
