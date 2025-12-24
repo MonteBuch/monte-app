@@ -87,9 +87,20 @@ function setupNetworkListeners() {
   });
 
   // Visibility Change: Wenn Tab wieder aktiv wird
-  document.addEventListener("visibilitychange", () => {
+  document.addEventListener("visibilitychange", async () => {
     if (document.visibilityState === "visible") {
-      log("Tab wurde aktiviert - prüfe Verbindung");
+      const timeSinceActivity = Date.now() - lastActivityTime;
+      const minutesInactive = Math.round(timeSinceActivity / 60000);
+      log(`Tab wurde aktiviert - ${minutesInactive} Minuten inaktiv`);
+
+      // Nach 10+ Minuten im Hintergrund: Seite neu laden
+      // TCP Connections sind dann definitiv tot
+      if (timeSinceActivity > 10 * 60 * 1000) {
+        log("Lange Hintergrund-Inaktivität - lade Seite neu für frische Verbindung");
+        window.location.reload();
+        return;
+      }
+
       checkAndReconnect();
     }
   });
