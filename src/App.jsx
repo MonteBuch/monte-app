@@ -57,6 +57,7 @@ import GroupChat from "./components/chat/GroupChat";
 import AdminArea from "./components/admin/AdminArea";
 import ErrorBoundary from "./components/ErrorBoundary";
 import InstallPrompt from "./components/ui/InstallPrompt";
+import UpdatePrompt from "./components/ui/UpdatePrompt";
 import MoreMenu, { ALL_TABS, DEFAULT_TABS } from "./components/ui/MoreMenu";
 import WelcomeScreen from "./components/ui/WelcomeScreen";
 import { hasTodayBirthdaysForUser } from "./lib/notificationTriggers";
@@ -1003,6 +1004,7 @@ function AppContent() {
         />
 
         <InstallPrompt />
+        <UpdatePrompt />
 
         {/* Willkommensscreen für neue User */}
         {showWelcome && (

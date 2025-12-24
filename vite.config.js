@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt', // Zeigt Update-Banner statt silent update
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
         name: 'Monte - Montessori Kinderhaus',
@@ -38,6 +38,11 @@ export default defineConfig({
         ]
       },
       workbox: {
+        // Alte Caches beim Update löschen
+        cleanupOutdatedCaches: true,
+        // Neuen Service Worker sofort aktivieren
+        skipWaiting: true,
+        clientsClaim: true,
         // Cache-Strategien
         runtimeCaching: [
           {
@@ -56,14 +61,14 @@ export default defineConfig({
             }
           },
           {
-            // Statische Assets: Cache First
+            // Statische Assets: StaleWhileRevalidate (zeigt Cache, holt Update im Hintergrund)
             urlPattern: /\.(?:js|css|woff2?|png|jpg|jpeg|gif|svg|ico)$/i,
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'static-assets',
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 Tage
+                maxAgeSeconds: 60 * 60 * 24 // 1 Tag (vorher 30)
               }
             }
           },
