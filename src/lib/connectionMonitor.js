@@ -260,7 +260,12 @@ async function checkAndReconnect() {
     log("Lange Inaktivität - prüfe Session");
 
     try {
-      const { data, error } = await supabase.auth.getSession();
+      // Session-Check mit 10 Sekunden Timeout
+      const { data, error } = await withTimeout(
+        supabase.auth.getSession(),
+        10000,
+        "Session-Check"
+      );
 
       if (error) {
         log("Session-Fehler:", error);
@@ -282,7 +287,16 @@ async function checkAndReconnect() {
         reconnectRealtime();
       }
     } catch (e) {
-      log("Fehler bei Session-Prüfung:", e);
+      log("Fehler bei Session-Prüfung:", e.message);
+
+      // Bei Timeout: Verbindungsproblem
+      if (e.message.includes("Timeout")) {
+        onStatusChange?.({
+          type: "connection_lost",
+          status: "failed",
+          message: "Verbindung hängt. Bitte Seite neu laden."
+        });
+      }
     }
   }
 }
@@ -302,6 +316,21 @@ function startHeartbeat() {
   }, 30000);
 }
 
+// Timeout-Wrapper der sauber aufräumt
+function withTimeout(promise, ms, label) {
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      log(`TIMEOUT bei ${label} nach ${ms}ms`);
+      reject(new Error(`Timeout: ${label}`));
+    }, ms);
+  });
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    clearTimeout(timeoutId);
+  });
+}
+
 // Proaktiver Health-Check: Alle 60 Sekunden wenn Tab aktiv
 function startHealthCheck() {
   healthCheckInterval = setInterval(async () => {
@@ -316,11 +345,13 @@ function startHealthCheck() {
 
     try {
       const start = Date.now();
-      const { error } = await supabase
-        .from("facilities")
-        .select("id")
-        .limit(1)
-        .single();
+
+      // Health-Check mit 10 Sekunden Timeout
+      const { error } = await withTimeout(
+        supabase.from("facilities").select("id").limit(1).single(),
+        10000,
+        "Health-Check"
+      );
 
       if (error) {
         log("Health-Check fehlgeschlagen:", error.message);
@@ -332,13 +363,18 @@ function startHealthCheck() {
       }
     } catch (e) {
       log("Health-Check Exception:", e.message);
+      recordFailedRequest(e);
 
-      // Bei AbortError (Timeout) oder TypeError (Netzwerk): Verbindungsproblem
-      if (e.name === "AbortError" || e.name === "TypeError") {
-        recordFailedRequest(e);
+      // Bei Timeout: Sofort Verbindungsproblem melden
+      if (e.message.includes("Timeout")) {
+        onStatusChange?.({
+          type: "connection_lost",
+          status: "failed",
+          message: "Verbindung hängt. Bitte Seite neu laden."
+        });
       }
     }
-  }, 60000); // Alle 60 Sekunden
+  }, 30000); // Alle 30 Sekunden (vorher 60)
 }
 
 // Test-Funktion für manuelle Verbindungsprüfung
@@ -348,19 +384,6 @@ export async function testConnection() {
   const results = {
     network: navigator.onLine,
     timestamp: new Date().toISOString(),
-  };
-
-  // Timeout-Wrapper für alle Promises
-  const withTimeout = (promise, ms, label) => {
-    return Promise.race([
-      promise,
-      new Promise((_, reject) =>
-        setTimeout(() => {
-          log(`TIMEOUT bei ${label} nach ${ms}ms`);
-          reject(new Error(`Timeout: ${label}`));
-        }, ms)
-      )
-    ]);
   };
 
   // 1. Auth-Session prüfen (mit 5s Timeout)
