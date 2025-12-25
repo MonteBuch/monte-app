@@ -46,30 +46,59 @@ const DEFAULT_TABS = {
 };
 
 // Separates Tab-Item für sauberes Rendering
-function TabItem({ tabId, isDragging = false, willBeSwapped = false, dragHandleProps = null }) {
+// dragHandleProps wird auf das gesamte Element angewendet für bessere Touch-Unterstützung
+function TabItem({ tabId, isDragging = false, willBeSwapped = false, dragHandleProps = null, isClone = false }) {
   const tab = ALL_TABS[tabId];
   if (!tab) return null;
 
   const Icon = tab.icon;
 
-  return (
-    <div
-      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
-        isDragging
-          ? "bg-white shadow-xl border-2 border-amber-500 scale-105"
-          : willBeSwapped
-          ? "bg-amber-100 border-2 border-amber-400 text-amber-700"
-          : "bg-white hover:bg-stone-100 text-stone-700"
-      }`}
-    >
-      {dragHandleProps && (
-        <div
-          {...dragHandleProps}
-          className="cursor-grab active:cursor-grabbing text-stone-400 hover:text-stone-600"
-        >
+  // Basis-Klassen
+  const baseClasses = `w-full flex items-center gap-3 p-3 rounded-xl transition-all select-none ${
+    isDragging
+      ? "bg-white shadow-xl border-2 border-amber-500 scale-105"
+      : willBeSwapped
+      ? "bg-amber-100 border-2 border-amber-400 text-amber-700"
+      : "bg-white hover:bg-stone-100 text-stone-700"
+  }`;
+
+  // Im Edit-Mode: Gesamtes Element ist der Drag-Handle (bessere Touch-UX)
+  if (dragHandleProps) {
+    return (
+      <div
+        {...dragHandleProps}
+        className={`${baseClasses} cursor-grab active:cursor-grabbing`}
+        style={{ touchAction: 'none' }} // Verhindert Scroll während Drag auf Touch
+      >
+        <div className="text-stone-400">
           <GripVertical size={16} />
         </div>
-      )}
+        <div className="relative">
+          <Icon size={20} />
+        </div>
+        <span className="font-medium">{tab.label}</span>
+      </div>
+    );
+  }
+
+  // Clone-Rendering (im Portal)
+  if (isClone) {
+    return (
+      <div className={baseClasses} style={{ touchAction: 'none' }}>
+        <div className="text-stone-400">
+          <GripVertical size={16} />
+        </div>
+        <div className="relative">
+          <Icon size={20} />
+        </div>
+        <span className="font-medium">{tab.label}</span>
+      </div>
+    );
+  }
+
+  // Normale Ansicht (nicht im Edit-Mode)
+  return (
+    <div className={baseClasses}>
       <div className="relative">
         <Icon size={20} />
       </div>
@@ -296,9 +325,10 @@ export default function MoreMenu({
         {...provided.dragHandleProps}
         style={{
           ...provided.draggableProps.style,
+          touchAction: 'none',
         }}
       >
-        <TabItem tabId={tabId} isDragging={true} dragHandleProps={null} />
+        <TabItem tabId={tabId} isDragging={true} isClone={true} />
       </div>
     );
   }, []);
@@ -413,7 +443,10 @@ export default function MoreMenu({
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
-                                style={provided.draggableProps.style}
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  touchAction: 'none',
+                                }}
                               >
                                 <TabItem
                                   tabId={tabId}
@@ -457,7 +490,10 @@ export default function MoreMenu({
                             <div
                               ref={provided.innerRef}
                               {...provided.draggableProps}
-                              style={provided.draggableProps.style}
+                              style={{
+                                ...provided.draggableProps.style,
+                                touchAction: 'none',
+                              }}
                             >
                               <TabItem
                                 tabId={tabId}
