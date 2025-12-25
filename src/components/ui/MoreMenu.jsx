@@ -1,5 +1,5 @@
 // src/components/ui/MoreMenu.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   X,
   Home,
@@ -13,7 +13,22 @@ import {
   Sliders,
   GripVertical,
 } from "lucide-react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  pointerWithin,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "../../api/supabaseClient";
 import { useToast } from "./Toast";
 
@@ -45,25 +60,68 @@ const DEFAULT_TABS = {
   },
 };
 
-// Separates Tab-Item für sauberes Rendering
-function TabItem({ tabId, isDragging = false, willBeSwapped = false, showGrip = false }) {
-  const tab = ALL_TABS[tabId];
-  if (!tab) return null;
+// Sortable Tab Item Komponente
+function SortableTabItem({ id, willBeSwapped }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
 
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    touchAction: "none",
+  };
+
+  const tab = ALL_TABS[id];
+  if (!tab) return null;
   const Icon = tab.icon;
 
   return (
-    <>
-      {showGrip && (
-        <div className="text-stone-400">
-          <GripVertical size={16} />
-        </div>
-      )}
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`w-full flex items-center gap-3 p-3 rounded-xl select-none cursor-grab active:cursor-grabbing ${
+        isDragging
+          ? "opacity-50 bg-stone-100"
+          : willBeSwapped
+          ? "bg-amber-100 border-2 border-amber-400 text-amber-700"
+          : "bg-white hover:bg-stone-100 text-stone-700"
+      }`}
+    >
+      <div className="text-stone-400">
+        <GripVertical size={16} />
+      </div>
       <div className="relative">
         <Icon size={20} />
       </div>
       <span className="font-medium">{tab.label}</span>
-    </>
+    </div>
+  );
+}
+
+// Drag Overlay Item (das sichtbare gezogene Element)
+function DragOverlayItem({ id }) {
+  const tab = ALL_TABS[id];
+  if (!tab) return null;
+  const Icon = tab.icon;
+
+  return (
+    <div className="w-full flex items-center gap-3 p-3 rounded-xl select-none bg-white shadow-xl border-2 border-amber-500 scale-105 cursor-grabbing">
+      <div className="text-stone-400">
+        <GripVertical size={16} />
+      </div>
+      <div className="relative">
+        <Icon size={20} />
+      </div>
+      <span className="font-medium">{tab.label}</span>
+    </div>
   );
 }
 
@@ -81,11 +139,27 @@ export default function MoreMenu({
   const [saving, setSaving] = useState(false);
   const [visible, setVisible] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
-
-  // Drag State für korrektes Swap-Highlighting
-  const [dragInfo, setDragInfo] = useState(null);
+  const [activeId, setActiveId] = useState(null);
+  const [overContainer, setOverContainer] = useState(null);
+  const [overIndex, setOverIndex] = useState(null);
 
   const { showSuccess } = useToast();
+
+  // Sensoren für @dnd-kit - Touch sofort aktivieren, keine Verzögerung
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 5,
+    },
+  });
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 0,
+      tolerance: 5,
+    },
+  });
+
+  const sensors = useSensors(mouseSensor, touchSensor);
 
   // Animation: Ein- und Ausblenden mit gleicher Geschwindigkeit
   useEffect(() => {
@@ -98,6 +172,11 @@ export default function MoreMenu({
       });
     } else {
       setAnimateIn(false);
+      // Bei Schließen: Edit-Mode beenden
+      if (customizeMode) {
+        setCustomizeMode(false);
+        loadTabPreferences();
+      }
       const timer = setTimeout(() => setVisible(false), 300);
       return () => clearTimeout(timer);
     }
@@ -147,86 +226,162 @@ export default function MoreMenu({
     return true;
   };
 
-  // Drag Start - speichern welches Element gezogen wird
-  const handleDragStart = useCallback((start) => {
-    setDragInfo({
-      draggableId: start.draggableId,
-      sourceDroppableId: start.source.droppableId,
-      sourceIndex: start.source.index,
-      destinationIndex: null,
-      destinationDroppableId: null,
-    });
+  // Finde Container und Index für ein Tab
+  const findContainer = useCallback(
+    (id) => {
+      if (mainTabs.includes(id)) return "main";
+      if (moreTabs.includes(id)) return "more";
+      return null;
+    },
+    [mainTabs, moreTabs]
+  );
+
+  // Drag Start
+  const handleDragStart = useCallback((event) => {
+    setActiveId(event.active.id);
   }, []);
 
-  // Drag Update - tracken wohin gezogen wird
-  const handleDragUpdate = useCallback((update) => {
-    if (!update.destination) {
-      setDragInfo(prev => prev ? { ...prev, destinationIndex: null, destinationDroppableId: null } : null);
-      return;
-    }
-
-    setDragInfo(prev => prev ? {
-      ...prev,
-      destinationIndex: update.destination.index,
-      destinationDroppableId: update.destination.droppableId,
-    } : null);
-  }, []);
-
-  // Drag End Handler
-  const handleDragEnd = useCallback((result) => {
-    setDragInfo(null);
-
-    if (!result.destination) return;
-
-    const { source, destination } = result;
-
-    // Gleiche Liste
-    if (source.droppableId === destination.droppableId) {
-      const items = source.droppableId === "main" ? [...mainTabs] : [...moreTabs];
-      const [removed] = items.splice(source.index, 1);
-      items.splice(destination.index, 0, removed);
-
-      if (source.droppableId === "main") {
-        setMainTabs(items);
-      } else {
-        setMoreTabs(items);
+  // Drag Over - tracken wohin gezogen wird
+  const handleDragOver = useCallback(
+    (event) => {
+      const { active, over } = event;
+      if (!over) {
+        setOverContainer(null);
+        setOverIndex(null);
+        return;
       }
-    } else {
-      // Zwischen Listen verschieben
-      const sourceItems = source.droppableId === "main" ? [...mainTabs] : [...moreTabs];
-      const destItems = destination.droppableId === "main" ? [...mainTabs] : [...moreTabs];
 
-      // Max 4 Tabs im Hauptmenü - bei vollem Menü: Tausch durchführen
-      if (destination.droppableId === "main" && destItems.length >= 4) {
-        const draggedItem = sourceItems[source.index];
-        const swapIndex = Math.min(destination.index, destItems.length - 1);
-        const swappedItem = destItems[swapIndex];
+      const activeContainer = findContainer(active.id);
+      let overContainerId = findContainer(over.id);
 
-        sourceItems[source.index] = swappedItem;
-        destItems[swapIndex] = draggedItem;
+      // Wenn over.id ein Container-ID ist (main/more)
+      if (over.id === "main" || over.id === "more") {
+        overContainerId = over.id;
+      }
 
-        if (source.droppableId === "main") {
+      setOverContainer(overContainerId);
+
+      // Index bestimmen
+      if (overContainerId === "main") {
+        const idx = mainTabs.indexOf(over.id);
+        setOverIndex(idx >= 0 ? idx : mainTabs.length - 1);
+      } else if (overContainerId === "more") {
+        const idx = moreTabs.indexOf(over.id);
+        setOverIndex(idx >= 0 ? idx : moreTabs.length);
+      }
+    },
+    [findContainer, mainTabs, moreTabs]
+  );
+
+  // Drag End
+  const handleDragEnd = useCallback(
+    (event) => {
+      const { active, over } = event;
+
+      setActiveId(null);
+      setOverContainer(null);
+      setOverIndex(null);
+
+      if (!over) return;
+
+      const activeContainer = findContainer(active.id);
+      let overContainer = findContainer(over.id);
+
+      // Wenn über Container selbst gedroppt
+      if (over.id === "main" || over.id === "more") {
+        overContainer = over.id;
+      }
+
+      if (!activeContainer || !overContainer) return;
+
+      // Gleicher Container - Neuordnung
+      if (activeContainer === overContainer) {
+        const items =
+          activeContainer === "main" ? [...mainTabs] : [...moreTabs];
+        const oldIndex = items.indexOf(active.id);
+        let newIndex = items.indexOf(over.id);
+
+        if (over.id === "main" || over.id === "more") {
+          newIndex = items.length - 1;
+        }
+
+        if (oldIndex !== newIndex && newIndex >= 0) {
+          items.splice(oldIndex, 1);
+          items.splice(newIndex, 0, active.id);
+
+          if (activeContainer === "main") {
+            setMainTabs(items);
+          } else {
+            setMoreTabs(items);
+          }
+        }
+      } else {
+        // Zwischen Containern verschieben
+        const sourceItems =
+          activeContainer === "main" ? [...mainTabs] : [...moreTabs];
+        const destItems =
+          overContainer === "main" ? [...mainTabs] : [...moreTabs];
+
+        const sourceIndex = sourceItems.indexOf(active.id);
+        let destIndex = destItems.indexOf(over.id);
+
+        if (over.id === "main" || over.id === "more") {
+          destIndex = destItems.length;
+        }
+
+        // Max 4 im Hauptmenü - Tausch durchführen
+        if (overContainer === "main" && destItems.length >= 4) {
+          const swapIdx =
+            destIndex >= 0 ? Math.min(destIndex, destItems.length - 1) : destItems.length - 1;
+          const swappedItem = destItems[swapIdx];
+
+          // Tausch
+          sourceItems[sourceIndex] = swappedItem;
+          destItems[swapIdx] = active.id;
+
+          if (activeContainer === "main") {
+            setMainTabs(sourceItems);
+            setMoreTabs(destItems);
+          } else {
+            setMainTabs(destItems);
+            setMoreTabs(sourceItems);
+          }
+          return;
+        }
+
+        // Normales Verschieben
+        sourceItems.splice(sourceIndex, 1);
+        if (destIndex < 0) destIndex = destItems.length;
+        destItems.splice(destIndex, 0, active.id);
+
+        if (activeContainer === "main") {
           setMainTabs(sourceItems);
           setMoreTabs(destItems);
         } else {
           setMainTabs(destItems);
           setMoreTabs(sourceItems);
         }
-        return;
       }
+    },
+    [findContainer, mainTabs, moreTabs]
+  );
 
-      const [removed] = sourceItems.splice(source.index, 1);
-      destItems.splice(destination.index, 0, removed);
-
-      if (source.droppableId === "main") {
-        setMainTabs(sourceItems);
-        setMoreTabs(destItems);
-      } else {
-        setMainTabs(destItems);
-        setMoreTabs(sourceItems);
-      }
+  // Swap-Index berechnen für Highlighting
+  const swapIndex = useMemo(() => {
+    if (!activeId || !overContainer) return -1;
+    const activeContainer = findContainer(activeId);
+    if (
+      activeContainer === "more" &&
+      overContainer === "main" &&
+      mainTabs.length >= 4 &&
+      overIndex !== null
+    ) {
+      return Math.min(overIndex, mainTabs.length - 1);
     }
-  }, [mainTabs, moreTabs]);
+    return -1;
+  }, [activeId, overContainer, overIndex, findContainer, mainTabs]);
+
+  const isDraggingToFullMain = swapIndex >= 0;
 
   // Speichern
   const savePreferences = async () => {
@@ -259,40 +414,6 @@ export default function MoreMenu({
     setMainTabs(defaults.main);
     setMoreTabs(defaults.more);
   };
-
-  // Prüfen ob ein Element getauscht wird (für Highlighting)
-  const getSwapIndex = () => {
-    if (!dragInfo) return -1;
-    if (dragInfo.sourceDroppableId === "more" &&
-        dragInfo.destinationDroppableId === "main" &&
-        mainTabs.length >= 4 &&
-        dragInfo.destinationIndex !== null) {
-      return Math.min(dragInfo.destinationIndex, mainTabs.length - 1);
-    }
-    return -1;
-  };
-
-  const swapIndex = getSwapIndex();
-  const isDraggingToFullMain = swapIndex >= 0;
-
-  // renderClone für Portal-Rendering des gezogenen Elements
-  const renderClone = useCallback((provided, snapshot, rubric) => {
-    const tabId = rubric.draggableId;
-    return (
-      <div
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-        className="w-full flex items-center gap-3 p-3 rounded-xl select-none bg-white shadow-xl border-2 border-amber-500 scale-105 cursor-grabbing"
-        style={{
-          ...provided.draggableProps.style,
-          touchAction: 'none',
-        }}
-      >
-        <TabItem tabId={tabId} isDragging={true} showGrip={true} />
-      </div>
-    );
-  }, []);
 
   // Tab-Button für normale Ansicht (nicht im Edit Mode)
   const renderNormalTabButton = (tabId) => {
@@ -367,9 +488,11 @@ export default function MoreMenu({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 flex flex-col">
           {customizeMode ? (
-            <DragDropContext
+            <DndContext
+              sensors={sensors}
+              collisionDetection={pointerWithin}
               onDragStart={handleDragStart}
-              onDragUpdate={handleDragUpdate}
+              onDragOver={handleDragOver}
               onDragEnd={handleDragEnd}
             >
               {/* Hauptmenü (max 4 Tabs) */}
@@ -382,56 +505,27 @@ export default function MoreMenu({
                     </span>
                   )}
                 </p>
-                <Droppable
-                  droppableId="main"
-                  renderClone={renderClone}
+                <SortableContext
+                  items={mainTabs}
+                  strategy={verticalListSortingStrategy}
+                  id="main"
                 >
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className={`space-y-2 min-h-[100px] rounded-xl p-2 transition-colors ${
-                        snapshot.isDraggingOver && mainTabs.length >= 4
-                          ? "bg-amber-50 border-2 border-dashed border-amber-400"
-                          : "bg-stone-50"
-                      }`}
-                    >
-                      {mainTabs.map((tabId, index) => {
-                        const willBeSwapped = index === swapIndex;
-                        return (
-                          <Draggable key={tabId} draggableId={tabId} index={index}>
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className={`w-full flex items-center gap-3 p-3 rounded-xl select-none cursor-grab active:cursor-grabbing ${
-                                  snapshot.isDragging
-                                    ? "bg-white shadow-xl border-2 border-amber-500 scale-105"
-                                    : willBeSwapped
-                                    ? "bg-amber-100 border-2 border-amber-400 text-amber-700"
-                                    : "bg-white hover:bg-stone-100 text-stone-700"
-                                }`}
-                                style={{
-                                  ...provided.draggableProps.style,
-                                  touchAction: 'none',
-                                }}
-                              >
-                                <TabItem
-                                  tabId={tabId}
-                                  isDragging={snapshot.isDragging}
-                                  willBeSwapped={willBeSwapped && !snapshot.isDragging}
-                                  showGrip={true}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        );
-                      })}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
+                  <div
+                    className={`space-y-2 min-h-[100px] rounded-xl p-2 transition-colors ${
+                      activeId && overContainer === "main" && mainTabs.length >= 4
+                        ? "bg-amber-50 border-2 border-dashed border-amber-400"
+                        : "bg-stone-50"
+                    }`}
+                  >
+                    {mainTabs.map((tabId, index) => (
+                      <SortableTabItem
+                        key={tabId}
+                        id={tabId}
+                        willBeSwapped={index === swapIndex}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
               </div>
 
               {/* Mehr-Menü */}
@@ -439,51 +533,29 @@ export default function MoreMenu({
                 <p className="text-xs font-semibold text-stone-500 uppercase mb-2">
                   Im "Mehr"-Menü
                 </p>
-                <Droppable
-                  droppableId="more"
-                  renderClone={renderClone}
+                <SortableContext
+                  items={moreTabs}
+                  strategy={verticalListSortingStrategy}
+                  id="more"
                 >
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className={`space-y-2 min-h-[100px] rounded-xl p-2 transition-colors ${
-                        snapshot.isDraggingOver
-                          ? "bg-amber-50 border-2 border-dashed border-amber-300"
-                          : "bg-stone-50"
-                      }`}
-                    >
-                      {moreTabs.map((tabId, index) => (
-                        <Draggable key={tabId} draggableId={tabId} index={index}>
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className={`w-full flex items-center gap-3 p-3 rounded-xl select-none cursor-grab active:cursor-grabbing ${
-                                snapshot.isDragging
-                                  ? "bg-white shadow-xl border-2 border-amber-500 scale-105"
-                                  : "bg-white hover:bg-stone-100 text-stone-700"
-                              }`}
-                              style={{
-                                ...provided.draggableProps.style,
-                                touchAction: 'none',
-                              }}
-                            >
-                              <TabItem
-                                tabId={tabId}
-                                isDragging={snapshot.isDragging}
-                                showGrip={true}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
+                  <div
+                    className={`space-y-2 min-h-[100px] rounded-xl p-2 transition-colors ${
+                      activeId && overContainer === "more"
+                        ? "bg-amber-50 border-2 border-dashed border-amber-300"
+                        : "bg-stone-50"
+                    }`}
+                  >
+                    {moreTabs.map((tabId) => (
+                      <SortableTabItem key={tabId} id={tabId} willBeSwapped={false} />
+                    ))}
+                  </div>
+                </SortableContext>
               </div>
+
+              {/* Drag Overlay - das sichtbare gezogene Element */}
+              <DragOverlay>
+                {activeId ? <DragOverlayItem id={activeId} /> : null}
+              </DragOverlay>
 
               {/* Aktionen */}
               <div className="space-y-2">
@@ -507,7 +579,7 @@ export default function MoreMenu({
                   Abbrechen
                 </button>
               </div>
-            </DragDropContext>
+            </DndContext>
           ) : (
             <>
               {/* Spacer um Inhalte nach unten zu drücken */}
