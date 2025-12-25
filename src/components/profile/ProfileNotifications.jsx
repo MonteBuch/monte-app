@@ -4,6 +4,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { supabase } from "../../api/supabaseClient";
 
 const OPTIONS = ["email", "app", "both", "off"];
+const OPTIONS_APP_ONLY = ["app", "off"]; // Für Kategorien ohne Email-Unterstützung
 
 export default function ProfileNotifications({ user, onBack }) {
   const [prefs, setPrefs] = useState({});
@@ -45,24 +46,56 @@ export default function ProfileNotifications({ user, onBack }) {
   }
 
   const savePref = async (cat, val) => {
+    // Optimistisches UI-Update
+    setPrefs(prev => ({ ...prev, [cat]: val }));
+
     try {
-      // Upsert: Insert oder Update
-      const { error } = await supabase
+      // Prüfen ob Eintrag existiert
+      const { data: existing, error: checkError } = await supabase
         .from("notification_preferences")
-        .upsert({
-          user_id: user.id,
-          category: cat,
-          preference: val,
-          updated_at: new Date().toISOString(),
-        }, {
-          onConflict: "user_id,category"
-        });
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("category", cat)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (checkError) {
+        console.error("[Notifications] Check fehlgeschlagen:", checkError);
+        throw checkError;
+      }
 
-      setPrefs(prev => ({ ...prev, [cat]: val }));
+      let error;
+      if (existing) {
+        // Update existierenden Eintrag
+        const result = await supabase
+          .from("notification_preferences")
+          .update({
+            preference: val,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
+        error = result.error;
+      } else {
+        // Insert neuen Eintrag
+        const result = await supabase
+          .from("notification_preferences")
+          .insert({
+            user_id: user.id,
+            category: cat,
+            preference: val,
+          });
+        error = result.error;
+      }
+
+      if (error) {
+        console.error("[Notifications] Speichern fehlgeschlagen:", error);
+        // Rollback bei Fehler
+        setPrefs(prev => ({ ...prev, [cat]: prefs[cat] }));
+        throw error;
+      }
+
+      console.log("[Notifications] Preference gespeichert:", cat, val);
     } catch (err) {
-      console.error("Notification pref speichern fehlgeschlagen:", err);
+      console.error("[Notifications] Fehler:", err);
     }
   };
 
@@ -113,32 +146,37 @@ export default function ProfileNotifications({ user, onBack }) {
       </h2>
 
       <div className="space-y-5">
-        {categories.map((c) => (
-          <div
-            key={c}
-            className="bg-white p-5 rounded-2xl border border-stone-200 space-y-3"
-          >
-            <p className="font-semibold text-sm text-stone-800">
-              {labelMap[c]}
-            </p>
+        {categories.map((c) => {
+          // Chat hat keine Email-Unterstützung
+          const options = c === "chat" ? OPTIONS_APP_ONLY : OPTIONS;
 
-            <div className="grid grid-cols-4 gap-2">
-              {OPTIONS.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => savePref(c, opt)}
-                  className={`py-2 rounded-xl text-xs font-semibold border transition ${
-                    prefs[c] === opt
-                      ? "bg-amber-500 text-white border-amber-600"
-                      : "bg-stone-50 text-stone-600 border-stone-300 hover:bg-stone-100"
-                  }`}
-                >
-                  {optionText[opt]}
-                </button>
-              ))}
+          return (
+            <div
+              key={c}
+              className="bg-white p-5 rounded-2xl border border-stone-200 space-y-3"
+            >
+              <p className="font-semibold text-sm text-stone-800">
+                {labelMap[c]}
+              </p>
+
+              <div className={`grid gap-2 ${options.length === 2 ? "grid-cols-2" : "grid-cols-4"}`}>
+                {options.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => savePref(c, opt)}
+                    className={`py-2 rounded-xl text-xs font-semibold border transition ${
+                      prefs[c] === opt
+                        ? "bg-amber-500 text-white border-amber-600"
+                        : "bg-stone-50 text-stone-600 border-stone-300 hover:bg-stone-100"
+                    }`}
+                  >
+                    {optionText[opt]}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ import {
   Move,
   Check,
   Copy,
+  Calendar,
 } from "lucide-react";
 import { supabase } from "../../api/supabaseClient";
 import { FACILITY_ID } from "../../lib/constants";
@@ -27,6 +28,12 @@ export default function AdminSystemTools() {
   const { facility, refreshFacility } = useFacility();
   const fileInputRef = useRef(null);
   const canvasRef = useRef(null);
+  const calendarFileInputRef = useRef(null);
+
+  // Calendar import/export states
+  const [calendarExporting, setCalendarExporting] = useState(false);
+  const [calendarImporting, setCalendarImporting] = useState(false);
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
 
   // Reset states
   const [resetStep, setResetStep] = useState(0);
@@ -209,6 +216,140 @@ export default function AdminSystemTools() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  };
+
+  /* =============================================================
+     CALENDAR EXPORT/IMPORT
+     ============================================================= */
+  const exportCalendarEvents = async () => {
+    setCalendarExporting(true);
+    try {
+      // Exportiere nur Termine des ausgewählten Jahres (basierend auf Startdatum)
+      const { data: events, error } = await supabase
+        .from("facility_events")
+        .select("title, date_start, date_end, time_info, category, notes")
+        .eq("facility_id", FACILITY_ID)
+        .gte("date_start", `${calendarYear}-01-01`)
+        .lte("date_start", `${calendarYear}-12-31`)
+        .order("date_start", { ascending: true });
+
+      if (error) throw error;
+
+      if (!events || events.length === 0) {
+        showWarning(`Keine Termine für ${calendarYear} vorhanden`);
+        return;
+      }
+
+      const headers = ["Titel", "Startdatum", "Enddatum", "Uhrzeit", "Kategorie", "Notizen"];
+      const rows = events.map((e) => [
+        e.title || "",
+        e.date_start || "",
+        e.date_end || "",
+        e.time_info || "",
+        e.category || "other",
+        e.notes || "",
+      ]);
+
+      const csvContent = [
+        headers.join(";"),
+        ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";")),
+      ].join("\n");
+
+      downloadCSV(csvContent, `termine_${calendarYear}_export_${formatDate()}.csv`);
+      showSuccess(`${events.length} Termine für ${calendarYear} exportiert`);
+    } catch (err) {
+      console.error("Termin-Export fehlgeschlagen:", err);
+      showError("Export fehlgeschlagen: " + err.message);
+    } finally {
+      setCalendarExporting(false);
+    }
+  };
+
+  const handleCalendarFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setCalendarImporting(true);
+    try {
+      const text = await file.text();
+      const lines = text.split(/\r?\n/).filter(line => line.trim());
+
+      if (lines.length < 2) {
+        showError("CSV-Datei enthält keine Daten");
+        return;
+      }
+
+      // Skip header
+      const dataLines = lines.slice(1);
+      const events = [];
+      let skipped = 0;
+
+      for (const line of dataLines) {
+        // Parse CSV with semicolon delimiter
+        const values = [];
+        let current = "";
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              current += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ";" && !inQuotes) {
+            values.push(current.trim());
+            current = "";
+          } else {
+            current += char;
+          }
+        }
+        values.push(current.trim());
+
+        const [title, date_start, date_end, time_info, category, notes] = values;
+
+        if (!title || !date_start) {
+          skipped++;
+          continue;
+        }
+
+        // Validate date format (YYYY-MM-DD)
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date_start)) {
+          skipped++;
+          continue;
+        }
+
+        events.push({
+          facility_id: FACILITY_ID,
+          title: title,
+          date_start: date_start,
+          date_end: date_end && /^\d{4}-\d{2}-\d{2}$/.test(date_end) ? date_end : null,
+          time_info: time_info || null,
+          category: ["closed", "parent_event", "celebration", "other"].includes(category) ? category : "other",
+          notes: notes || null,
+        });
+      }
+
+      if (events.length === 0) {
+        showError("Keine gültigen Termine gefunden");
+        return;
+      }
+
+      const { error } = await supabase.from("facility_events").insert(events);
+      if (error) throw error;
+
+      showSuccess(`${events.length} Termine importiert${skipped > 0 ? ` (${skipped} übersprungen)` : ""}`);
+    } catch (err) {
+      console.error("Termin-Import fehlgeschlagen:", err);
+      showError("Import fehlgeschlagen: " + err.message);
+    } finally {
+      setCalendarImporting(false);
+      if (calendarFileInputRef.current) {
+        calendarFileInputRef.current.value = "";
+      }
+    }
   };
 
   const formatDate = () => {
@@ -545,6 +686,58 @@ export default function AdminSystemTools() {
             {exporting ? <Loader2 className="animate-spin" size={18} /> : <><Mail size={18} /> Emails</>}
           </button>
         </div>
+      </div>
+
+      {/* TERMIN EXPORT/IMPORT */}
+      <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+        <h3 className="font-semibold text-stone-700 flex items-center gap-2">
+          <Calendar size={18} />
+          Termine Export / Import
+        </h3>
+        <p className="text-sm text-stone-500">
+          Exportiere Termine als CSV oder importiere aus einer CSV-Datei. Das Startdatum bestimmt die Jahreszuordnung.
+        </p>
+
+        {/* Jahresauswahl */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-stone-600">Jahr:</span>
+          <select
+            value={calendarYear}
+            onChange={(e) => setCalendarYear(parseInt(e.target.value))}
+            className="px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+          >
+            {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={exportCalendarEvents}
+            disabled={calendarExporting}
+            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-purple-500 text-white font-semibold rounded-xl hover:bg-purple-600 transition-colors disabled:opacity-50"
+          >
+            {calendarExporting ? <Loader2 className="animate-spin" size={18} /> : <><Download size={18} /> Export {calendarYear}</>}
+          </button>
+          <input
+            type="file"
+            ref={calendarFileInputRef}
+            accept=".csv"
+            onChange={handleCalendarFileSelect}
+            className="hidden"
+          />
+          <button
+            onClick={() => calendarFileInputRef.current?.click()}
+            disabled={calendarImporting}
+            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-amber-500 text-white font-semibold rounded-xl hover:bg-amber-600 transition-colors disabled:opacity-50"
+          >
+            {calendarImporting ? <Loader2 className="animate-spin" size={18} /> : <><Upload size={18} /> Import</>}
+          </button>
+        </div>
+        <p className="text-xs text-stone-400">
+          CSV-Format: Titel; Startdatum (YYYY-MM-DD); Enddatum; Uhrzeit; Kategorie (closed/parent_event/celebration/other); Notizen
+        </p>
       </div>
 
       {/* APP NAME */}

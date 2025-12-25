@@ -78,6 +78,7 @@ export default function GroupChat({ user }) {
               .from("group_chat_messages")
               .select("id", { count: "exact", head: true })
               .eq("group_id", groupId)
+              .neq("user_id", user.id) // Eigene Nachrichten nicht zählen
               .gt("created_at", part.last_read_at || part.activated_at);
 
             if (!countError) {
@@ -253,14 +254,12 @@ export default function GroupChat({ user }) {
                 </div>
                 <div className="flex items-center gap-2">
                   {isActive && unread > 0 && (
-                    <span className="bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                      {unread > 99 ? "99+" : unread}
+                    <span className="w-5 h-5 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      !
                     </span>
                   )}
-                  {isActive ? (
+                  {isActive && (
                     <ChevronRight size={20} className="text-stone-400" />
-                  ) : (
-                    <span className="text-xs text-stone-400">Tippen zum Aktivieren</span>
                   )}
                 </div>
               </button>

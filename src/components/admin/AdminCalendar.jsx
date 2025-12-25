@@ -1,7 +1,6 @@
 // src/components/admin/AdminCalendar.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import {
-  ArrowLeft,
   Loader2,
   Plus,
   Edit,
@@ -25,14 +24,8 @@ const CATEGORIES = {
     lightColor: "bg-red-100",
     textColor: "text-red-700",
   },
-  team: {
-    label: "Team",
-    color: "bg-blue-500",
-    lightColor: "bg-blue-100",
-    textColor: "text-blue-700",
-  },
   parent_event: {
-    label: "Elternabend",
+    label: "Elternvertreterversammlung",
     color: "bg-purple-500",
     lightColor: "bg-purple-100",
     textColor: "text-purple-700",
@@ -42,12 +35,6 @@ const CATEGORIES = {
     color: "bg-amber-500",
     lightColor: "bg-amber-100",
     textColor: "text-amber-700",
-  },
-  info: {
-    label: "Information",
-    color: "bg-green-500",
-    lightColor: "bg-green-100",
-    textColor: "text-green-700",
   },
   other: {
     label: "Sonstiges",
@@ -83,19 +70,28 @@ export default function AdminCalendar({ user, onBack }) {
     notes: "",
   });
 
-  // Daten laden
+  // Daten laden - auch jahresübergreifende Termine berücksichtigen
   const loadEvents = useCallback(async () => {
     try {
+      // Lade Termine, deren Start ODER Ende im ausgewählten Jahr liegt
       const { data, error } = await supabase
         .from("facility_events")
         .select("*")
         .eq("facility_id", FACILITY_ID)
-        .gte("date_start", `${selectedYear}-01-01`)
-        .lte("date_start", `${selectedYear}-12-31`)
+        .or(`date_start.gte.${selectedYear}-01-01,date_end.gte.${selectedYear}-01-01`)
+        .or(`date_start.lte.${selectedYear}-12-31,date_end.lte.${selectedYear}-12-31`)
         .order("date_start", { ascending: true });
 
       if (error) throw error;
-      setEvents(data || []);
+
+      // Filtere nur relevante Events für dieses Jahr
+      const relevantEvents = (data || []).filter(event => {
+        const startYear = new Date(event.date_start).getFullYear();
+        const endYear = event.date_end ? new Date(event.date_end).getFullYear() : startYear;
+        return startYear === selectedYear || endYear === selectedYear;
+      });
+
+      setEvents(relevantEvents);
     } catch (err) {
       console.error("Events laden fehlgeschlagen:", err);
       showError("Termine konnten nicht geladen werden");
@@ -196,34 +192,56 @@ export default function AdminCalendar({ user, onBack }) {
     }
   };
 
-  // Events nach Monat gruppieren
+  // Events nach Monat gruppieren - jahresübergreifende Termine in relevanten Monaten
   const eventsByMonth = {};
   MONTHS.forEach((_, idx) => {
     eventsByMonth[idx] = [];
   });
   events.forEach((event) => {
-    const month = new Date(event.date_start).getMonth();
-    eventsByMonth[month].push(event);
+    const startDate = new Date(event.date_start);
+    const endDate = event.date_end ? new Date(event.date_end) : startDate;
+    const startYear = startDate.getFullYear();
+    const endYear = endDate.getFullYear();
+
+    // Bestimme welche Monate im ausgewählten Jahr betroffen sind
+    if (startYear === selectedYear && endYear === selectedYear) {
+      // Termin komplett im ausgewählten Jahr - nur Startmonat
+      eventsByMonth[startDate.getMonth()].push(event);
+    } else if (startYear === selectedYear && endYear > selectedYear) {
+      // Termin beginnt im ausgewählten Jahr, endet später
+      for (let m = startDate.getMonth(); m <= 11; m++) {
+        eventsByMonth[m].push(event);
+      }
+    } else if (startYear < selectedYear && endYear === selectedYear) {
+      // Termin begann vorher, endet im ausgewählten Jahr
+      for (let m = 0; m <= endDate.getMonth(); m++) {
+        eventsByMonth[m].push(event);
+      }
+    } else if (startYear < selectedYear && endYear > selectedYear) {
+      // Termin umspannt das ganze Jahr
+      for (let m = 0; m <= 11; m++) {
+        eventsByMonth[m].push(event);
+      }
+    }
   });
 
-  // Datum formatieren
+  // Datum formatieren - immer TT.MM.YY
   const formatDate = (dateStr, endDateStr) => {
     const start = new Date(dateStr);
     const startDay = start.getDate().toString().padStart(2, "0");
     const startMonth = (start.getMonth() + 1).toString().padStart(2, "0");
+    const startYear = start.getFullYear().toString().slice(-2);
 
     if (endDateStr) {
       const end = new Date(endDateStr);
       const endDay = end.getDate().toString().padStart(2, "0");
       const endMonth = (end.getMonth() + 1).toString().padStart(2, "0");
+      const endYear = end.getFullYear().toString().slice(-2);
 
-      if (start.getMonth() === end.getMonth()) {
-        return `${startDay}.–${endDay}.${startMonth}.`;
-      }
-      return `${startDay}.${startMonth}.–${endDay}.${endMonth}.`;
+      return `${startDay}.${startMonth}.${startYear} – ${endDay}.${endMonth}.${endYear}`;
     }
 
-    return `${startDay}.${startMonth}.`;
+    return `${startDay}.${startMonth}.${startYear}`;
   };
 
   if (loading) {
@@ -234,19 +252,13 @@ export default function AdminCalendar({ user, onBack }) {
     );
   }
 
+  // Jahresgrenzen: nur letztes, aktuelles und nächstes Jahr (wie für Eltern)
+  const currentYear = new Date().getFullYear();
+  const minYear = currentYear - 1;
+  const maxYear = currentYear + 1;
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      {onBack && (
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-stone-500 hover:text-stone-800"
-        >
-          <ArrowLeft size={18} />
-          <span className="text-sm font-medium">Zurück</span>
-        </button>
-      )}
-
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-stone-800">Terminverwaltung</h2>
@@ -256,8 +268,9 @@ export default function AdminCalendar({ user, onBack }) {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setSelectedYear((y) => y - 1)}
-            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600"
+            onClick={() => setSelectedYear((y) => Math.max(minYear, y - 1))}
+            disabled={selectedYear <= minYear}
+            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronLeft size={20} />
           </button>
@@ -265,8 +278,9 @@ export default function AdminCalendar({ user, onBack }) {
             {selectedYear}
           </span>
           <button
-            onClick={() => setSelectedYear((y) => y + 1)}
-            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600"
+            onClick={() => setSelectedYear((y) => Math.min(maxYear, y + 1))}
+            disabled={selectedYear >= maxYear}
+            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronRight size={20} />
           </button>
@@ -299,7 +313,7 @@ export default function AdminCalendar({ user, onBack }) {
             <p className="text-2xl font-bold text-purple-600">
               {events.filter((e) => e.category === "parent_event").length}
             </p>
-            <p className="text-xs text-stone-500">Elternabende</p>
+            <p className="text-xs text-stone-500">Versammlungen</p>
           </div>
         </div>
       </div>

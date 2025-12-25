@@ -22,6 +22,7 @@ export default function ChatRoom({ group, user, participation, onBack }) {
   const [replyTo, setReplyTo] = useState(null);
   const [userNames, setUserNames] = useState({});
   const [likes, setLikes] = useState({});
+  const [initialLoad, setInitialLoad] = useState(true);
   const messagesEndRef = useRef(null);
   const { showError } = useToast();
 
@@ -82,6 +83,9 @@ export default function ChatRoom({ group, user, participation, onBack }) {
         .update({ last_read_at: new Date().toISOString() })
         .eq("id", participation.id);
 
+      // Badge in Menu Bar aktualisieren
+      window.dispatchEvent(new Event("refreshChatBadge"));
+
     } catch (err) {
       console.error("Nachrichten laden fehlgeschlagen:", err);
     } finally {
@@ -95,6 +99,8 @@ export default function ChatRoom({ group, user, participation, onBack }) {
 
   // Realtime Subscription
   useEffect(() => {
+    console.log("[ChatRoom] Setting up realtime subscription for group:", group.id);
+
     const channel = supabase
       .channel(`chat-${group.id}`)
       .on(
@@ -106,8 +112,19 @@ export default function ChatRoom({ group, user, participation, onBack }) {
           filter: `group_id=eq.${group.id}`,
         },
         async (payload) => {
+          console.log("[ChatRoom] Realtime INSERT received:", payload);
+
+          // Prüfen ob Nachricht schon existiert (eigene Nachrichten)
+          setMessages((prev) => {
+            if (prev.some(m => m.id === payload.new.id)) {
+              console.log("[ChatRoom] Message already exists, skipping");
+              return prev;
+            }
+            return prev; // Wird unten aktualisiert
+          });
+
           // Neue Nachricht mit Profil laden
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from("group_chat_messages")
             .select(`
               *,
@@ -119,8 +136,19 @@ export default function ChatRoom({ group, user, participation, onBack }) {
             .eq("id", payload.new.id)
             .single();
 
+          if (error) {
+            console.error("[ChatRoom] Error loading new message:", error);
+            return;
+          }
+
           if (data) {
-            setMessages((prev) => [...prev, data]);
+            setMessages((prev) => {
+              // Doppelte verhindern
+              if (prev.some(m => m.id === data.id)) {
+                return prev;
+              }
+              return [...prev, data];
+            });
             if (data.profiles) {
               setUserNames((prev) => ({
                 ...prev,
@@ -130,17 +158,31 @@ export default function ChatRoom({ group, user, participation, onBack }) {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("[ChatRoom] Subscription status:", status);
+      });
 
     return () => {
+      console.log("[ChatRoom] Removing realtime subscription for group:", group.id);
       supabase.removeChannel(channel);
     };
   }, [group.id]);
 
-  // Auto-scroll bei neuen Nachrichten
+  // Auto-scroll bei neuen Nachrichten (instant beim ersten Laden, sonst smooth)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (!loading && messages.length > 0) {
+      // Kleiner Timeout um sicherzustellen dass das DOM gerendert ist
+      const timer = setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({
+          behavior: initialLoad ? "instant" : "smooth"
+        });
+        if (initialLoad) {
+          setInitialLoad(false);
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [messages, loading, initialLoad]);
 
   // Nachricht senden
   const sendMessage = async () => {
@@ -326,19 +368,29 @@ export default function ChatRoom({ group, user, participation, onBack }) {
                       {formatTime(message.created_at)}
                     </span>
 
-                    {/* Like Button */}
-                    <button
-                      onClick={() => toggleLike(message.id)}
-                      className={`flex items-center gap-1 text-[10px] ${
-                        hasLiked ? "text-red-500" : "text-stone-400 hover:text-red-500"
-                      }`}
-                    >
-                      <Heart
-                        size={12}
-                        fill={hasLiked ? "currentColor" : "none"}
-                      />
-                      {messageLikes.length > 0 && messageLikes.length}
-                    </button>
+                    {/* Like Button (nur für fremde Nachrichten, aber Likes-Count immer sichtbar) */}
+                    {!isOwn ? (
+                      <button
+                        onClick={() => toggleLike(message.id)}
+                        className={`flex items-center gap-1 text-[10px] ${
+                          hasLiked ? "text-red-500" : "text-stone-400 hover:text-red-500"
+                        }`}
+                      >
+                        <Heart
+                          size={12}
+                          fill={hasLiked ? "currentColor" : "none"}
+                        />
+                        {messageLikes.length > 0 && messageLikes.length}
+                      </button>
+                    ) : (
+                      /* Nur Likes-Count anzeigen für eigene Nachrichten */
+                      messageLikes.length > 0 && (
+                        <span className="flex items-center gap-1 text-[10px] text-red-400">
+                          <Heart size={12} fill="currentColor" />
+                          {messageLikes.length}
+                        </span>
+                      )
+                    )}
 
                     {/* Reply Button (nur für fremde Nachrichten) */}
                     {!isOwn && (

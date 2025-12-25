@@ -21,15 +21,8 @@ const CATEGORIES = {
     textColor: "text-red-700",
     borderColor: "border-red-300",
   },
-  team: {
-    label: "Team",
-    color: "bg-blue-500",
-    lightColor: "bg-blue-100",
-    textColor: "text-blue-700",
-    borderColor: "border-blue-300",
-  },
   parent_event: {
-    label: "Elternabend",
+    label: "Elternvertreterversammlung",
     color: "bg-purple-500",
     lightColor: "bg-purple-100",
     textColor: "text-purple-700",
@@ -41,13 +34,6 @@ const CATEGORIES = {
     lightColor: "bg-amber-100",
     textColor: "text-amber-700",
     borderColor: "border-amber-300",
-  },
-  info: {
-    label: "Information",
-    color: "bg-green-500",
-    lightColor: "bg-green-100",
-    textColor: "text-green-700",
-    borderColor: "border-green-300",
   },
   other: {
     label: "Sonstiges",
@@ -69,32 +55,84 @@ export default function CalendarView() {
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [availableYears, setAvailableYears] = useState([]);
+  const [yearsLoaded, setYearsLoaded] = useState(false);
 
-  // Daten laden
-  const loadEvents = useCallback(async () => {
+  // Verfügbare Jahre laden (basierend auf Startdatum der Termine)
+  const loadAvailableYears = useCallback(async () => {
     try {
+      const { data, error } = await supabase
+        .from("facility_events")
+        .select("date_start")
+        .eq("facility_id", FACILITY_ID);
+
+      if (error) throw error;
+
+      // Extrahiere einzigartige Jahre aus date_start
+      const years = [...new Set((data || []).map(e => new Date(e.date_start).getFullYear()))];
+      years.sort((a, b) => a - b);
+
+      setAvailableYears(years);
+
+      // Setze selectedYear auf das aktuellste verfügbare Jahr oder aktuelles Jahr
+      const currentYear = new Date().getFullYear();
+      if (years.length > 0) {
+        // Bevorzuge aktuelles Jahr wenn vorhanden, sonst nächstes verfügbares
+        if (years.includes(currentYear)) {
+          setSelectedYear(currentYear);
+        } else {
+          // Finde das nächste Jahr >= aktuelles Jahr, oder das letzte verfügbare
+          const futureYears = years.filter(y => y >= currentYear);
+          setSelectedYear(futureYears.length > 0 ? futureYears[0] : years[years.length - 1]);
+        }
+      }
+    } catch (err) {
+      console.error("Jahre laden fehlgeschlagen:", err);
+    } finally {
+      setYearsLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAvailableYears();
+  }, [loadAvailableYears]);
+
+  // Daten laden - auch jahresübergreifende Termine berücksichtigen
+  const loadEvents = useCallback(async () => {
+    if (!yearsLoaded) return;
+
+    try {
+      // Lade Termine, deren Start ODER Ende im ausgewählten Jahr liegt
       const { data, error } = await supabase
         .from("facility_events")
         .select("*")
         .eq("facility_id", FACILITY_ID)
-        .gte("date_start", `${selectedYear}-01-01`)
-        .lte("date_start", `${selectedYear}-12-31`)
+        .or(`date_start.gte.${selectedYear}-01-01,date_end.gte.${selectedYear}-01-01`)
+        .or(`date_start.lte.${selectedYear}-12-31,date_end.lte.${selectedYear}-12-31`)
         .order("date_start", { ascending: true });
 
       if (error) throw error;
-      setEvents(data || []);
+
+      // Filtere nur relevante Events für dieses Jahr
+      const relevantEvents = (data || []).filter(event => {
+        const startYear = new Date(event.date_start).getFullYear();
+        const endYear = event.date_end ? new Date(event.date_end).getFullYear() : startYear;
+        return startYear === selectedYear || endYear === selectedYear;
+      });
+
+      setEvents(relevantEvents);
     } catch (err) {
       console.error("Events laden fehlgeschlagen:", err);
     } finally {
       setLoading(false);
     }
-  }, [selectedYear]);
+  }, [selectedYear, yearsLoaded]);
 
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
 
-  // Events nach Monat gruppieren
+  // Events nach Monat gruppieren - jahresübergreifende Termine in relevanten Monaten
   const eventsByMonth = useMemo(() => {
     const grouped = {};
     MONTHS.forEach((_, idx) => {
@@ -102,31 +140,55 @@ export default function CalendarView() {
     });
 
     events.forEach((event) => {
-      const month = new Date(event.date_start).getMonth();
-      grouped[month].push(event);
+      const startDate = new Date(event.date_start);
+      const endDate = event.date_end ? new Date(event.date_end) : startDate;
+      const startYear = startDate.getFullYear();
+      const endYear = endDate.getFullYear();
+
+      // Bestimme welche Monate im ausgewählten Jahr betroffen sind
+      if (startYear === selectedYear && endYear === selectedYear) {
+        // Termin komplett im ausgewählten Jahr - nur Startmonat
+        grouped[startDate.getMonth()].push(event);
+      } else if (startYear === selectedYear && endYear > selectedYear) {
+        // Termin beginnt im ausgewählten Jahr, endet später
+        // Zeige in allen Monaten ab Startmonat bis Dezember
+        for (let m = startDate.getMonth(); m <= 11; m++) {
+          grouped[m].push(event);
+        }
+      } else if (startYear < selectedYear && endYear === selectedYear) {
+        // Termin begann vorher, endet im ausgewählten Jahr
+        // Zeige in allen Monaten von Januar bis Endmonat
+        for (let m = 0; m <= endDate.getMonth(); m++) {
+          grouped[m].push(event);
+        }
+      } else if (startYear < selectedYear && endYear > selectedYear) {
+        // Termin umspannt das ganze Jahr
+        for (let m = 0; m <= 11; m++) {
+          grouped[m].push(event);
+        }
+      }
     });
 
     return grouped;
-  }, [events]);
+  }, [events, selectedYear]);
 
-  // Datum formatieren
+  // Datum formatieren - immer TT.MM.YY
   const formatDate = (dateStr, endDateStr) => {
     const start = new Date(dateStr);
     const startDay = start.getDate().toString().padStart(2, "0");
     const startMonth = (start.getMonth() + 1).toString().padStart(2, "0");
+    const startYear = start.getFullYear().toString().slice(-2);
 
     if (endDateStr) {
       const end = new Date(endDateStr);
       const endDay = end.getDate().toString().padStart(2, "0");
       const endMonth = (end.getMonth() + 1).toString().padStart(2, "0");
+      const endYear = end.getFullYear().toString().slice(-2);
 
-      if (start.getMonth() === end.getMonth()) {
-        return `${startDay}.–${endDay}.${startMonth}.`;
-      }
-      return `${startDay}.${startMonth}.–${endDay}.${endMonth}.`;
+      return `${startDay}.${startMonth}.${startYear} – ${endDay}.${endMonth}.${endYear}`;
     }
 
-    return `${startDay}.${startMonth}.`;
+    return `${startDay}.${startMonth}.${startYear}`;
   };
 
   // Prüfen ob Event in der Vergangenheit liegt
@@ -152,13 +214,34 @@ export default function CalendarView() {
     return start.getTime() === today.getTime();
   };
 
-  if (loading) {
+  if (loading || !yearsLoaded) {
     return (
       <div className="flex justify-center py-12">
         <Loader2 className="animate-spin text-amber-500" size={32} />
       </div>
     );
   }
+
+  // Keine Termine vorhanden
+  if (availableYears.length === 0) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+          <CalendarIcon size={20} className="text-amber-500" />
+          Terminübersicht
+        </h2>
+        <div className="bg-white rounded-2xl border border-stone-200 p-8 text-center">
+          <CalendarIcon size={48} className="mx-auto text-stone-300 mb-4" />
+          <p className="text-stone-500">Noch keine Termine vorhanden.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Navigation-Hilfsvariablen
+  const currentYearIndex = availableYears.indexOf(selectedYear);
+  const canGoBack = currentYearIndex > 0;
+  const canGoForward = currentYearIndex < availableYears.length - 1;
 
   return (
     <div className="space-y-6">
@@ -170,8 +253,9 @@ export default function CalendarView() {
         </h2>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setSelectedYear((y) => y - 1)}
-            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600"
+            onClick={() => canGoBack && setSelectedYear(availableYears[currentYearIndex - 1])}
+            disabled={!canGoBack}
+            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronLeft size={20} />
           </button>
@@ -179,8 +263,9 @@ export default function CalendarView() {
             {selectedYear}
           </span>
           <button
-            onClick={() => setSelectedYear((y) => y + 1)}
-            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600"
+            onClick={() => canGoForward && setSelectedYear(availableYears[currentYearIndex + 1])}
+            disabled={!canGoForward}
+            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronRight size={20} />
           </button>
