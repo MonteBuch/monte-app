@@ -201,15 +201,18 @@ export default function WelcomeScreen({ user, onComplete }) {
 
   const handleComplete = async () => {
     setIsClosing(true);
-    try {
-      // In DB speichern, dass User Welcome gesehen hat
-      await supabase
-        .from("profiles")
-        .update({ has_seen_welcome: true })
-        .eq("id", user.id);
-    } catch (err) {
-      console.error("Welcome-Status speichern fehlgeschlagen:", err);
+    // In DB speichern, dass User Welcome gesehen hat
+    const { error } = await supabase
+      .from("profiles")
+      .update({ has_seen_welcome: true })
+      .eq("id", user.id);
+
+    if (error) {
+      console.error("Welcome-Status speichern fehlgeschlagen:", error);
+    } else {
+      console.log("[WelcomeScreen] has_seen_welcome erfolgreich gesetzt für User:", user.id);
     }
+
     // Callback nach kurzer Animation
     setTimeout(() => {
       onComplete();

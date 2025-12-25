@@ -130,7 +130,7 @@ const NavButton = ({ icon, label, active, onClick, badge }) => (
     <div className="w-6 h-6 flex items-center justify-center relative">
       {icon}
       {badge && (
-        <div className="absolute -top-1 -right-3 bg-amber-500 text-white rounded-full p-0.5">
+        <div className="absolute -top-1.5 -right-2.5 w-4 h-4 bg-amber-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold">
           {badge}
         </div>
       )}
@@ -271,10 +271,10 @@ function AppContent() {
   const [profileView, setProfileView] = useState("home");
   // Geburtstags-Badge für Team-User
   const [hasBirthdays, setHasBirthdays] = useState(false);
-  // Unbestätigte Antworten-Badge für Eltern
-  const [hasUnacknowledgedResponses, setHasUnacknowledgedResponses] = useState(false);
-  // Ungelesene Chat-Nachrichten Badge für Eltern
-  const [hasUnreadChat, setHasUnreadChat] = useState(false);
+  // Unbestätigte Antworten-Count für Eltern (Badge in Navigation)
+  const [unacknowledgedResponsesCount, setUnacknowledgedResponsesCount] = useState(0);
+  // Ungelesene Chat-Nachrichten Count für Eltern (Badge in Navigation)
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
   // Email-Bestätigung erfolgreich (zeigt Meldung statt Auto-Login)
   const [emailConfirmed, setEmailConfirmed] = useState(false);
   // Tab-Präferenzen für dynamisches Menü
@@ -494,7 +494,7 @@ function AppContent() {
   // Unbestätigte Antworten für Eltern prüfen (Badge in Navigation)
   useEffect(() => {
     if (!user || user.role !== "parent") {
-      setHasUnacknowledgedResponses(false);
+      setUnacknowledgedResponsesCount(0);
       return;
     }
 
@@ -503,11 +503,11 @@ function AppContent() {
         // Alle Kinder-IDs des Elternteils
         const childIds = (user.children || []).map(c => c.id);
         if (childIds.length === 0) {
-          setHasUnacknowledgedResponses(false);
+          setUnacknowledgedResponsesCount(0);
           return;
         }
 
-        // Prüfen ob es unbestätigte Antworten gibt
+        // Anzahl unbestätigter Antworten zählen
         const { count, error } = await supabase
           .from("absences")
           .select("id", { count: "exact", head: true })
@@ -517,10 +517,10 @@ function AppContent() {
 
         if (error) throw error;
 
-        setHasUnacknowledgedResponses(count > 0);
+        setUnacknowledgedResponsesCount(count || 0);
       } catch (err) {
         console.error("Unbestätigte Antworten Check fehlgeschlagen:", err);
-        setHasUnacknowledgedResponses(false);
+        setUnacknowledgedResponsesCount(0);
       }
     }
 
@@ -555,7 +555,7 @@ function AppContent() {
   // Ungelesene Chat-Nachrichten für Eltern prüfen (Badge in Navigation)
   useEffect(() => {
     if (!user || user.role !== "parent") {
-      setHasUnreadChat(false);
+      setUnreadChatCount(0);
       return;
     }
 
@@ -571,29 +571,29 @@ function AppContent() {
         if (partError) throw partError;
 
         if (!participations || participations.length === 0) {
-          setHasUnreadChat(false);
+          setUnreadChatCount(0);
           return;
         }
 
-        // Für jede Teilnahme prüfen ob es ungelesene Nachrichten gibt
-        let hasUnread = false;
+        // Für jede Teilnahme ungelesene Nachrichten zählen
+        let totalUnread = 0;
         for (const part of participations) {
           const { count, error } = await supabase
             .from("group_chat_messages")
             .select("id", { count: "exact", head: true })
             .eq("group_id", part.group_id)
+            .neq("user_id", user.id) // Eigene Nachrichten nicht zählen
             .gt("created_at", part.last_read_at || part.activated_at);
 
           if (!error && count > 0) {
-            hasUnread = true;
-            break;
+            totalUnread += count;
           }
         }
 
-        setHasUnreadChat(hasUnread);
+        setUnreadChatCount(totalUnread);
       } catch (err) {
         console.error("Ungelesene Chat-Nachrichten Check fehlgeschlagen:", err);
-        setHasUnreadChat(false);
+        setUnreadChatCount(0);
       }
     }
 
@@ -982,8 +982,8 @@ function AppContent() {
           user={user}
           badges={{
             group: hasBirthdays ? <Cake size={10} /> : null,
-            absence: hasUnacknowledgedResponses ? <span className="w-2 h-2 rounded-full bg-amber-500" /> : null,
-            chat: hasUnreadChat ? <span className="w-2 h-2 rounded-full bg-amber-500" /> : null,
+            absence: unacknowledgedResponsesCount > 0 ? "!" : null,
+            chat: unreadChatCount > 0 ? "!" : null,
           }}
           tabPrefs={tabPrefs}
           onOpenMore={() => setMoreMenuOpen(true)}
@@ -998,8 +998,8 @@ function AppContent() {
           user={user}
           badges={{
             group: hasBirthdays ? <Cake size={10} /> : null,
-            absence: hasUnacknowledgedResponses ? <span className="w-2 h-2 rounded-full bg-amber-500" /> : null,
-            chat: hasUnreadChat ? <span className="w-2 h-2 rounded-full bg-amber-500" /> : null,
+            absence: unacknowledgedResponsesCount > 0 ? "!" : null,
+            chat: unreadChatCount > 0 ? "!" : null,
           }}
         />
 

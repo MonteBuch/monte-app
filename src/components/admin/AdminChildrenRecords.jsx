@@ -285,11 +285,18 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            {child.authorized_pickups && (
-                              <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
-                                Abholberechtigte
-                              </span>
-                            )}
+                            <div className="flex flex-col items-end gap-1">
+                              {child.notes && (
+                                <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+                                  Hinweise
+                                </span>
+                              )}
+                              {child.authorized_pickups && (
+                                <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+                                  Abholberechtigte
+                                </span>
+                              )}
+                            </div>
                             {isEditable ? (
                               <Edit size={16} className="text-stone-400" />
                             ) : (
