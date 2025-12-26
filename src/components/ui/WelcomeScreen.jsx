@@ -140,7 +140,7 @@ const ADMIN_SLIDES = [
     title: "Pinnwand",
     subtitle: "Kommunikation mit allen",
     description:
-      "Erstelle Mitteilungen für alle Eltern oder einzelne Gruppen. Sowohl Leitung als auch Team können Beiträge für die gesamte Einrichtung verfassen.",
+      "Erstelle Mitteilungen für alle Eltern oder einzelne Gruppen. Sowohl Leitung als auch das Team können Beiträge für die gesamte Einrichtung verfassen.",
   },
   {
     icon: CalendarDays,
