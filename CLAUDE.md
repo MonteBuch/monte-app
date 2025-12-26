@@ -66,7 +66,7 @@ Das Problem: Supabase-Requests hängen manchmal ohne Response (weder Erfolg noch
 
 ---
 
-## Current State (as of 2025-12-24)
+## Current State (as of 2025-12-26)
 
 ### Migration Status: 100% Complete
 
@@ -231,7 +231,25 @@ src/
 - [ ] Monitoring/Error tracking (Sentry)
 - [ ] Deployment documentation
 
-### Recent Updates (2025-12-24)
+### Recent Updates (2025-12-26)
+
+**Dark Mode Komplett-Fix:**
+- [x] Dark Mode für alle 43+ Komponenten implementiert
+- [x] Profile, Admin, Group, Food, Absence, Calendar, Chat, News Komponenten
+- [x] ThemeContext für bedingte Header-Farben (helle Pastellfarben nur im Light Mode)
+- [x] Gruppenheader mit korrekter Text-Lesbarkeit in beiden Modi
+
+**Video-Support für Pinnwand:**
+- [x] Video-Upload mit korrektem contentType
+- [x] 5 Minuten Timeout für große Videos
+- [x] Video-Player in NewsFeed
+
+**Email-Template:**
+- [x] "Montessori Kinderhaus Buch" Header
+- [x] "Du"-Form im Text
+- [x] Auto-Cleanup Migration für alte News (>6 Monate)
+
+### Updates (2025-12-24)
 
 **Connection & PWA Stabilität:**
 - [x] Connection Monitor mit proaktiven Health-Checks (30s Intervall)
@@ -282,67 +300,127 @@ src/
 | Offline-Caching | Workbox | Workbox |
 | Install to Home Screen | Browser Prompt | Play Store |
 
-### V2 Features (2025-12-23)
+### V2 Features (2025-12-26) - Mit UAT Feedback
 
-**Feature 1: Rückmeldung Abwesenheitsmeldung**
+**Feature 1: Rückmeldung Abwesenheitsmeldung** ⚠️ TEILWEISE OFFEN
 - [x] Optionales Textfeld für alle Abwesenheitsmeldungen
 - [x] Team/Admin kann auf Meldungen reagieren (staff_response, staff_response_by)
 - [x] Eltern sehen Antwort in ihrer Meldung
 - [x] Badge für unbestätigte Antworten (response_acknowledged)
-- [x] Benachrichtigungsoption "absence_response" für Eltern
+- [ ] **OFFEN:** Notification preference "Rückmeldung zu Abwesenheitsmeldungen" lässt sich nicht setzen
+- [ ] **OFFEN:** Tab Badge fehlerhaft (nur kleiner gelber Punkt statt Zahl)
+- [ ] **SPÄTER (Native):** App Badge bei offenen Rückmeldungen
 
-**Feature 2: Kinderakten**
+**Feature 2: Kinderakten** ⚠️ TEILWEISE OFFEN
 - [x] Neuer Menüpunkt "Kinderakten" im Admin-Bereich
 - [x] Alle Kinder nach Gruppen sortiert
 - [x] Modal mit: Name, Gruppe, Geburtstag, Notizen, Abholberechtigte
 - [x] Team: nur Lesen, Admin: Lesen + Schreiben
 - [x] authorized_pickups Feld in children Tabelle
+- [x] Grüner "Abholberechtigte"-Badge wenn hinterlegt
+- [ ] **OFFEN:** Grüner "Hinweise"-Badge wenn Notizen hinterlegt sind (analog zu Abholberechtigte)
 
-**Feature 3: Terminübersicht**
+**Feature 3: Terminübersicht** ⚠️ MEHRERE OFFEN
 - [x] facility_events Tabelle für Jahresplanung
 - [x] CalendarView für Eltern/Team als Tab
 - [x] AdminCalendar für Admin im Admin-Menü
-- [x] Kategorien: closed, team, parent_event, celebration, info, other
 - [x] Kalendarische Darstellung mit Farbkodierung und Legende
+- [ ] **OFFEN:** Datumsformat TT.MM.YY bei allen Terminen (Start + Ende)
+- [ ] **OFFEN:** Kategorien: "Team" und "Information" entfernen, "Elternabend" → "Elternvertreterversammlung"
+- [ ] **OFFEN:** Nur max. letztes vergangenes Jahr auswählbar, ältere aus DB löschen
+- [ ] **OFFEN:** Für Eltern nur letztes, aktuelles und nächstes Jahr (falls Einträge)
+- [ ] **OFFEN:** Download/Upload Option in Admin → System Tools
+- [ ] **OFFEN:** 2x Zurück Button fixen
 
-**Feature 4: Gruppenchat**
-- [x] Realtime Chat nur für Eltern
+**Feature 4: Gruppenchat** ⚠️ MEHRERE OFFEN
+- [x] Chat nur für Eltern
 - [x] Pro Gruppe ein Chat (basierend auf Kindern)
 - [x] Opt-in/opt-out pro Gruppe
 - [x] Antworten (Reply), Likes, Zeitstempel
 - [x] Team/Admin haben KEINEN Zugriff
-- [x] Badge für ungelesene Nachrichten
-- [x] Benachrichtigungsoption "chat" für Eltern
+- [ ] **OFFEN:** Realtime funktioniert nicht - Nachrichten erst nach Neuladen sichtbar
+- [ ] **OFFEN:** Eigene Nachrichten erzeugen "ungelesen" Badge beim Verlassen
+- [ ] **OFFEN:** Notifications lassen sich nicht setzen (WICHTIG: Keine Email-Option! Budget!)
+- [ ] **OFFEN:** "Tippen zum Aktivieren" Text entfernen (Button reicht)
+- [ ] **OFFEN:** Eigene Nachrichten liken deaktivieren
+- [ ] **OFFEN:** Tab Badge fehlerhaft (nur kleiner gelber Punkt)
+- [ ] **OFFEN:** Badge verschwindet nicht zuverlässig nach Lesen
+- [ ] **SPÄTER (Native):** App Badge bei ungelesenen Nachrichten
+- [ ] **OFFEN:** Scrollbalken entfernen, standardmäßig aktiviert?, Medien?
 
-**Feature 5: Tab-Management**
+**Feature 5: Tab-Management** ⚠️ MEHRERE OFFEN
 - [x] "Mehr"-Menü als 5. Tab (Burger-Icon)
 - [x] Slide-out Seitenmenü
 - [x] user_tab_preferences Tabelle
 - [x] Drag & Drop zum Anpassen der Tab-Reihenfolge
 - [x] Speichern auf Benutzerebene
 - [x] Badges auch im Mehr-Menü sichtbar
+- [ ] **OFFEN:** Neusortierung funktioniert nicht am PC (nur Smartphone)
+- [ ] **OFFEN:** "Wechsel" ermöglichen - Tausch vs. Einsortieren unterscheiden
+- [ ] **OFFEN:** Edit Mode beenden wenn Seitenleiste durch Tab geschlossen wird
+- [ ] **OFFEN:** Elemente im Seitenmenü von UNTEN anordnen (nicht von oben) - Mobile UX
+- [ ] **OFFEN:** Am Smartphone buggy (2 touches benötigt)
 
-**Feature 6: Willkommensscreen**
+**Feature 6: Willkommensscreen** ⚠️ MEHRERE OFFEN
 - [x] Welcome-Popup für neue User nach Registrierung
 - [x] Durchschaltbare Slides mit Tipps
 - [x] Rollenspezifische Inhalte (Eltern/Team/Admin)
 - [x] has_seen_welcome Flag in profiles
 - [x] Kann später erneut angezeigt werden (in Anpassungen)
+- [ ] **BUG:** Willkommensscreen kommt bei JEDEM Login erneut (soll nur beim ersten Mal!)
+- [ ] **OFFEN:** Eltern Gruppenbereich: "Dienstpläne" → "Dienstlisten", generischeres Wording (kein "Fingertipp")
+- [ ] **OFFEN:** Team Gruppenbereich: "Dienstpläne" → "Dienstlisten"
+- [ ] **OFFEN:** Admin Pinnwand: Wording anpassen (Team kann auch für gesamte Einrichtung posten)
+- [ ] **OFFEN:** Admin Abwesenheits-Dashboard: "Export" erwähnen entfernen (existiert nicht)
 
-**Feature 7: News → Pinnwand**
+**Feature 7: News → Pinnwand** ⚠️ TEILWEISE OFFEN
 - [x] Umbenennung von "News" zu "Pinnwand"
 - [x] Modernisiertes Card-Design
 - [x] Bildergalerie mit Grid-Layout
 - [x] Lightbox für Vollbild-Ansicht
 - [x] "Weiterlesen" für lange Texte
 - [x] Like-Funktion für alle User (news_likes Tabelle)
+- [x] Video-Support mit korrektem contentType
+- [ ] **OFFEN:** Team/Admin Tab Badge bei "ungelesenen" Likes
 
-**Feature 8: Dark/Light Mode**
+**Feature 8: Dark/Light Mode** ✅ ERLEDIGT
 - [x] theme_preference in profiles (light/dark/system)
 - [x] ThemeContext für App-weite Theme-Verwaltung
-- [x] Dark Mode CSS-Klassen (Tailwind)
+- [x] Dark Mode CSS-Klassen (Tailwind) - alle Komponenten
 - [x] "Anpassungen" Menüpunkt im Profil
 - [x] Option zum erneuten Anzeigen des Willkommensscreens
+- [x] Gruppenheader: Im Dark Mode dunkler Hintergrund statt heller Pastellfarben
+
+**Feature 9: Gruppenbuch** 📋 ROADMAP
+- Wartet auf Input von Kitaleitung
+
+---
+
+### NEUE THEMEN (aus UAT Feedback)
+
+**Registrierung** ❌ OFFEN
+- [ ] "Vollständiger Name" → "Anzeigename" umbenennen
+- [ ] "Konto erstellen" Button: Nur Popup mit Hinweis "Einladungslink erforderlich" (nicht zum Registrierungsscreen)
+- [ ] Rollenauswahl-Sektion entfernen (nur noch Einladungslinks)
+
+**Notification Screen Redesign** ❌ OFFEN
+- [ ] Neues Design: On/Off Checkboxen für Email und App (getrennt)
+- [ ] "Beides" Option entfernen (Checkboxen können beide gewählt werden)
+- [ ] Badge-Einstellung pro Bereich hinzufügen (Tab-Badge an/aus)
+- [ ] Überlegen: Unterschiedliche Sets für Web vs. Native App?
+
+**UI/UX Verbesserungen** ❌ OFFEN
+1. [ ] Email-Adresse im Profil ändern ermöglichen
+2. [ ] "Einrichtungsinfos und Kontakt" aus Profil entfernen → "i" Icon im Header (rechts oben)
+   - Bei Team/Admin: unter dem Rollen-Chip
+   - Bei Eltern: an Stelle des Chips
+3. [ ] Logout Button aus Profil entfernen → Icon im Header (rechts vom "i")
+4. [ ] Auto-Timeout nach 10 Min? (bereits teilweise implementiert mit Connection Monitor)
+5. [ ] Einladungs-Email aus Email-Verzeichnis generieren und senden (schönes Template mit "Monte Intro.jpg")
+6. [ ] Passwort-Reset Email mit schönem Template (wie Registrierungs-Email)
+7. [ ] Tab "Gruppe" → "Listen" umbenennen, Gruppenheader → "Listenbereich" (auch in Willkommensscreens)
+
+---
 
 **Neue Datenbank-Tabellen (V2):**
 - `facility_events` - Jahresplanung/Termine
@@ -351,6 +429,7 @@ src/
 - `group_chat_likes` - Likes auf Chat-Nachrichten
 - `user_tab_preferences` - Tab-Anordnung
 - `news_likes` - Likes auf Pinnwand-Beiträge
+- `news_hidden` - Ausgeblendete News pro User
 
 **Neue Spalten (V2):**
 - `profiles.has_seen_welcome` - Welcome-Screen gesehen
@@ -383,8 +462,24 @@ Ein Feature zur Dokumentation des Gruppenalltags:
 
 ## NÄCHSTE OFFENE SCHRITTE
 
-### 0. UAT für Web/PWA Version (PRIORITÄT)
-Siehe TO-DO Liste oben. Systematischer Test aller Features vor Go-Live.
+### 0. V2 Feature Bugfixes (PRIORITÄT)
+Basierend auf UAT Feedback aus "V2 Features der Monte.pdf" - siehe V2 Features Sektion oben.
+
+**Kritische Bugs:**
+1. **Willkommensscreen** kommt bei jedem Login (soll nur einmal!)
+2. **Gruppenchat Realtime** funktioniert nicht
+3. **Tab Badges** fehlerhaft (nur gelber Punkt statt Zahl)
+4. **Notification Preferences** für Chat/Abwesenheits-Rückmeldung lassen sich nicht setzen
+
+**Priorisierte Reihenfolge:**
+1. Willkommensscreen Bug (has_seen_welcome wird nicht korrekt gesetzt/geprüft)
+2. Badge-System überarbeiten (einheitliches Zahlen-Badge)
+3. Gruppenchat Realtime fixen
+4. Notification Preferences fixen
+5. Terminübersicht Anpassungen
+6. Tab-Management PC-Support
+7. Registrierung Anpassungen
+8. UI-Verschiebungen (Logout/Info in Header)
 
 ### 1. Email-Versand debuggen (OFFEN)
 
@@ -394,12 +489,6 @@ Siehe TO-DO Liste oben. Systematischer Test aller Features vor Go-Live.
 - Resend Domain-Verifikation: ✅ Erfolgreich
 - Edge Function `send-news-email` ist deployed
 - `FROM_EMAIL` Secret ist gesetzt
-
-**Debug-Logging aktiv:**
-Bei News-Erstellung wird in Browser-Console ausgegeben:
-- Anzahl geladener Profile
-- Welche User Email-Benachrichtigungen aktiviert haben
-- Edge Function Response
 
 **Zu prüfen:**
 1. Browser-Console öffnen (F12) beim News-Erstellen
@@ -414,6 +503,7 @@ Im Supabase Dashboard unter Database → Replication:
 - `groups` aktivieren
 - `group_lists` aktivieren
 - `facilities` aktivieren
+- `group_chat_messages` aktivieren (für Chat Realtime!)
 
 ### 3. Play Store Submission (WARTET)
 
