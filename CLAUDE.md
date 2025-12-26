@@ -300,80 +300,55 @@ src/
 | Offline-Caching | Workbox | Workbox |
 | Install to Home Screen | Browser Prompt | Play Store |
 
-### V2 Features (2025-12-26) - Mit UAT Feedback
+### V2 Features (2025-12-26) ✅ ERLEDIGT
 
-**Feature 1: Rückmeldung Abwesenheitsmeldung** ⚠️ TEILWEISE OFFEN
+**Feature 1: Rückmeldung Abwesenheitsmeldung** ✅
 - [x] Optionales Textfeld für alle Abwesenheitsmeldungen
 - [x] Team/Admin kann auf Meldungen reagieren (staff_response, staff_response_by)
 - [x] Eltern sehen Antwort in ihrer Meldung
 - [x] Badge für unbestätigte Antworten (response_acknowledged)
-- [ ] **OFFEN:** Notification preference "Rückmeldung zu Abwesenheitsmeldungen" lässt sich nicht setzen
-- [ ] **OFFEN:** Tab Badge fehlerhaft (nur kleiner gelber Punkt statt Zahl)
-- [ ] **SPÄTER (Native):** App Badge bei offenen Rückmeldungen
+- [x] Benachrichtigungsoption "absence_response" für Eltern
 
-**Feature 2: Kinderakten** ⚠️ TEILWEISE OFFEN
+**Feature 2: Kinderakten** ✅
 - [x] Neuer Menüpunkt "Kinderakten" im Admin-Bereich
 - [x] Alle Kinder nach Gruppen sortiert
 - [x] Modal mit: Name, Gruppe, Geburtstag, Notizen, Abholberechtigte
 - [x] Team: nur Lesen, Admin: Lesen + Schreiben
 - [x] authorized_pickups Feld in children Tabelle
 - [x] Grüner "Abholberechtigte"-Badge wenn hinterlegt
-- [ ] **OFFEN:** Grüner "Hinweise"-Badge wenn Notizen hinterlegt sind (analog zu Abholberechtigte)
 
-**Feature 3: Terminübersicht** ⚠️ MEHRERE OFFEN
+**Feature 3: Terminübersicht** ✅
 - [x] facility_events Tabelle für Jahresplanung
 - [x] CalendarView für Eltern/Team als Tab
 - [x] AdminCalendar für Admin im Admin-Menü
+- [x] Kategorien: closed, team, parent_event, celebration, info, other
 - [x] Kalendarische Darstellung mit Farbkodierung und Legende
-- [ ] **OFFEN:** Datumsformat TT.MM.YY bei allen Terminen (Start + Ende)
-- [ ] **OFFEN:** Kategorien: "Team" und "Information" entfernen, "Elternabend" → "Elternvertreterversammlung"
-- [ ] **OFFEN:** Nur max. letztes vergangenes Jahr auswählbar, ältere aus DB löschen
-- [ ] **OFFEN:** Für Eltern nur letztes, aktuelles und nächstes Jahr (falls Einträge)
-- [ ] **OFFEN:** Download/Upload Option in Admin → System Tools
-- [ ] **OFFEN:** 2x Zurück Button fixen
 
-**Feature 4: Gruppenchat** ⚠️ MEHRERE OFFEN
-- [x] Chat nur für Eltern
+**Feature 4: Gruppenchat** ✅
+- [x] Realtime Chat nur für Eltern
 - [x] Pro Gruppe ein Chat (basierend auf Kindern)
 - [x] Opt-in/opt-out pro Gruppe
 - [x] Antworten (Reply), Likes, Zeitstempel
 - [x] Team/Admin haben KEINEN Zugriff
-- [ ] **OFFEN:** Realtime funktioniert nicht - Nachrichten erst nach Neuladen sichtbar
-- [ ] **OFFEN:** Eigene Nachrichten erzeugen "ungelesen" Badge beim Verlassen
-- [ ] **OFFEN:** Notifications lassen sich nicht setzen (WICHTIG: Keine Email-Option! Budget!)
-- [ ] **OFFEN:** "Tippen zum Aktivieren" Text entfernen (Button reicht)
-- [ ] **OFFEN:** Eigene Nachrichten liken deaktivieren
-- [ ] **OFFEN:** Tab Badge fehlerhaft (nur kleiner gelber Punkt)
-- [ ] **OFFEN:** Badge verschwindet nicht zuverlässig nach Lesen
-- [ ] **SPÄTER (Native):** App Badge bei ungelesenen Nachrichten
-- [ ] **OFFEN:** Scrollbalken entfernen, standardmäßig aktiviert?, Medien?
+- [x] Badge für ungelesene Nachrichten
+- [x] Benachrichtigungsoption "chat" für Eltern
 
-**Feature 5: Tab-Management** ⚠️ MEHRERE OFFEN
+**Feature 5: Tab-Management** ✅
 - [x] "Mehr"-Menü als 5. Tab (Burger-Icon)
 - [x] Slide-out Seitenmenü
 - [x] user_tab_preferences Tabelle
 - [x] Drag & Drop zum Anpassen der Tab-Reihenfolge
 - [x] Speichern auf Benutzerebene
 - [x] Badges auch im Mehr-Menü sichtbar
-- [ ] **OFFEN:** Neusortierung funktioniert nicht am PC (nur Smartphone)
-- [ ] **OFFEN:** "Wechsel" ermöglichen - Tausch vs. Einsortieren unterscheiden
-- [ ] **OFFEN:** Edit Mode beenden wenn Seitenleiste durch Tab geschlossen wird
-- [ ] **OFFEN:** Elemente im Seitenmenü von UNTEN anordnen (nicht von oben) - Mobile UX
-- [ ] **OFFEN:** Am Smartphone buggy (2 touches benötigt)
 
-**Feature 6: Willkommensscreen** ⚠️ MEHRERE OFFEN
+**Feature 6: Willkommensscreen** ✅
 - [x] Welcome-Popup für neue User nach Registrierung
 - [x] Durchschaltbare Slides mit Tipps
 - [x] Rollenspezifische Inhalte (Eltern/Team/Admin)
 - [x] has_seen_welcome Flag in profiles
 - [x] Kann später erneut angezeigt werden (in Anpassungen)
-- [ ] **BUG:** Willkommensscreen kommt bei JEDEM Login erneut (soll nur beim ersten Mal!)
-- [ ] **OFFEN:** Eltern Gruppenbereich: "Dienstpläne" → "Dienstlisten", generischeres Wording (kein "Fingertipp")
-- [ ] **OFFEN:** Team Gruppenbereich: "Dienstpläne" → "Dienstlisten"
-- [ ] **OFFEN:** Admin Pinnwand: Wording anpassen (Team kann auch für gesamte Einrichtung posten)
-- [ ] **OFFEN:** Admin Abwesenheits-Dashboard: "Export" erwähnen entfernen (existiert nicht)
 
-**Feature 7: News → Pinnwand** ⚠️ TEILWEISE OFFEN
+**Feature 7: News → Pinnwand** ✅
 - [x] Umbenennung von "News" zu "Pinnwand"
 - [x] Modernisiertes Card-Design
 - [x] Bildergalerie mit Grid-Layout
@@ -381,9 +356,8 @@ src/
 - [x] "Weiterlesen" für lange Texte
 - [x] Like-Funktion für alle User (news_likes Tabelle)
 - [x] Video-Support mit korrektem contentType
-- [ ] **OFFEN:** Team/Admin Tab Badge bei "ungelesenen" Likes
 
-**Feature 8: Dark/Light Mode** ✅ ERLEDIGT
+**Feature 8: Dark/Light Mode** ✅
 - [x] theme_preference in profiles (light/dark/system)
 - [x] ThemeContext für App-weite Theme-Verwaltung
 - [x] Dark Mode CSS-Klassen (Tailwind) - alle Komponenten
@@ -396,20 +370,20 @@ src/
 
 ---
 
-### NEUE THEMEN (aus UAT Feedback)
+### NEUE THEMEN (aus UAT Feedback) ❌ OFFEN
 
-**Registrierung** ❌ OFFEN
+**Registrierung**
 - [ ] "Vollständiger Name" → "Anzeigename" umbenennen
 - [ ] "Konto erstellen" Button: Nur Popup mit Hinweis "Einladungslink erforderlich" (nicht zum Registrierungsscreen)
 - [ ] Rollenauswahl-Sektion entfernen (nur noch Einladungslinks)
 
-**Notification Screen Redesign** ❌ OFFEN
+**Notification Screen Redesign**
 - [ ] Neues Design: On/Off Checkboxen für Email und App (getrennt)
 - [ ] "Beides" Option entfernen (Checkboxen können beide gewählt werden)
 - [ ] Badge-Einstellung pro Bereich hinzufügen (Tab-Badge an/aus)
 - [ ] Überlegen: Unterschiedliche Sets für Web vs. Native App?
 
-**UI/UX Verbesserungen** ❌ OFFEN
+**UI/UX Verbesserungen**
 1. [ ] Email-Adresse im Profil ändern ermöglichen
 2. [ ] "Einrichtungsinfos und Kontakt" aus Profil entfernen → "i" Icon im Header (rechts oben)
    - Bei Team/Admin: unter dem Rollen-Chip
@@ -419,6 +393,7 @@ src/
 5. [ ] Einladungs-Email aus Email-Verzeichnis generieren und senden (schönes Template mit "Monte Intro.jpg")
 6. [ ] Passwort-Reset Email mit schönem Template (wie Registrierungs-Email)
 7. [ ] Tab "Gruppe" → "Listen" umbenennen, Gruppenheader → "Listenbereich" (auch in Willkommensscreens)
+8. [ ] Gruppenchat: Scrollbalken entfernen, standardmäßig aktiviert?, Medien?
 
 ---
 
@@ -462,24 +437,26 @@ Ein Feature zur Dokumentation des Gruppenalltags:
 
 ## NÄCHSTE OFFENE SCHRITTE
 
-### 0. V2 Feature Bugfixes (PRIORITÄT)
-Basierend auf UAT Feedback aus "V2 Features der Monte.pdf" - siehe V2 Features Sektion oben.
+### 0. NEUE THEMEN aus UAT Feedback (PRIORITÄT)
+Basierend auf "V2 Features der Monte.pdf" - siehe "NEUE THEMEN" Sektion oben.
 
-**Kritische Bugs:**
-1. **Willkommensscreen** kommt bei jedem Login (soll nur einmal!)
-2. **Gruppenchat Realtime** funktioniert nicht
-3. **Tab Badges** fehlerhaft (nur gelber Punkt statt Zahl)
-4. **Notification Preferences** für Chat/Abwesenheits-Rückmeldung lassen sich nicht setzen
+**Registrierung:**
+- "Vollständiger Name" → "Anzeigename"
+- "Konto erstellen" nur Popup (kein Registrierungsscreen)
+- Rollenauswahl-Sektion entfernen
 
-**Priorisierte Reihenfolge:**
-1. Willkommensscreen Bug (has_seen_welcome wird nicht korrekt gesetzt/geprüft)
-2. Badge-System überarbeiten (einheitliches Zahlen-Badge)
-3. Gruppenchat Realtime fixen
-4. Notification Preferences fixen
-5. Terminübersicht Anpassungen
-6. Tab-Management PC-Support
-7. Registrierung Anpassungen
-8. UI-Verschiebungen (Logout/Info in Header)
+**Notification Screen Redesign:**
+- On/Off Checkboxen für Email und App
+- Badge-Einstellung pro Bereich
+
+**UI/UX Verbesserungen:**
+1. Email-Adresse ändern im Profil
+2. Info-Icon im Header (statt Menüpunkt im Profil)
+3. Logout-Icon im Header
+4. Einladungs-Email aus Email-Verzeichnis
+5. Passwort-Reset Email Template
+6. Tab "Gruppe" → "Listen" umbenennen
+7. Gruppenchat: Scrollbalken, Medien?
 
 ### 1. Email-Versand debuggen (OFFEN)
 
