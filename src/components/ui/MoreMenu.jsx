@@ -71,10 +71,15 @@ function SortableTabItem({ id, willBeSwapped }) {
     isDragging,
   } = useSortable({ id });
 
+  // Nur Y-Translation verwenden um horizontales Wackeln zu verhindern
+  // Keine CSS-Transition - sofortiges Repositionieren verhindert Wackeln
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+    transform: transform
+      ? `translate3d(0, ${transform.y}px, 0)`
+      : undefined,
     touchAction: "none",
+    // Verstecken während des Drags - DragOverlay zeigt das Element
+    opacity: isDragging ? 0 : 1,
   };
 
   const tab = ALL_TABS[id];
@@ -88,9 +93,7 @@ function SortableTabItem({ id, willBeSwapped }) {
       {...attributes}
       {...listeners}
       className={`w-full flex items-center gap-3 p-3 rounded-xl select-none cursor-grab active:cursor-grabbing ${
-        isDragging
-          ? "opacity-50 bg-stone-100"
-          : willBeSwapped
+        willBeSwapped
           ? "bg-amber-100 border-2 border-amber-400 text-amber-700"
           : "bg-white hover:bg-stone-100 text-stone-700"
       }`}
@@ -113,7 +116,10 @@ function DragOverlayItem({ id }) {
   const Icon = tab.icon;
 
   return (
-    <div className="w-full flex items-center gap-3 p-3 rounded-xl select-none bg-white shadow-xl border-2 border-amber-500 scale-105 cursor-grabbing">
+    <div
+      className="flex items-center gap-3 p-3 rounded-xl select-none bg-white shadow-xl border-2 border-amber-500 cursor-grabbing"
+      style={{ width: "224px" }} // Feste Breite für Portal-Rendering
+    >
       <div className="text-stone-400">
         <GripVertical size={16} />
       </div>
@@ -511,7 +517,7 @@ export default function MoreMenu({
                   id="main"
                 >
                   <div
-                    className={`space-y-2 min-h-[100px] rounded-xl p-2 transition-colors ${
+                    className={`space-y-2 min-h-[100px] rounded-xl p-2 ${
                       activeId && overContainer === "main" && mainTabs.length >= 4
                         ? "bg-amber-50 border-2 border-dashed border-amber-400"
                         : "bg-stone-50"
@@ -553,7 +559,12 @@ export default function MoreMenu({
               </div>
 
               {/* Drag Overlay - das sichtbare gezogene Element */}
-              <DragOverlay>
+              <DragOverlay
+                dropAnimation={{
+                  duration: 200,
+                  easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+                }}
+              >
                 {activeId ? <DragOverlayItem id={activeId} /> : null}
               </DragOverlay>
 
