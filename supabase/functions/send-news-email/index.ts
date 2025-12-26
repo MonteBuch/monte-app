@@ -71,7 +71,7 @@ serve(async (req) => {
           <tr>
             <td style="background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); padding: 24px; text-align: center;">
               <p style="margin: 0 0 8px 0; color: rgba(255,255,255,0.9); font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
-                📌 Pinnwand
+                🏠 Montessori Kinderhaus Buch
               </p>
               <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: bold;">
                 ${headerTitle}
@@ -111,7 +111,7 @@ serve(async (req) => {
               <p style="margin: 0; color: #a8a29e; font-size: 12px;">
                 Diese Nachricht wurde automatisch gesendet.
                 <br>
-                Sie erhalten diese Email, weil Sie Benachrichtigungen aktiviert haben.
+                Du erhältst diese Email, weil du Benachrichtigungen für neue Pinnwandeinträge aktiviert hast.
               </p>
             </td>
           </tr>
@@ -125,13 +125,16 @@ serve(async (req) => {
 
     // Plain text version
     const textContent = `
-📌 PINNWAND
+🏠 MONTESSORI KINDERHAUS BUCH
 ${headerTitle}
 
 ${news_title ? `${news_title}\n\n` : ""}${news_content.replace(/<[^>]*>/g, "")}
 
 ${author_name ? `Gesendet von: ${author_name}\n` : ""}
 In der App öffnen: ${app_url}
+
+---
+Du erhältst diese Email, weil du Benachrichtigungen für neue Pinnwandeinträge aktiviert hast.
     `.trim();
 
     // WICHTIG: Alle Empfänger als BCC senden (Datenschutz!)
