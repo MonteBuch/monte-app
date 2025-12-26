@@ -76,17 +76,18 @@ function SortableTabItem({ id, willBeSwapped }) {
     animateLayoutChanges: noAnimations,
   });
 
-  // Einfache Transform ohne Animation
+  // Transform nur für NICHT-gezogene Elemente (die Platz machen müssen)
+  // Gezogenes Element bleibt an Ursprungsposition als Platzhalter
   const style = {
-    // Nur Translate verwenden, kein Scale
-    transform: transform ? CSS.Translate.toString(transform) : undefined,
+    // Nur Transform anwenden wenn NICHT das gezogene Element
+    transform: !isDragging && transform ? CSS.Translate.toString(transform) : undefined,
     touchAction: "none",
     // Beim Drag: Platzhalter zeigen (reduzierte Opacity)
-    opacity: isDragging ? 0.3 : 1,
+    opacity: isDragging ? 0.4 : 1,
     // Beim Drag: visuell als Platzhalter kennzeichnen
-    backgroundColor: isDragging ? "#f5f5f4" : undefined,
+    backgroundColor: isDragging ? "#fafaf9" : undefined,
     borderStyle: isDragging ? "dashed" : undefined,
-    borderColor: isDragging ? "#d6d3d1" : undefined,
+    borderColor: isDragging ? "#a8a29e" : undefined,
     borderWidth: isDragging ? "2px" : undefined,
   };
 
@@ -585,8 +586,8 @@ export default function MoreMenu({
                   <div
                     style={{
                       position: "fixed",
-                      left: mousePos.x - 110, // Zentriert (halbe Breite)
-                      top: mousePos.y - 25, // Leicht über dem Cursor
+                      left: mousePos.x - 160, // Weiter links für bessere Mobile-Positionierung
+                      top: mousePos.y - 30, // Leicht über dem Cursor
                       zIndex: 99999,
                       pointerEvents: "none",
                       transform: "rotate(-2deg)", // Leichte Neigung für "schwebenden" Effekt
