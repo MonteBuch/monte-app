@@ -1,5 +1,6 @@
 // src/components/ui/MoreMenu.jsx
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   Home,
@@ -15,13 +16,11 @@ import {
 } from "lucide-react";
 import {
   DndContext,
-  DragOverlay,
   closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-// Modifiers werden inline definiert (siehe centerOnCursor)
 import {
   SortableContext,
   useSortable,
@@ -62,17 +61,6 @@ const DEFAULT_TABS = {
 // Keine Layout-Animationen - verhindert Wackeln
 const noAnimations = () => false;
 
-// DEBUG: Feste Position um zu testen ob DragOverlay überhaupt rendert
-// Wenn das Element bei (100, 100) erscheint, funktioniert DragOverlay
-// und das Problem ist die Positionsberechnung
-const debugFixedPosition = () => {
-  return {
-    x: 100,
-    y: 100,
-    scaleX: 1,
-    scaleY: 1,
-  };
-};
 
 // Sortable Tab Item Komponente
 function SortableTabItem({ id, willBeSwapped }) {
@@ -174,7 +162,22 @@ export default function MoreMenu({
   const [overContainer, setOverContainer] = useState(null);
   const [overIndex, setOverIndex] = useState(null);
 
+  // Custom Overlay: Mausposition tracken
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
   const { showSuccess } = useToast();
+
+  // Mausposition während Drag tracken
+  useEffect(() => {
+    if (!activeId) return;
+
+    const handlePointerMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    return () => window.removeEventListener("pointermove", handlePointerMove);
+  }, [activeId]);
 
   // Einheitlicher PointerSensor für Mouse und Touch
   const pointerSensor = useSensor(PointerSensor, {
@@ -576,36 +579,23 @@ export default function MoreMenu({
                 </SortableContext>
               </div>
 
-              {/* DEBUG: Zeigt ob activeId gesetzt ist */}
-              {activeId && (
-                <div
-                  style={{
-                    position: "fixed",
-                    top: "10px",
-                    left: "10px",
-                    backgroundColor: "red",
-                    color: "white",
-                    padding: "10px 20px",
-                    borderRadius: "8px",
-                    zIndex: 99999,
-                    fontWeight: "bold",
-                  }}
-                >
-                  DRAGGING: {activeId}
-                </div>
-              )}
-
-              {/* Drag Overlay - das sichtbare gezogene Element */}
-              <DragOverlay
-                zIndex={9999}
-                modifiers={[debugFixedPosition]}
-                dropAnimation={{
-                  duration: 200,
-                  easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
-                }}
-              >
-                {activeId ? <DragOverlayItem id={activeId} /> : null}
-              </DragOverlay>
+              {/* Custom Drag Overlay via Portal - ersetzt DragOverlay Komponente */}
+              {activeId &&
+                createPortal(
+                  <div
+                    style={{
+                      position: "fixed",
+                      left: mousePos.x - 110, // Zentriert (halbe Breite)
+                      top: mousePos.y - 25, // Leicht über dem Cursor
+                      zIndex: 99999,
+                      pointerEvents: "none",
+                      transform: "rotate(-2deg)", // Leichte Neigung für "schwebenden" Effekt
+                    }}
+                  >
+                    <DragOverlayItem id={activeId} />
+                  </div>,
+                  document.body
+                )}
 
               {/* Aktionen */}
               <div className="space-y-2">
