@@ -14,7 +14,18 @@ const fetchWithTimeout = (url, options = {}) => {
     controller.abort();
   }, REQUEST_TIMEOUT);
 
-  // Headers zusammenführen (bestehende Headers behalten!)
+  // Edge Functions haben eigene CORS-Config - keine Cache-Header hinzufügen
+  const isEdgeFunction = url.includes('/functions/v1/');
+
+  if (isEdgeFunction) {
+    // Edge Functions: Nur Timeout, keine zusätzlichen Headers
+    return fetch(url, {
+      ...options,
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeoutId));
+  }
+
+  // Normale Requests: Cache-Header hinzufügen für frische Verbindungen
   const existingHeaders = options.headers || {};
   const newHeaders = new Headers(existingHeaders);
   newHeaders.set('Cache-Control', 'no-cache, no-store, must-revalidate');
