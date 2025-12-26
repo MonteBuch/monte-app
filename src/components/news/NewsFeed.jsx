@@ -1,6 +1,6 @@
 // src/components/news/NewsFeed.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import { Calendar, Trash2, Heart, ChevronDown, ChevronUp, X } from "lucide-react";
+import { Calendar, Heart, ChevronDown, ChevronUp, X, EyeOff } from "lucide-react";
 import { supabase } from "../../api/supabaseClient";
 import { getGroupStyles } from "../../utils/groupUtils";
 
@@ -199,17 +199,21 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
     );
   };
 
-  // Bildergalerie rendern
+  // Medien-Galerie rendern (Bilder + Videos)
   const renderAttachments = (attachments) => {
     if (!attachments || attachments.length === 0) return null;
 
-    // Bilder und andere Dateien trennen
+    // Bilder, Videos und andere Dateien trennen
     const images = attachments.filter((att) =>
       att.type?.startsWith("image/") ||
       att.name?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
     );
+    const videos = attachments.filter((att) =>
+      att.type?.startsWith("video/") ||
+      att.name?.match(/\.(mp4|webm|mov|avi|mkv)$/i)
+    );
     const otherFiles = attachments.filter(
-      (att) => !images.includes(att)
+      (att) => !images.includes(att) && !videos.includes(att)
     );
 
     return (
@@ -247,6 +251,25 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
                     </span>
                   </div>
                 )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Videos mit Player */}
+        {videos.length > 0 && (
+          <div className="space-y-2">
+            {videos.map((video, idx) => (
+              <div key={idx} className="rounded-xl overflow-hidden bg-black">
+                <video
+                  src={video.url}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="w-full max-h-96"
+                >
+                  Dein Browser unterstützt keine Videos.
+                </video>
               </div>
             ))}
           </div>
@@ -372,15 +395,15 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
                   </span>
                 </button>
 
-                {/* Delete Button (nur Team/Admin) */}
+                {/* Hide Button (für alle User) */}
                 {onDelete && (
                   <button
                     type="button"
                     onClick={() => onDelete(n.id)}
-                    className="p-2 text-stone-400 dark:text-stone-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                    title="Löschen"
+                    className="p-2 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-lg transition-colors"
+                    title="Ausblenden"
                   >
-                    <Trash2 size={16} />
+                    <EyeOff size={16} />
                   </button>
                 )}
               </div>

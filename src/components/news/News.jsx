@@ -38,10 +38,19 @@ export default function News({ user }) {
     createdBy: row.created_by,
   });
 
-  // News aus Supabase laden
+  // News aus Supabase laden (mit Filter für versteckte News)
   const loadNews = async () => {
     setLoading(true);
     try {
+      // Zuerst versteckte News-IDs für diesen User laden
+      const { data: hiddenData } = await supabase
+        .from("news_hidden")
+        .select("news_id")
+        .eq("user_id", user.id);
+
+      const hiddenIds = new Set((hiddenData || []).map(h => h.news_id));
+
+      // Dann alle News laden
       const { data, error } = await supabase
         .from("news")
         .select("*")
@@ -52,7 +61,11 @@ export default function News({ user }) {
         showError("News konnten nicht geladen werden");
         setAllNews([]);
       } else {
-        setAllNews((data || []).map(mapNewsRow));
+        // Versteckte News herausfiltern
+        const visibleNews = (data || [])
+          .filter(n => !hiddenIds.has(n.id))
+          .map(mapNewsRow);
+        setAllNews(visibleNews);
       }
     } catch (e) {
       console.error("Unerwarteter Fehler beim Laden der News:", e);
@@ -266,48 +279,35 @@ export default function News({ user }) {
 
   const handleGroupsChange = (ids) => setSelectedGroupIds(ids || []);
 
-  // News wirklich aus der Datenbank löschen (nur Team/Admin)
-  const handleDeleteNews = async (id) => {
-    if (user.role !== "team" && user.role !== "admin") {
-      showError("Keine Berechtigung zum Löschen");
-      return;
-    }
-
+  // News für diesen User ausblenden (nicht global löschen!)
+  const handleHideNews = async (id) => {
     try {
-      // Erst Attachments aus Storage löschen
-      const newsToDelete = allNews.find(n => n.id === id);
-      if (newsToDelete?.attachments?.length > 0) {
-        for (const att of newsToDelete.attachments) {
-          if (att.url) {
-            // URL parsen um Storage-Pfad zu bekommen
-            const urlParts = att.url.split("/news-attachments/");
-            if (urlParts[1]) {
-              await supabase.storage
-                .from("news-attachments")
-                .remove([urlParts[1]]);
-            }
-          }
-        }
-      }
-
-      // News aus DB löschen
+      // In news_hidden eintragen (nur für diesen User)
       const { error } = await supabase
-        .from("news")
-        .delete()
-        .eq("id", id);
+        .from("news_hidden")
+        .insert({
+          news_id: id,
+          user_id: user.id,
+        });
 
       if (error) {
-        console.error("Fehler beim Löschen der News:", error);
-        showError("News konnte nicht gelöscht werden");
+        // Falls bereits versteckt (Unique Constraint), ignorieren
+        if (error.code === "23505") {
+          // Trotzdem aus UI entfernen
+          setAllNews((prev) => prev.filter((n) => n.id !== id));
+          return;
+        }
+        console.error("Fehler beim Ausblenden der News:", error);
+        showError("News konnte nicht ausgeblendet werden");
         return;
       }
 
       // Aus lokalem State entfernen
       setAllNews((prev) => prev.filter((n) => n.id !== id));
-      showSuccess("News gelöscht");
+      showSuccess("Beitrag ausgeblendet");
     } catch (e) {
-      console.error("Unerwarteter Fehler beim Löschen der News:", e);
-      showError("Fehler beim Löschen");
+      console.error("Unerwarteter Fehler beim Ausblenden der News:", e);
+      showError("Fehler beim Ausblenden");
     }
   };
 
@@ -389,7 +389,7 @@ export default function News({ user }) {
         user={user}
         news={filteredNews}
         groups={groups}
-        onDelete={(user.role === "team" || user.role === "admin") ? handleDeleteNews : null}
+        onDelete={handleHideNews}
       />
 
       {loading && <SkeletonList count={3} />}

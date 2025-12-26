@@ -196,19 +196,24 @@ export async function sendNewsEmailNotifications(news, groupIds, groupNames, aut
     const title = news.title || extractTitleFromHtml(news.text);
     let content = htmlToEmailContent(news.text);
 
-    // Galerie-Bilder aus Attachments hinzufügen
+    // Medien aus Attachments für Email aufbereiten
     console.log("News Attachments:", news.attachments);
     const imageAttachments = (news.attachments || []).filter(att =>
       att.type?.startsWith('image/') ||
       att.name?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ||
       att.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
     );
-    console.log("Image Attachments für Email:", imageAttachments);
+    const videoAttachments = (news.attachments || []).filter(att =>
+      att.type?.startsWith('video/') ||
+      att.name?.match(/\.(mp4|webm|mov|avi|mkv)$/i) ||
+      att.url?.match(/\.(mp4|webm|mov|avi|mkv)$/i)
+    );
+    console.log("Image Attachments für Email:", imageAttachments.length);
+    console.log("Video Attachments für Email:", videoAttachments.length);
 
+    // Bilder als HTML für Email
     if (imageAttachments.length > 0) {
-      // Bilder als HTML für Email - jedes Bild auf voller Breite
       const imagesHtml = imageAttachments.map(img => {
-        console.log("Adding image to email:", img.url);
         return `<img src="${img.url}" alt="${img.name || 'Bild'}" style="display: block; max-width: 100%; width: 100%; height: auto; border-radius: 8px; margin: 8px 0;" />`;
       }).join('\n');
 
@@ -217,7 +222,23 @@ export async function sendNewsEmailNotifications(news, groupIds, groupNames, aut
           ${imagesHtml}
         </div>
       `;
-      console.log("Content mit Bildern:", content.substring(content.length - 500));
+    }
+
+    // Videos als Platzhalter mit Hinweis (können nicht in Emails abgespielt werden)
+    if (videoAttachments.length > 0) {
+      const videosHtml = videoAttachments.map(() =>
+        `<div style="background: linear-gradient(135deg, #1c1917 0%, #44403c 100%); border-radius: 12px; padding: 32px; text-align: center; margin: 8px 0;">
+          <div style="font-size: 48px; margin-bottom: 8px;">🎬</div>
+          <p style="color: #fafaf9; font-weight: bold; margin: 0 0 4px 0;">Video verfügbar</p>
+          <p style="color: #a8a29e; font-size: 14px; margin: 0;">In der App ansehen</p>
+        </div>`
+      ).join('\n');
+
+      content += `
+        <div style="margin-top: 16px;">
+          ${videosHtml}
+        </div>
+      `;
     }
 
     // Gruppennamen für Betreff formatieren

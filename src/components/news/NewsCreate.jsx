@@ -15,6 +15,8 @@ import {
   Check,
   Images,
   X,
+  Play,
+  Film,
 } from "lucide-react";
 
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -208,32 +210,49 @@ export default function NewsCreate({
   const isActive = (name, attrs = {}) =>
     editor ? editor.isActive(name, attrs) : false;
 
-  // GALERIE-BILDER HINZUFÜGEN (mehrere möglich)
+  // GALERIE-MEDIEN HINZUFÜGEN (Bilder + Videos)
   const handleGalleryImagesChange = async (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
-    const newImages = [];
+    const newMedia = [];
     for (const file of files) {
-      if (!file.type.startsWith("image/")) continue;
+      const isImage = file.type.startsWith("image/");
+      const isVideo = file.type.startsWith("video/");
+
+      if (!isImage && !isVideo) continue;
 
       try {
-        // Komprimiere das Bild und erstelle Vorschau
-        const compressedDataUrl = await compressImage(file);
-        newImages.push({
-          id: crypto.randomUUID(),
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          file: file,
-          preview: compressedDataUrl,
-        });
+        if (isImage) {
+          // Komprimiere das Bild und erstelle Vorschau
+          const compressedDataUrl = await compressImage(file);
+          newMedia.push({
+            id: crypto.randomUUID(),
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            file: file,
+            preview: compressedDataUrl,
+            isVideo: false,
+          });
+        } else if (isVideo) {
+          // Video: URL.createObjectURL für Vorschau
+          newMedia.push({
+            id: crypto.randomUUID(),
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            file: file,
+            preview: URL.createObjectURL(file),
+            isVideo: true,
+          });
+        }
       } catch (error) {
-        console.error("Fehler beim Verarbeiten des Bildes:", error);
+        console.error("Fehler beim Verarbeiten der Datei:", error);
       }
     }
 
-    setGalleryImages((prev) => [...prev, ...newImages]);
+    setGalleryImages((prev) => [...prev, ...newMedia]);
     e.target.value = "";
   };
 
@@ -391,10 +410,10 @@ export default function NewsCreate({
 
             <div className="flex-1" />
 
-            {/* Bilder für Galerie */}
-            <label className="p-1.5 rounded-md hover:bg-stone-200 cursor-pointer" title="Bilder hinzufügen">
-              <Images size={16} />
-              <input type="file" accept="image/*" multiple className="hidden" onChange={handleGalleryImagesChange} />
+            {/* Bilder/Videos für Galerie */}
+            <label className="p-1.5 rounded-md hover:bg-stone-200 cursor-pointer" title="Bilder/Videos hinzufügen">
+              <Film size={16} />
+              <input type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleGalleryImagesChange} />
             </label>
 
             {/* Andere Dateien */}
@@ -412,44 +431,65 @@ export default function NewsCreate({
         />
       </div>
 
-      {/* BILDERGALERIE VORSCHAU */}
+      {/* MEDIEN-GALERIE VORSCHAU (Bilder + Videos) */}
       {galleryImages.length > 0 && (
         <div className="space-y-2">
           <p className="text-xs font-semibold text-stone-500 flex items-center gap-1">
-            <Images size={14} />
-            {galleryImages.length} {galleryImages.length === 1 ? "Bild" : "Bilder"}
+            <Film size={14} />
+            {galleryImages.length} {galleryImages.length === 1 ? "Medium" : "Medien"}
+            {galleryImages.some(m => m.isVideo) && (
+              <span className="text-amber-600 ml-1">
+                ({galleryImages.filter(m => m.isVideo).length} Video{galleryImages.filter(m => m.isVideo).length !== 1 ? "s" : ""})
+              </span>
+            )}
           </p>
           <div className={`grid gap-2 ${
             galleryImages.length === 1 ? "grid-cols-1" :
             galleryImages.length === 2 ? "grid-cols-2" :
             "grid-cols-3"
           }`}>
-            {galleryImages.map((img) => (
+            {galleryImages.map((media) => (
               <div
-                key={img.id}
+                key={media.id}
                 className="relative group aspect-square rounded-xl overflow-hidden bg-stone-100 border border-stone-200"
               >
-                <img
-                  src={img.preview}
-                  alt={img.name}
-                  className="w-full h-full object-cover"
-                />
+                {media.isVideo ? (
+                  <>
+                    <video
+                      src={media.preview}
+                      className="w-full h-full object-cover"
+                      muted
+                    />
+                    {/* Play-Icon Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <div className="p-3 bg-white/90 rounded-full">
+                        <Play size={24} className="text-stone-700 ml-0.5" />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <img
+                    src={media.preview}
+                    alt={media.name}
+                    className="w-full h-full object-cover"
+                  />
+                )}
                 <button
                   type="button"
-                  onClick={() => removeGalleryImage(img.id)}
-                  className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                  onClick={() => removeGalleryImage(media.id)}
+                  className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10"
                 >
                   <X size={14} />
                 </button>
               </div>
             ))}
-            {/* Button zum Hinzufügen weiterer Bilder */}
+            {/* Button zum Hinzufügen weiterer Medien */}
             <label className="aspect-square rounded-xl border-2 border-dashed border-stone-300 flex items-center justify-center cursor-pointer hover:bg-stone-50 hover:border-amber-400 transition-colors">
               <div className="text-center text-stone-400">
-                <Images size={24} className="mx-auto mb-1" />
+                <Film size={24} className="mx-auto mb-1" />
                 <span className="text-xs">Weitere</span>
               </div>
-              <input type="file" accept="image/*" multiple className="hidden" onChange={handleGalleryImagesChange} />
+              <input type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleGalleryImagesChange} />
             </label>
           </div>
         </div>
