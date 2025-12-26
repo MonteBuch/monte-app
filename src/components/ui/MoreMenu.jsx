@@ -21,6 +21,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+// Modifiers werden inline definiert (siehe centerOnCursor)
 import {
   SortableContext,
   useSortable,
@@ -60,6 +61,24 @@ const DEFAULT_TABS = {
 
 // Keine Layout-Animationen - verhindert Wackeln
 const noAnimations = () => false;
+
+// Custom Modifier: Zentriert das Overlay horizontal unter dem Cursor
+// und verschiebt es leicht nach links damit es besser unter dem Finger/Maus liegt
+const centerOnCursor = ({ transform, activatorEvent, draggingNodeRect }) => {
+  if (!draggingNodeRect || !activatorEvent) {
+    return transform;
+  }
+
+  // Berechne Offset um das Element zu zentrieren
+  // Das Element ist 220px breit, also verschieben wir um die Hälfte nach links
+  const offsetX = -110; // Halbe Breite des Overlay-Elements
+
+  return {
+    ...transform,
+    x: transform.x + offsetX,
+    y: transform.y - 20, // Etwas nach oben, damit man es besser sieht
+  };
+};
 
 // Sortable Tab Item Komponente
 function SortableTabItem({ id, willBeSwapped }) {
@@ -124,19 +143,21 @@ function DragOverlayItem({ id }) {
 
   return (
     <div
-      className="flex items-center gap-3 p-3 rounded-xl select-none bg-white shadow-2xl border-2 border-amber-500 cursor-grabbing"
+      className="flex items-center gap-3 p-3 rounded-xl select-none cursor-grabbing"
       style={{
         width: "220px",
-        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.4)",
+        backgroundColor: "#fef3c7", // amber-100 - sehr sichtbar
+        border: "3px solid #f59e0b", // amber-500
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
       }}
     >
-      <div className="text-amber-500">
-        <GripVertical size={16} />
+      <div className="text-amber-600">
+        <GripVertical size={18} />
       </div>
-      <div className="relative text-amber-600">
-        <Icon size={20} />
+      <div className="text-amber-700">
+        <Icon size={22} />
       </div>
-      <span className="font-semibold text-amber-700">{tab.label}</span>
+      <span className="font-bold text-amber-800">{tab.label}</span>
     </div>
   );
 }
@@ -564,6 +585,7 @@ export default function MoreMenu({
               {/* Drag Overlay - das sichtbare gezogene Element */}
               <DragOverlay
                 zIndex={9999}
+                modifiers={[centerOnCursor]}
                 dropAnimation={{
                   duration: 200,
                   easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
