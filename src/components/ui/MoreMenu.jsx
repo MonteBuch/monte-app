@@ -17,8 +17,7 @@ import {
   DndContext,
   DragOverlay,
   closestCenter,
-  MouseSensor,
-  TouchSensor,
+  PointerSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -81,8 +80,13 @@ function SortableTabItem({ id, willBeSwapped }) {
     // Nur Translate verwenden, kein Scale
     transform: transform ? CSS.Translate.toString(transform) : undefined,
     touchAction: "none",
-    // Verstecken während des Drags - DragOverlay zeigt das Element
-    opacity: isDragging ? 0 : 1,
+    // Beim Drag: Platzhalter zeigen (reduzierte Opacity)
+    opacity: isDragging ? 0.3 : 1,
+    // Beim Drag: visuell als Platzhalter kennzeichnen
+    backgroundColor: isDragging ? "#f5f5f4" : undefined,
+    borderStyle: isDragging ? "dashed" : undefined,
+    borderColor: isDragging ? "#d6d3d1" : undefined,
+    borderWidth: isDragging ? "2px" : undefined,
   };
 
   const tab = ALL_TABS[id];
@@ -120,16 +124,19 @@ function DragOverlayItem({ id }) {
 
   return (
     <div
-      className="flex items-center gap-3 p-3 rounded-xl select-none bg-white shadow-xl border-2 border-amber-500 cursor-grabbing"
-      style={{ width: "224px" }} // Feste Breite für Portal-Rendering
+      className="flex items-center gap-3 p-3 rounded-xl select-none bg-white shadow-2xl border-2 border-amber-500 cursor-grabbing"
+      style={{
+        width: "220px",
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.4)",
+      }}
     >
-      <div className="text-stone-400">
+      <div className="text-amber-500">
         <GripVertical size={16} />
       </div>
-      <div className="relative">
+      <div className="relative text-amber-600">
         <Icon size={20} />
       </div>
-      <span className="font-medium">{tab.label}</span>
+      <span className="font-semibold text-amber-700">{tab.label}</span>
     </div>
   );
 }
@@ -154,21 +161,14 @@ export default function MoreMenu({
 
   const { showSuccess } = useToast();
 
-  // Sensoren für @dnd-kit - Touch sofort aktivieren, keine Verzögerung
-  const mouseSensor = useSensor(MouseSensor, {
+  // Einheitlicher PointerSensor für Mouse und Touch
+  const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 5,
+      distance: 3, // Kleine Bewegung nötig um Drag zu starten
     },
   });
 
-  const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: 0,
-      tolerance: 5,
-    },
-  });
-
-  const sensors = useSensors(mouseSensor, touchSensor);
+  const sensors = useSensors(pointerSensor);
 
   // Animation: Ein- und Ausblenden mit gleicher Geschwindigkeit
   useEffect(() => {
