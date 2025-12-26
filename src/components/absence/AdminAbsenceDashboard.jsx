@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "../../api/supabaseClient";
 import { FACILITY_ID } from "../../lib/constants";
 import { getGroupById, getGroupStyles } from "../../utils/groupUtils";
+import { useTheme } from "../../context/ThemeContext";
 import { CheckCircle, Undo2, Trash2, CalendarDays, Loader2, MessageSquare, X } from "lucide-react";
 
 const REASON_STYLES = {
@@ -12,6 +13,8 @@ const REASON_STYLES = {
 };
 
 export default function AdminAbsenceDashboard({ user }) {
+  const { effectiveTheme } = useTheme();
+  const isDark = effectiveTheme === "dark";
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   // Team-User: Stammgruppe als Default, sonst "all"
@@ -394,7 +397,7 @@ export default function AdminAbsenceDashboard({ user }) {
       {/* NUR DER HEADER (KEIN EXTRA „ABWESENHEITEN") */}
       <div
         className="p-6 rounded-3xl shadow-sm border border-stone-200 dark:border-stone-700 flex flex-col gap-3 bg-[#f8f9fa] dark:bg-stone-800"
-        style={{ backgroundColor: groupId === "all" ? undefined : currentGroup?.headerColor }}
+        style={isDark ? undefined : { backgroundColor: groupId === "all" ? undefined : currentGroup?.headerColor }}
       >
         <div className="flex items-center gap-3">
           {groupId === "all" ? (

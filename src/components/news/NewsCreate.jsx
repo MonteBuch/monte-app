@@ -25,6 +25,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { Mark } from "@tiptap/core";
 
 import { getGroupStyles } from "../../utils/groupUtils";
+import { useTheme } from "../../context/ThemeContext";
 
 // Bildkomprimierung: Max 1920px Breite, 85% Qualität
 const MAX_IMAGE_WIDTH = 1920;
@@ -100,6 +101,8 @@ export default function NewsCreate({
   onGroupsChange,
   onSubmit,
 }) {
+  const { effectiveTheme } = useTheme();
+  const isDark = effectiveTheme === "dark";
   const [title, setTitle] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [galleryImages, setGalleryImages] = useState([]); // Neue Bildergalerie
@@ -328,8 +331,8 @@ export default function NewsCreate({
     <div className="space-y-4">
       {/* HEADER */}
       <div
-        className="p-5 rounded-3xl border shadow-sm text-stone-800 transition-colors duration-300"
-        style={{ backgroundColor: styles.headerColor }}
+        className="p-5 rounded-3xl border border-stone-200 dark:border-stone-700 shadow-sm dark:bg-stone-800 transition-colors duration-300"
+        style={isDark ? undefined : { backgroundColor: styles.headerColor }}
       >
         <div className="flex items-center gap-3">
           <div className={`${iconBg} p-2 rounded-2xl shadow transition-colors duration-300`}>
@@ -337,14 +340,14 @@ export default function NewsCreate({
           </div>
 
           <div>
-            <h3 className="text-lg font-bold">News erstellen</h3>
-            <p className="text-xs opacity-80">Neue Mitteilung an Eltern senden</p>
+            <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100">News erstellen</h3>
+            <p className="text-xs text-stone-600 dark:text-stone-400">Neue Mitteilung an Eltern senden</p>
           </div>
         </div>
 
         {/* Gruppenwahl - Multi-Select */}
         <div className="mt-4">
-          <p className="text-xs font-semibold text-stone-600 mb-2">Empfänger auswählen:</p>
+          <p className="text-xs font-semibold text-stone-600 dark:text-stone-400 mb-2">Empfänger auswählen:</p>
           <div className="flex flex-wrap gap-2">
             {/* "Alle" Button */}
             <button

@@ -4,6 +4,7 @@ import AbsenceEditor from "./AbsenceEditor";
 import { supabase } from "../../api/supabaseClient";
 import { FACILITY_ID } from "../../lib/constants";
 import { getGroupById, getGroupStyles } from "../../utils/groupUtils";
+import { useTheme } from "../../context/ThemeContext";
 import { sendAbsencePushNotifications } from "../../api/pushApi";
 
 function formatDate(iso) {
@@ -62,6 +63,8 @@ function getReasonMeta(reason) {
 }
 
 export default function AbsenceReport({ user }) {
+  const { effectiveTheme } = useTheme();
+  const isDark = effectiveTheme === "dark";
   const children = Array.isArray(user.children) ? user.children : [];
 
   const [groups, setGroups] = useState([]);
@@ -258,8 +261,8 @@ export default function AbsenceReport({ user }) {
     <div className="space-y-5">
       {/* === HEADER - UI Review Update === */}
       <div
-        className="p-6 rounded-3xl shadow-sm border border-stone-200 dark:border-stone-700 flex flex-col gap-3"
-        style={{
+        className="p-6 rounded-3xl shadow-sm border border-stone-200 dark:border-stone-700 dark:bg-stone-800 flex flex-col gap-3"
+        style={isDark ? undefined : {
           backgroundColor: activeGroupStyles?.headerColor || "#f8f9fa",
         }}
       >

@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { supabase } from "../../api/supabaseClient";
 import { getGroupById, getGroupStyles } from "../../utils/groupUtils";
 import { useGroups } from "../../context/GroupsContext";
+import { useTheme } from "../../context/ThemeContext";
 import { fetchListsByGroup, updateListPositions } from "../../api/listApi";
 
 import GroupChips from "./GroupChips";
@@ -14,6 +15,8 @@ export default function GroupArea({ user }) {
   const role = user?.role || "parent";
   const isStaff = role === "team" || role === "admin";
   const isAdminView = isStaff;
+  const { effectiveTheme } = useTheme();
+  const isDark = effectiveTheme === "dark";
 
   const realChildren = Array.isArray(user.children) ? user.children : [];
 
@@ -282,8 +285,8 @@ export default function GroupArea({ user }) {
     <div className="space-y-5">
       {/* HEADER-KARTE */}
       <div
-        className="p-6 rounded-3xl shadow-sm border border-stone-100 dark:border-stone-700 flex flex-col gap-3"
-        style={{ backgroundColor: currentGroup.headerColor }}
+        className="p-6 rounded-3xl shadow-sm border border-stone-100 dark:border-stone-700 dark:bg-stone-800 flex flex-col gap-3"
+        style={isDark ? undefined : { backgroundColor: currentGroup.headerColor }}
       >
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">

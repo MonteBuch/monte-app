@@ -375,16 +375,15 @@ export default function News({ user }) {
       {/* === HEADER (PARENT VIEW) - Pinnwand === */}
       {user.role === "parent" && (
         <div
-          className="p-5 rounded-3xl shadow-sm border border-stone-200"
-          style={{ backgroundColor: "#f8f9fa" }}
+          className="p-5 rounded-3xl shadow-sm border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800"
         >
           <div className="flex items-center gap-3">
             <div className="bg-amber-500 p-2 rounded-2xl text-white shadow">
               <Home size={18} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-stone-800">Pinnwand</h2>
-              <p className="text-xs text-stone-600">
+              <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Pinnwand</h2>
+              <p className="text-xs text-stone-600 dark:text-stone-400">
                 Neuigkeiten aus dem Kinderhaus
               </p>
             </div>
