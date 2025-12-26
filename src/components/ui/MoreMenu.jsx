@@ -21,7 +21,6 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
-  pointerWithin,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -60,6 +59,9 @@ const DEFAULT_TABS = {
   },
 };
 
+// Keine Layout-Animationen - verhindert Wackeln
+const noAnimations = () => false;
+
 // Sortable Tab Item Komponente
 function SortableTabItem({ id, willBeSwapped }) {
   const {
@@ -67,16 +69,17 @@ function SortableTabItem({ id, willBeSwapped }) {
     listeners,
     setNodeRef,
     transform,
-    transition,
     isDragging,
-  } = useSortable({ id });
+  } = useSortable({
+    id,
+    // Deaktiviert alle Layout-Animationen - verhindert Wackeln komplett
+    animateLayoutChanges: noAnimations,
+  });
 
-  // Nur Y-Translation verwenden um horizontales Wackeln zu verhindern
-  // Keine CSS-Transition - sofortiges Repositionieren verhindert Wackeln
+  // Einfache Transform ohne Animation
   const style = {
-    transform: transform
-      ? `translate3d(0, ${transform.y}px, 0)`
-      : undefined,
+    // Nur Translate verwenden, kein Scale
+    transform: transform ? CSS.Translate.toString(transform) : undefined,
     touchAction: "none",
     // Verstecken während des Drags - DragOverlay zeigt das Element
     opacity: isDragging ? 0 : 1,
@@ -496,7 +499,7 @@ export default function MoreMenu({
           {customizeMode ? (
             <DndContext
               sensors={sensors}
-              collisionDetection={pointerWithin}
+              collisionDetection={closestCenter}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDragEnd={handleDragEnd}
@@ -560,6 +563,7 @@ export default function MoreMenu({
 
               {/* Drag Overlay - das sichtbare gezogene Element */}
               <DragOverlay
+                zIndex={9999}
                 dropAnimation={{
                   duration: 200,
                   easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
