@@ -140,12 +140,12 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
       return (
         <div className="space-y-2">
           {!isExpanded && needsTruncation ? (
-            <p className="text-sm text-stone-700 leading-relaxed">
+            <p className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed">
               {displayHtml}
             </p>
           ) : (
             <div
-              className="prose prose-sm max-w-none text-stone-700 leading-relaxed prose-p:my-1 prose-headings:my-2"
+              className="prose prose-sm max-w-none text-stone-700 dark:text-stone-300 leading-relaxed prose-p:my-1 prose-headings:my-2 dark:prose-invert"
               dangerouslySetInnerHTML={{ __html: displayHtml }}
             />
           )}
@@ -176,7 +176,7 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
 
     return (
       <div className="space-y-2">
-        <p className="text-sm text-stone-700 leading-relaxed whitespace-pre-wrap">
+        <p className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed whitespace-pre-wrap">
           {displayText}
         </p>
         {needsTruncation && (
@@ -260,7 +260,7 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
                 key={idx}
                 href={att.url}
                 download={att.name}
-                className="inline-flex items-center gap-2 px-3 py-2 bg-stone-100 rounded-lg text-sm text-stone-700 hover:bg-stone-200 transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-stone-100 dark:bg-stone-700 rounded-lg text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors"
               >
                 <span className="text-lg">📎</span>
                 <span className="truncate max-w-[150px]">{att.name}</span>
@@ -275,10 +275,10 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
   if (!safeNews.length) {
     return (
       <div className="text-center py-12">
-        <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Calendar size={24} className="text-stone-400" />
+        <div className="w-16 h-16 bg-stone-100 dark:bg-stone-700 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Calendar size={24} className="text-stone-400 dark:text-stone-500" />
         </div>
-        <p className="text-stone-500 text-sm">Keine Beiträge vorhanden.</p>
+        <p className="text-stone-500 dark:text-stone-400 text-sm">Keine Beiträge vorhanden.</p>
       </div>
     );
   }
@@ -306,13 +306,13 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
           return (
             <div
               key={n.id}
-              className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden"
+              className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm overflow-hidden"
             >
               {/* Header mit Gruppen-Chips und Datum */}
               <div className="px-4 pt-4 pb-2 flex items-center justify-between">
                 <div className="flex flex-wrap gap-1.5">
                   {isGlobal ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-stone-100 text-stone-600">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300">
                       Alle Gruppen
                     </span>
                   ) : (
@@ -330,7 +330,7 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
                     })
                   )}
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-stone-400">
+                <div className="flex items-center gap-1.5 text-xs text-stone-400 dark:text-stone-500">
                   <Calendar size={12} />
                   <span>{formatDate(n.date)}</span>
                 </div>
@@ -340,7 +340,7 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
               <div className="px-4 pb-3 space-y-3">
                 {/* Titel */}
                 {n.title && (
-                  <h3 className="text-lg font-bold text-stone-900 leading-tight">
+                  <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100 leading-tight">
                     {n.title}
                   </h3>
                 )}
@@ -353,14 +353,14 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
               </div>
 
               {/* Footer mit Like und Delete */}
-              <div className="px-4 py-3 border-t border-stone-100 flex items-center justify-between">
+              <div className="px-4 py-3 border-t border-stone-100 dark:border-stone-700 flex items-center justify-between">
                 {/* Like Button */}
                 <button
                   onClick={() => toggleLike(n.id)}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${
                     hasLiked
-                      ? "bg-red-50 text-red-500"
-                      : "bg-stone-50 text-stone-500 hover:bg-stone-100"
+                      ? "bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400"
+                      : "bg-stone-50 dark:bg-stone-700 text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-600"
                   }`}
                 >
                   <Heart
@@ -377,7 +377,7 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
                   <button
                     type="button"
                     onClick={() => onDelete(n.id)}
-                    className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-2 text-stone-400 dark:text-stone-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                     title="Löschen"
                   >
                     <Trash2 size={16} />

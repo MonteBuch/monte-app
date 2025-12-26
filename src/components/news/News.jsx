@@ -65,6 +65,24 @@ export default function News({ user }) {
   useEffect(() => {
     loadNews();
 
+    // Für Team/Admin: last_seen_news_likes aktualisieren (für Badge-Reset)
+    if (user.role === "team" || user.role === "admin") {
+      const updateLastSeen = async () => {
+        try {
+          await supabase
+            .from("profiles")
+            .update({ last_seen_news_likes: new Date().toISOString() })
+            .eq("id", user.id);
+          // Badge-Zähler aktualisieren
+          window.dispatchEvent(new Event("refreshNewsBadge"));
+        } catch (err) {
+          // Graceful degradation - Spalte existiert evtl. noch nicht
+          console.debug("last_seen_news_likes update:", err);
+        }
+      };
+      updateLastSeen();
+    }
+
     // Realtime Subscription für News-Änderungen
     const channel = supabase
       .channel("news-changes")

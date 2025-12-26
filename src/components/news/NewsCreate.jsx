@@ -10,16 +10,16 @@ import {
   Trash2,
   List as ListIcon,
   ListOrdered,
-  Image as ImageIcon,
   Minus as MinusIcon,
   Type as TypeIcon,
   Check,
+  Images,
+  X,
 } from "lucide-react";
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import Image from "@tiptap/extension-image";
 import { Mark } from "@tiptap/core";
 
 import { getGroupStyles } from "../../utils/groupUtils";
@@ -100,6 +100,7 @@ export default function NewsCreate({
 }) {
   const [title, setTitle] = useState("");
   const [attachments, setAttachments] = useState([]);
+  const [galleryImages, setGalleryImages] = useState([]); // Neue Bildergalerie
   const [refresh, setRefresh] = useState(0);
 
   // Effektive Auswahl: Array von IDs oder "all"
@@ -142,7 +143,7 @@ export default function NewsCreate({
     onGroupsChange([]);
   };
 
-  // TIPTAP EDITOR
+  // TIPTAP EDITOR (ohne inline Images - Bilder gehen in Galerie)
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -153,7 +154,6 @@ export default function NewsCreate({
         },
       }),
       CustomUnderline,
-      Image.configure({ inline: true }),
       Placeholder.configure({
         placeholder: "Nachricht eingeben...",
       }),
@@ -208,25 +208,38 @@ export default function NewsCreate({
   const isActive = (name, attrs = {}) =>
     editor ? editor.isActive(name, attrs) : false;
 
-  // IMAGE EMBED (mit Komprimierung)
-  const handleImageFileChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file || !editor) return;
+  // GALERIE-BILDER HINZUFÜGEN (mehrere möglich)
+  const handleGalleryImagesChange = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
-    try {
-      // Komprimiere das Bild
-      const compressedDataUrl = await compressImage(file);
-      editor.chain().focus().setImage({ src: compressedDataUrl }).run();
-    } catch (error) {
-      console.error("Fehler beim Komprimieren des Bildes:", error);
-      // Fallback: Original verwenden
-      const reader = new FileReader();
-      reader.onload = () => {
-        editor.chain().focus().setImage({ src: reader.result }).run();
-      };
-      reader.readAsDataURL(file);
+    const newImages = [];
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) continue;
+
+      try {
+        // Komprimiere das Bild und erstelle Vorschau
+        const compressedDataUrl = await compressImage(file);
+        newImages.push({
+          id: crypto.randomUUID(),
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          file: file,
+          preview: compressedDataUrl,
+        });
+      } catch (error) {
+        console.error("Fehler beim Verarbeiten des Bildes:", error);
+      }
     }
+
+    setGalleryImages((prev) => [...prev, ...newImages]);
     e.target.value = "";
+  };
+
+  // Galerie-Bild entfernen
+  const removeGalleryImage = (id) => {
+    setGalleryImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   // FILE ATTACHMENTS
@@ -255,7 +268,19 @@ export default function NewsCreate({
 
     const html = editor.getHTML();
     const plain = editor.getText().trim();
-    if (!plain) return;
+    // Erlauben wenn Text ODER Bilder vorhanden
+    if (!plain && galleryImages.length === 0) return;
+
+    // Galerie-Bilder + andere Attachments zusammenführen
+    const allAttachments = [
+      ...galleryImages.map((img) => ({
+        name: img.name,
+        size: img.size,
+        type: img.type,
+        file: img.file,
+      })),
+      ...attachments,
+    ];
 
     const newItem = {
       id: crypto.randomUUID(),
@@ -267,7 +292,7 @@ export default function NewsCreate({
       // Legacy-Felder für Abwärtskompatibilität
       groupId: isAllSelected ? null : (selectedGroupIds[0] || null),
       target: isAllSelected ? "all" : "group",
-      attachments,
+      attachments: allAttachments,
       createdBy: user.id,
     };
 
@@ -277,6 +302,7 @@ export default function NewsCreate({
     setTitle("");
     editor.commands.setContent("");
     setAttachments([]);
+    setGalleryImages([]);
   };
 
   return (
@@ -359,18 +385,20 @@ export default function NewsCreate({
             <button onClick={() => applyFormat("orderedList")} className={`p-1.5 rounded-md hover:bg-stone-200 ${isActive("orderedList") ? "bg-stone-300" : ""}`}><ListOrdered size={16} /></button>
             <button onClick={() => applyFormat("heading")} className={`p-1.5 rounded-md hover:bg-stone-200 ${isActive("heading", { level: 2 }) ? "bg-stone-300" : ""}`}><TypeIcon size={16} /></button>
 
-            <label className="p-1.5 rounded-md hover:bg-stone-200 cursor-pointer">
-              <ImageIcon size={16} />
-              <input type="file" accept="image/*" className="hidden" onChange={handleImageFileChange} />
-            </label>
-
             <button onClick={() => applyFormat("hr")} className="p-1.5 rounded-md hover:bg-stone-200">
               <MinusIcon size={16} />
             </button>
 
             <div className="flex-1" />
 
-            <label className="p-1.5 rounded-md hover:bg-stone-200 cursor-pointer">
+            {/* Bilder für Galerie */}
+            <label className="p-1.5 rounded-md hover:bg-stone-200 cursor-pointer" title="Bilder hinzufügen">
+              <Images size={16} />
+              <input type="file" accept="image/*" multiple className="hidden" onChange={handleGalleryImagesChange} />
+            </label>
+
+            {/* Andere Dateien */}
+            <label className="p-1.5 rounded-md hover:bg-stone-200 cursor-pointer" title="Dateien anhängen">
               <Paperclip size={16} />
               <input type="file" multiple className="hidden" onChange={handleFileChange} />
             </label>
@@ -383,6 +411,49 @@ export default function NewsCreate({
           className="ProseMirror min-h-[140px] px-3 py-2 focus:outline-none text-sm"
         />
       </div>
+
+      {/* BILDERGALERIE VORSCHAU */}
+      {galleryImages.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold text-stone-500 flex items-center gap-1">
+            <Images size={14} />
+            {galleryImages.length} {galleryImages.length === 1 ? "Bild" : "Bilder"}
+          </p>
+          <div className={`grid gap-2 ${
+            galleryImages.length === 1 ? "grid-cols-1" :
+            galleryImages.length === 2 ? "grid-cols-2" :
+            "grid-cols-3"
+          }`}>
+            {galleryImages.map((img) => (
+              <div
+                key={img.id}
+                className="relative group aspect-square rounded-xl overflow-hidden bg-stone-100 border border-stone-200"
+              >
+                <img
+                  src={img.preview}
+                  alt={img.name}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeGalleryImage(img.id)}
+                  className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+            {/* Button zum Hinzufügen weiterer Bilder */}
+            <label className="aspect-square rounded-xl border-2 border-dashed border-stone-300 flex items-center justify-center cursor-pointer hover:bg-stone-50 hover:border-amber-400 transition-colors">
+              <div className="text-center text-stone-400">
+                <Images size={24} className="mx-auto mb-1" />
+                <span className="text-xs">Weitere</span>
+              </div>
+              <input type="file" accept="image/*" multiple className="hidden" onChange={handleGalleryImagesChange} />
+            </label>
+          </div>
+        </div>
+      )}
 
       {/* ATTACHMENTS */}
       {attachments.length > 0 && (

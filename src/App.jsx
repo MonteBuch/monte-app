@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Home,
   Users,
@@ -275,6 +275,8 @@ function AppContent() {
   const [unacknowledgedResponsesCount, setUnacknowledgedResponsesCount] = useState(0);
   // Ungelesene Chat-Nachrichten Count für Eltern (Badge in Navigation)
   const [unreadChatCount, setUnreadChatCount] = useState(0);
+  // Ungelesene Likes Count für Team/Admin (Badge in Navigation)
+  const [unreadLikesCount, setUnreadLikesCount] = useState(0);
   // Email-Bestätigung erfolgreich (zeigt Meldung statt Auto-Login)
   const [emailConfirmed, setEmailConfirmed] = useState(false);
   // Tab-Präferenzen für dynamisches Menü
@@ -283,6 +285,8 @@ function AppContent() {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   // Willkommensscreen anzeigen
   const [showWelcome, setShowWelcome] = useState(false);
+  // Ref um zu tracken ob Welcome-Check bereits durchgeführt wurde (verhindert Mehrfach-Anzeige)
+  const welcomeCheckDoneRef = useRef(false);
   // Verbindungsstatus für Debug/Anzeige
   const [connectionIssue, setConnectionIssue] = useState(null);
   // Facility context
@@ -377,6 +381,8 @@ function AppContent() {
         if (event === "SIGNED_OUT") {
           setUser(null);
           setPendingResetUser(null);
+          // Welcome-Check zurücksetzen für nächsten Login
+          welcomeCheckDoneRef.current = false;
         } else if (event === "PASSWORD_RECOVERY" && session?.user) {
           // User hat Passwort-Reset-Link geklickt → ForceReset anzeigen
           try {
@@ -625,6 +631,80 @@ function AppContent() {
     };
   }, [user]);
 
+  // Ungelesene Likes für Team/Admin prüfen (Badge in Navigation)
+  useEffect(() => {
+    if (!user || (user.role !== "team" && user.role !== "admin")) {
+      setUnreadLikesCount(0);
+      return;
+    }
+
+    async function checkUnreadLikes() {
+      try {
+        // Zuerst last_seen_news_likes aus Profil laden
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("last_seen_news_likes")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError) {
+          // Spalte existiert evtl. noch nicht - graceful degradation
+          setUnreadLikesCount(0);
+          return;
+        }
+
+        const lastSeen = profile?.last_seen_news_likes;
+
+        // Alle Likes zählen die nach lastSeen erstellt wurden
+        // Falls lastSeen null ist, zeige nichts an (erste Nutzung)
+        if (!lastSeen) {
+          setUnreadLikesCount(0);
+          return;
+        }
+
+        // Anzahl neuer Likes seit lastSeen
+        const { count, error: countError } = await supabase
+          .from("news_likes")
+          .select("id", { count: "exact", head: true })
+          .gt("created_at", lastSeen);
+
+        if (countError) throw countError;
+
+        setUnreadLikesCount(count || 0);
+      } catch (err) {
+        console.error("Ungelesene Likes Check fehlgeschlagen:", err);
+        setUnreadLikesCount(0);
+      }
+    }
+
+    checkUnreadLikes();
+
+    // Custom Event Listener für manuelle Aktualisierung
+    const handleRefresh = () => checkUnreadLikes();
+    window.addEventListener("refreshNewsBadge", handleRefresh);
+
+    // Realtime-Subscription für neue Likes
+    const channel = supabase
+      .channel("news-likes-badge")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "news_likes",
+        },
+        () => {
+          checkUnreadLikes();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      window.removeEventListener("refreshNewsBadge", handleRefresh);
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   // Tab-Präferenzen laden
   useEffect(() => {
     if (!user) {
@@ -666,15 +746,26 @@ function AppContent() {
     };
   }, [user]);
 
-  // Willkommensscreen anzeigen, wenn User neu ist
+  // Willkommensscreen anzeigen, wenn User neu ist (nur einmal pro Session prüfen)
   useEffect(() => {
-    if (user && !user.hasSeenWelcome) {
-      // Kurze Verzögerung, damit App erst vollständig lädt
-      const timer = setTimeout(() => {
-        setShowWelcome(true);
-      }, 500);
-      return () => clearTimeout(timer);
+    // Nur prüfen wenn User existiert
+    if (!user) return;
+
+    // Warten bis hasSeenWelcome einen definierten Wert hat (nicht undefined)
+    if (typeof user.hasSeenWelcome !== "boolean") return;
+
+    // Check nur einmal durchführen
+    if (welcomeCheckDoneRef.current) return;
+
+    // Jetzt markieren dass Check durchgeführt wurde
+    welcomeCheckDoneRef.current = true;
+
+    // Anzeigen wenn hasSeenWelcome false ist
+    if (user.hasSeenWelcome === false) {
+      // Direkt anzeigen (ohne Timeout, da User bereits vollständig geladen)
+      setShowWelcome(true);
     }
+    // Kein cleanup nötig - ref verhindert erneute Ausführung
   }, [user]);
 
   const handleWelcomeComplete = () => {
@@ -719,6 +810,8 @@ function AppContent() {
     }
     setUser(null);
     setPendingResetUser(null);
+    // Welcome-Check zurücksetzen für nächsten Login
+    welcomeCheckDoneRef.current = false;
   };
 
   const handlePasswordUpdated = (updatedUser) => {
@@ -800,8 +893,8 @@ function AppContent() {
               E-Mail bestätigt!
             </h2>
             <p className="text-stone-600">
-              Ihre E-Mail-Adresse wurde erfolgreich bestätigt.
-              Sie können sich jetzt anmelden.
+              Deine E-Mail-Adresse wurde erfolgreich bestätigt.
+              Du kannst dich jetzt anmelden.
             </p>
             <button
               onClick={() => setEmailConfirmed(false)}
@@ -981,6 +1074,7 @@ function AppContent() {
           setActiveTab={setActiveTab}
           user={user}
           badges={{
+            news: unreadLikesCount > 0 ? (unreadLikesCount > 9 ? "9+" : unreadLikesCount) : null,
             group: hasBirthdays ? <Cake size={10} /> : null,
             absence: unacknowledgedResponsesCount > 0 ? "!" : null,
             chat: unreadChatCount > 0 ? "!" : null,
@@ -997,6 +1091,7 @@ function AppContent() {
           setActiveTab={setActiveTab}
           user={user}
           badges={{
+            news: unreadLikesCount > 0 ? (unreadLikesCount > 9 ? "9+" : unreadLikesCount) : null,
             group: hasBirthdays ? <Cake size={10} /> : null,
             absence: unacknowledgedResponsesCount > 0 ? "!" : null,
             chat: unreadChatCount > 0 ? "!" : null,

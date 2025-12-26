@@ -190,8 +190,8 @@ src/
 - [x] Performance optimizations (parallel loading, shared contexts)
 - [x] Email notification Edge Function (send-news-email)
 - [x] Resend DNS-Records konfiguriert (SPF + DKIM)
-- [ ] **Resend Domain-Verifikation** - DNS korrekt, wartet auf Resend-Verifikation (Status: Pending)
-- [ ] **Email-Versand testen** - Nach Domain-Verifikation
+- [x] **Resend Domain-Verifikation** - Erfolgreich verifiziert
+- [ ] **Email-Versand debuggen** - Problem: Emails werden nicht versendet, Debug-Logging aktiv
 - [ ] Realtime in Supabase Dashboard aktivieren (Database → Replication)
 
 ### Phase 4: PWA / Offline Support (COMPLETED)
@@ -386,21 +386,26 @@ Ein Feature zur Dokumentation des Gruppenalltags:
 ### 0. UAT für Web/PWA Version (PRIORITÄT)
 Siehe TO-DO Liste oben. Systematischer Test aller Features vor Go-Live.
 
-### 1. Resend Domain-Verifikation (WARTET)
+### 1. Email-Versand debuggen (OFFEN)
 
-**Status:** DNS korrekt konfiguriert, wartet auf Resend-Verifikation (Status bei Resend: "Pending")
+**Status:** Resend Domain ist verifiziert, aber Emails werden nicht versendet.
 
-**DNS-Records bei Strato (korrekt eingetragen):**
-```
-TXT  resend._domainkey  (DKIM-Schlüssel von Resend)
-TXT  (leer/root)        v=spf1 include:amazonses.com ~all
-```
+**Bekannte Fakten:**
+- Resend Domain-Verifikation: ✅ Erfolgreich
+- Edge Function `send-news-email` ist deployed
+- `FROM_EMAIL` Secret ist gesetzt
 
-**MX-Record:** Nicht erforderlich für Verifikation (nur für Bounce-Handling)
+**Debug-Logging aktiv:**
+Bei News-Erstellung wird in Browser-Console ausgegeben:
+- Anzahl geladener Profile
+- Welche User Email-Benachrichtigungen aktiviert haben
+- Edge Function Response
 
-**Nach Verifikation:**
-- `FROM_EMAIL` Secret ist bereits gesetzt in Supabase Edge Function
-- Test-Email senden um Funktion zu prüfen
+**Zu prüfen:**
+1. Browser-Console öffnen (F12) beim News-Erstellen
+2. Prüfen ob Empfänger gefunden werden
+3. Edge Function Response auf Fehler prüfen
+4. Supabase Edge Function Logs prüfen
 
 ### 2. Supabase Realtime aktivieren
 

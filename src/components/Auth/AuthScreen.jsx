@@ -85,6 +85,8 @@ export default function AuthScreen({ onLogin }) {
   const defaultGroupId = groups.find(g => g.id !== "event")?.id || null;
 
   const [children, setChildren] = useState([]);
+  // Stammgruppe für Team-Mitglieder
+  const [primaryGroup, setPrimaryGroup] = useState(null);
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -182,6 +184,10 @@ export default function AuthScreen({ onLogin }) {
         birthday: "",
         notes: "",
       }]);
+      // Auch primaryGroup für Team setzen
+      if (!primaryGroup) {
+        setPrimaryGroup(firstGroup?.id || null);
+      }
     }
   }, [groups]);
 
@@ -299,10 +305,15 @@ export default function AuthScreen({ onLogin }) {
           }
         }
 
-        // 1. Auth-User erstellen
+        // 1. Auth-User erstellen (mit Name in Metadaten für Email-Template)
         const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email: email.toLowerCase().trim(),
           password,
+          options: {
+            data: {
+              full_name: name,
+            },
+          },
         });
 
         if (signUpError) {
@@ -318,9 +329,8 @@ export default function AuthScreen({ onLogin }) {
         }
 
         // 2. Profil erstellen oder updaten (Trigger erstellt evtl. schon ein leeres Profil)
-        const primaryGroup = role === "parent"
-          ? null
-          : (groups.find(g => !g.is_event_group)?.id || null);
+        // Für Team: Die ausgewählte Stammgruppe verwenden
+        const selectedPrimaryGroup = role === "parent" ? null : primaryGroup;
 
         // Erst versuchen zu updaten (falls Trigger das Profil schon erstellt hat)
         const userEmail = email.toLowerCase().trim();
@@ -330,7 +340,7 @@ export default function AuthScreen({ onLogin }) {
             facility_id: FACILITY_ID,
             full_name: name,
             role,
-            primary_group: primaryGroup,
+            primary_group: selectedPrimaryGroup,
             email: userEmail,
           })
           .eq("id", userId);
@@ -344,7 +354,7 @@ export default function AuthScreen({ onLogin }) {
               facility_id: FACILITY_ID,
               full_name: name,
               role,
-              primary_group: primaryGroup,
+              primary_group: selectedPrimaryGroup,
               email: userEmail,
             });
 
@@ -425,7 +435,12 @@ export default function AuthScreen({ onLogin }) {
               throw new Error("Passwort-Reset E-Mail konnte nicht gesendet werden.");
             }
 
-            throw new Error("Ihr Passwort wurde von der Leitung zurückgesetzt. Eine E-Mail mit einem Link zum Setzen eines neuen Passworts wurde an Sie gesendet.");
+            throw new Error("Dein Passwort wurde von der Leitung zurückgesetzt. Eine E-Mail mit einem Link zum Setzen eines neuen Passworts wurde an dich gesendet.");
+          }
+
+          // Email noch nicht bestätigt
+          if (signInError.message.includes("Email not confirmed")) {
+            throw new Error("Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir eine Bestätigungs-E-Mail gesendet. Prüfe auch deinen Spam-Ordner.");
           }
 
           if (signInError.message.includes("Invalid login")) {
@@ -536,7 +551,7 @@ export default function AuthScreen({ onLogin }) {
                 {biometricTypeName} aktivieren?
               </h2>
               <p className="text-stone-600">
-                Melden Sie sich beim nächsten Mal schneller an - mit Ihrem {biometricTypeName}.
+                Melde dich beim nächsten Mal schneller an - mit deinem {biometricTypeName}.
               </p>
               <div className="pt-4 space-y-3">
                 <button
@@ -565,11 +580,11 @@ export default function AuthScreen({ onLogin }) {
                 Registrierung erfolgreich!
               </h2>
               <p className="text-stone-600">
-                Wir haben Ihnen eine Bestätigungs-E-Mail an <strong>{email}</strong> gesendet.
+                Wir haben dir eine Bestätigungs-E-Mail an <strong>{email}</strong> gesendet.
               </p>
               <p className="text-sm text-stone-500">
-                Bitte klicken Sie auf den Link in der E-Mail, um Ihr Konto zu aktivieren.
-                Danach können Sie sich hier anmelden.
+                Bitte klicke auf den Link in der E-Mail, um dein Konto zu aktivieren.
+                Danach kannst du dich hier anmelden.
               </p>
               <div className="pt-4">
                 <button
@@ -585,7 +600,7 @@ export default function AuthScreen({ onLogin }) {
                 </button>
               </div>
               <p className="text-xs text-stone-400 mt-4">
-                Keine E-Mail erhalten? Prüfen Sie Ihren Spam-Ordner oder versuchen Sie es erneut.
+                Keine E-Mail erhalten? Prüfe deinen Spam-Ordner oder versuche es erneut.
               </p>
             </div>
           ) : (
@@ -673,7 +688,7 @@ export default function AuthScreen({ onLogin }) {
                         Einladungslink gültig
                       </p>
                       <p className="text-xs text-green-600">
-                        Sie wurden als {inviteRole === "parent" ? "Elternteil" : inviteRole === "team" ? "Team-Mitglied" : "Admin"} eingeladen.
+                        Du wurdest als {inviteRole === "parent" ? "Elternteil" : inviteRole === "team" ? "Team-Mitglied" : "Admin"} eingeladen.
                       </p>
                     </div>
                   </div>
@@ -685,8 +700,36 @@ export default function AuthScreen({ onLogin }) {
                         Einladungslink erforderlich
                       </p>
                       <p className="text-xs text-amber-600">
-                        Bitte fordern Sie einen Einladungslink von der Einrichtung an.
+                        Bitte fordere einen Einladungslink von der Einrichtung an.
                       </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* STAMMGRUPPE für Team */}
+                {(role === "team" || role === "admin") && !loadingGroups && displayGroups.length > 0 && (
+                  <div>
+                    <label className="block text-xs font-bold text-stone-400 uppercase mb-2">
+                      Deine Stammgruppe
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {displayGroups.map((g) => {
+                        const styles = getGroupStyles(g);
+                        return (
+                          <button
+                            type="button"
+                            key={g.id}
+                            onClick={() => setPrimaryGroup(g.id)}
+                            className={`p-3 rounded-xl text-sm flex items-center justify-center gap-2 border ${
+                              primaryGroup === g.id
+                                ? `${styles.chipClass} border-transparent shadow-sm`
+                                : "bg-white border-stone-200 text-stone-500 hover:bg-stone-100"
+                            }`}
+                          >
+                            <styles.Icon size={16} /> {styles.name}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -695,7 +738,7 @@ export default function AuthScreen({ onLogin }) {
                 {role === "parent" && !loadingGroups && (
                   <>
                     <label className="block text-xs font-bold text-stone-400 uppercase mt-4 mb-1">
-                      Ihre Kinder
+                      Deine Kinder
                     </label>
 
                     {children.map((child, index) => {

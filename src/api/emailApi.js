@@ -43,25 +43,37 @@ export async function getEmailRecipientsForNews(groupIds) {
     }
 
     // Filtern nach Gruppe und Email-Präferenz
+    console.log("Alle geladenen Profile:", profiles?.length || 0);
+
     const registeredEmails = (profiles || [])
       .filter(p => {
         // Prüfen ob Email-Benachrichtigung für News aktiviert ist
         const newsPrefs = p.notification_preferences?.find(np => np.category === 'news');
-        const preference = newsPrefs?.preference || 'app';
+        // WICHTIG: Standard ist jetzt 'both' (Email + App) statt nur 'app'
+        // Nutzer können in Profil → Benachrichtigungen auf 'app' oder 'off' ändern
+        const preference = newsPrefs?.preference || 'both';
         const emailEnabled = preference === 'email' || preference === 'both';
+
+        console.log(`Profil ${p.full_name}: news preference = "${preference}" (explizit: ${!!newsPrefs}), emailEnabled = ${emailEnabled}`);
+
         if (!emailEnabled) return false;
 
         // Prüfen ob Kind in einer der Zielgruppen ist
         if (!targetGroupIds) return true; // "Alle" - alle Eltern
-        return p.children?.some(c => targetGroupIds.includes(c.group_id));
+        const hasMatchingChild = p.children?.some(c => targetGroupIds.includes(c.group_id));
+        console.log(`  → Kinder in Zielgruppen: ${hasMatchingChild}`);
+        return hasMatchingChild;
       })
       .map(p => p.email)
       .filter(Boolean);
 
+    console.log("Registrierte Emails gefunden:", registeredEmails);
+
     // 2. Externe Emails aus dem Verzeichnis
+    console.log("Lade externe Emails, targetGroupIds:", targetGroupIds);
     let externalQuery = supabase
       .from("group_email_directory")
-      .select("email")
+      .select("email, group_id")
       .eq("facility_id", FACILITY_ID);
 
     if (targetGroupIds) {
@@ -69,6 +81,7 @@ export async function getEmailRecipientsForNews(groupIds) {
     }
 
     const { data: externalRows, error: externalError } = await externalQuery;
+    console.log("Externe Emails Ergebnis:", { rows: externalRows, error: externalError });
 
     if (externalError) {
       console.error("Fehler beim Laden der externen Emails:", externalError);
@@ -78,7 +91,7 @@ export async function getEmailRecipientsForNews(groupIds) {
     const externalEmails = (externalRows || [])
       .map(r => r.email)
       .filter(Boolean)
-      .filter(email => !registeredEmails.includes(email.toLowerCase()));
+      .filter(email => !registeredEmails.map(e => e.toLowerCase()).includes(email.toLowerCase()));
 
     return {
       registered: [...new Set(registeredEmails)],
@@ -161,12 +174,21 @@ function htmlToEmailContent(html) {
  */
 export async function sendNewsEmailNotifications(news, groupIds, groupNames, authorName) {
   try {
+    console.log("=== EMAIL DEBUG START ===");
+    console.log("News:", { id: news.id, title: news.title, groupIds });
+
     // Empfänger ermitteln (unterstützt jetzt Array von groupIds)
     const recipients = await getEmailRecipientsForNews(groupIds);
+    console.log("Gefundene Empfänger:", {
+      registered: recipients.registered,
+      external: recipients.external,
+    });
+
     const allEmails = [...recipients.registered, ...recipients.external];
 
     if (allEmails.length === 0) {
-      console.log("Keine Email-Empfänger gefunden");
+      console.log("Keine Email-Empfänger gefunden - prüfe notification_preferences!");
+      console.log("=== EMAIL DEBUG END ===");
       return { success: true, sentCount: 0 };
     }
 
@@ -187,6 +209,13 @@ export async function sendNewsEmailNotifications(news, groupIds, groupNames, aut
     // App-URL
     const appUrl = window.location.origin;
 
+    console.log("Rufe Edge Function auf mit:", {
+      to: allEmails,
+      subject: subject,
+      news_title: title,
+      app_url: appUrl,
+    });
+
     // Edge Function aufrufen
     const response = await supabase.functions.invoke('send-news-email', {
       body: {
@@ -202,6 +231,7 @@ export async function sendNewsEmailNotifications(news, groupIds, groupNames, aut
 
     // Detailliertes Logging
     console.log("Edge Function Response:", response);
+    console.log("=== EMAIL DEBUG END ===");
 
     if (response.error) {
       // Versuche den Fehler-Body zu lesen
