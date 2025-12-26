@@ -576,6 +576,25 @@ export default function MoreMenu({
                 </SortableContext>
               </div>
 
+              {/* DEBUG: Zeigt ob activeId gesetzt ist */}
+              {activeId && (
+                <div
+                  style={{
+                    position: "fixed",
+                    top: "10px",
+                    left: "10px",
+                    backgroundColor: "red",
+                    color: "white",
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    zIndex: 99999,
+                    fontWeight: "bold",
+                  }}
+                >
+                  DRAGGING: {activeId}
+                </div>
+              )}
+
               {/* Drag Overlay - das sichtbare gezogene Element */}
               <DragOverlay
                 zIndex={9999}
