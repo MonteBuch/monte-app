@@ -203,15 +203,22 @@ export default function NewsFeed({ user, news, groups, onDelete }) {
   const renderAttachments = (attachments) => {
     if (!attachments || attachments.length === 0) return null;
 
+    // Debug: Zeige alle Attachments
+    console.log("renderAttachments:", attachments);
+
     // Bilder, Videos und andere Dateien trennen
     const images = attachments.filter((att) =>
       att.type?.startsWith("image/") ||
-      att.name?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+      att.name?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ||
+      att.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
     );
     const videos = attachments.filter((att) =>
       att.type?.startsWith("video/") ||
-      att.name?.match(/\.(mp4|webm|mov|avi|mkv)$/i)
+      att.name?.match(/\.(mp4|webm|mov|avi|mkv)$/i) ||
+      att.url?.match(/\.(mp4|webm|mov|avi|mkv)$/i)
     );
+
+    console.log("Gefiltert - Bilder:", images.length, "Videos:", videos.length);
     const otherFiles = attachments.filter(
       (att) => !images.includes(att) && !videos.includes(att)
     );

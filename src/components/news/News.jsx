@@ -158,7 +158,18 @@ export default function News({ user }) {
 
     for (const att of attachments) {
       // att.file kommt aus NewsCreate
-      if (!att.file) continue;
+      if (!att.file) {
+        console.warn("Attachment ohne File übersprungen:", att.name);
+        continue;
+      }
+
+      // Debug: Zeige was hochgeladen wird
+      console.log("Uploading attachment:", {
+        name: att.name,
+        type: att.type,
+        size: att.size,
+        hasFile: !!att.file,
+      });
 
       const path = `${user.id}/${newsId}/${att.name}`;
 
@@ -166,10 +177,12 @@ export default function News({ user }) {
         .from(NEWS_BUCKET)
         .upload(path, att.file, {
           upsert: true,
+          contentType: att.type, // Wichtig für Videos!
         });
 
       if (uploadError) {
         console.error("Fehler beim Upload eines Anhangs:", uploadError);
+        showError(`Upload fehlgeschlagen: ${att.name}`);
         continue;
       }
 
@@ -178,7 +191,12 @@ export default function News({ user }) {
         .getPublicUrl(path);
 
       const url = publicData?.publicUrl;
-      if (!url) continue;
+      if (!url) {
+        console.warn("Keine öffentliche URL für:", att.name);
+        continue;
+      }
+
+      console.log("Upload erfolgreich:", { name: att.name, type: att.type, url });
 
       uploaded.push({
         name: att.name,

@@ -48,6 +48,11 @@ serve(async (req) => {
       );
     }
 
+    // Header-Text generieren
+    const headerTitle = group_name
+      ? `Neuer Pinnwandeintrag für ${group_name}`
+      : "Neuer Pinnwandeintrag";
+
     // HTML Email Template
     const htmlContent = `
 <!DOCTYPE html>
@@ -65,8 +70,11 @@ serve(async (req) => {
           <!-- Header -->
           <tr>
             <td style="background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); padding: 24px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold;">
-                ${group_name ? `${group_name}` : "Neue Mitteilung"}
+              <p style="margin: 0 0 8px 0; color: rgba(255,255,255,0.9); font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                📌 Pinnwand
+              </p>
+              <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: bold;">
+                ${headerTitle}
               </h1>
             </td>
           </tr>
@@ -117,12 +125,12 @@ serve(async (req) => {
 
     // Plain text version
     const textContent = `
-${group_name ? `${group_name}: ` : ""}${news_title || "Neue Mitteilung"}
+📌 PINNWAND
+${headerTitle}
 
-${news_content.replace(/<[^>]*>/g, "")}
+${news_title ? `${news_title}\n\n` : ""}${news_content.replace(/<[^>]*>/g, "")}
 
-${author_name ? `Gesendet von: ${author_name}` : ""}
-
+${author_name ? `Gesendet von: ${author_name}\n` : ""}
 In der App öffnen: ${app_url}
     `.trim();
 
