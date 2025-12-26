@@ -42,7 +42,7 @@ const PARENT_SLIDES = [
     title: "Gruppenbereich",
     subtitle: "Listen & Abstimmungen",
     description:
-      "Im Gruppenbereich findest du Mitbringlisten, Abstimmungen und Dienstpläne. Trage dich ein oder stimme ab - ganz einfach per Fingertipp.",
+      "Im Gruppenbereich findest du Mitbringlisten, Abstimmungen und Dienstlisten. Trage dich ein oder stimme ab - einfach und unkompliziert.",
   },
   {
     icon: CalendarDays,
@@ -100,7 +100,7 @@ const TEAM_SLIDES = [
     title: "Gruppenbereich",
     subtitle: "Listen verwalten",
     description:
-      "Erstelle und verwalte Mitbringlisten, Abstimmungen und Dienstpläne. Du siehst alle Einträge und Abstimmungsergebnisse deiner Gruppen.",
+      "Erstelle und verwalte Mitbringlisten, Abstimmungen und Dienstlisten. Du siehst alle Einträge und Abstimmungsergebnisse deiner Gruppen.",
   },
   {
     icon: CalendarDays,
@@ -140,7 +140,7 @@ const ADMIN_SLIDES = [
     title: "Pinnwand",
     subtitle: "Kommunikation mit allen",
     description:
-      "Erstelle Mitteilungen für alle Eltern oder einzelne Gruppen. Als Leitung kannst du Beiträge für die gesamte Einrichtung verfassen.",
+      "Erstelle Mitteilungen für alle Eltern oder einzelne Gruppen. Sowohl Leitung als auch Team können Beiträge für die gesamte Einrichtung verfassen.",
   },
   {
     icon: CalendarDays,
@@ -149,7 +149,7 @@ const ADMIN_SLIDES = [
     title: "Abwesenheits-Dashboard",
     subtitle: "Alle Meldungen im Blick",
     description:
-      "Im Dashboard siehst du alle Abwesenheitsmeldungen aller Gruppen. Exportiere Daten und behalte den Überblick.",
+      "Im Dashboard siehst du alle Abwesenheitsmeldungen aller Gruppen. Behalte den Überblick und reagiere auf Eltern-Meldungen.",
   },
   {
     icon: Calendar,
@@ -201,16 +201,22 @@ export default function WelcomeScreen({ user, onComplete }) {
 
   const handleComplete = async () => {
     setIsClosing(true);
-    // In DB speichern, dass User Welcome gesehen hat
-    const { error } = await supabase
-      .from("profiles")
-      .update({ has_seen_welcome: true })
-      .eq("id", user.id);
 
-    if (error) {
-      console.error("Welcome-Status speichern fehlgeschlagen:", error);
-    } else {
-      console.log("[WelcomeScreen] has_seen_welcome erfolgreich gesetzt für User:", user.id);
+    try {
+      // In DB speichern, dass User Welcome gesehen hat
+      const { error } = await supabase
+        .from("profiles")
+        .update({ has_seen_welcome: true })
+        .eq("id", user.id);
+
+      if (error) {
+        console.error("Welcome-Status speichern fehlgeschlagen:", error);
+        // Trotzdem fortfahren, aber Warnung loggen
+      } else {
+        console.log("[WelcomeScreen] has_seen_welcome erfolgreich gesetzt für User:", user.id);
+      }
+    } catch (err) {
+      console.error("Welcome-Status speichern Exception:", err);
     }
 
     // Callback nach kurzer Animation
