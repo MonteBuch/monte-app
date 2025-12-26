@@ -194,7 +194,26 @@ export async function sendNewsEmailNotifications(news, groupIds, groupNames, aut
 
     // Titel: Explizit aus news.title oder aus HTML extrahieren
     const title = news.title || extractTitleFromHtml(news.text);
-    const content = htmlToEmailContent(news.text);
+    let content = htmlToEmailContent(news.text);
+
+    // Galerie-Bilder aus Attachments hinzufügen
+    const imageAttachments = (news.attachments || []).filter(att =>
+      att.type?.startsWith('image/') ||
+      att.name?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+    );
+
+    if (imageAttachments.length > 0) {
+      // Bilder als HTML-Grid für Email
+      const imagesHtml = imageAttachments.map(img =>
+        `<img src="${img.url}" alt="${img.name || 'Bild'}" style="max-width: 100%; height: auto; border-radius: 8px; margin: 4px 0;" />`
+      ).join('');
+
+      content += `
+        <div style="margin-top: 16px;">
+          ${imagesHtml}
+        </div>
+      `;
+    }
 
     // Gruppennamen für Betreff formatieren
     const groupLabel = groupNames && groupNames.length > 0
