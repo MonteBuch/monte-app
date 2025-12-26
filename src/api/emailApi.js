@@ -197,22 +197,27 @@ export async function sendNewsEmailNotifications(news, groupIds, groupNames, aut
     let content = htmlToEmailContent(news.text);
 
     // Galerie-Bilder aus Attachments hinzufügen
+    console.log("News Attachments:", news.attachments);
     const imageAttachments = (news.attachments || []).filter(att =>
       att.type?.startsWith('image/') ||
-      att.name?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+      att.name?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ||
+      att.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
     );
+    console.log("Image Attachments für Email:", imageAttachments);
 
     if (imageAttachments.length > 0) {
-      // Bilder als HTML-Grid für Email
-      const imagesHtml = imageAttachments.map(img =>
-        `<img src="${img.url}" alt="${img.name || 'Bild'}" style="max-width: 100%; height: auto; border-radius: 8px; margin: 4px 0;" />`
-      ).join('');
+      // Bilder als HTML für Email - jedes Bild auf voller Breite
+      const imagesHtml = imageAttachments.map(img => {
+        console.log("Adding image to email:", img.url);
+        return `<img src="${img.url}" alt="${img.name || 'Bild'}" style="display: block; max-width: 100%; width: 100%; height: auto; border-radius: 8px; margin: 8px 0;" />`;
+      }).join('\n');
 
       content += `
         <div style="margin-top: 16px;">
           ${imagesHtml}
         </div>
       `;
+      console.log("Content mit Bildern:", content.substring(content.length - 500));
     }
 
     // Gruppennamen für Betreff formatieren
