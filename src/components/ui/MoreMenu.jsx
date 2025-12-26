@@ -62,21 +62,15 @@ const DEFAULT_TABS = {
 // Keine Layout-Animationen - verhindert Wackeln
 const noAnimations = () => false;
 
-// Custom Modifier: Zentriert das Overlay horizontal unter dem Cursor
-// und verschiebt es leicht nach links damit es besser unter dem Finger/Maus liegt
-const centerOnCursor = ({ transform, activatorEvent, draggingNodeRect }) => {
-  if (!draggingNodeRect || !activatorEvent) {
-    return transform;
-  }
-
-  // Berechne Offset um das Element zu zentrieren
-  // Das Element ist 220px breit, also verschieben wir um die Hälfte nach links
-  const offsetX = -110; // Halbe Breite des Overlay-Elements
-
+// DEBUG: Feste Position um zu testen ob DragOverlay überhaupt rendert
+// Wenn das Element bei (100, 100) erscheint, funktioniert DragOverlay
+// und das Problem ist die Positionsberechnung
+const debugFixedPosition = () => {
   return {
-    ...transform,
-    x: transform.x + offsetX,
-    y: transform.y - 20, // Etwas nach oben, damit man es besser sieht
+    x: 100,
+    y: 100,
+    scaleX: 1,
+    scaleY: 1,
   };
 };
 
@@ -585,7 +579,7 @@ export default function MoreMenu({
               {/* Drag Overlay - das sichtbare gezogene Element */}
               <DragOverlay
                 zIndex={9999}
-                modifiers={[centerOnCursor]}
+                modifiers={[debugFixedPosition]}
                 dropAnimation={{
                   duration: 200,
                   easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
