@@ -27,16 +27,16 @@ export default function EditGroupModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 p-4 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-2xl w-full max-w-md border border-stone-200 shadow-xl space-y-5">
-        <h3 className="text-lg font-bold text-stone-800">Gruppe bearbeiten</h3>
+      <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl w-full max-w-md border border-stone-200 dark:border-stone-700 shadow-xl space-y-5">
+        <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100">Gruppe bearbeiten</h3>
 
         {/* Name */}
         <div>
-          <label className="text-xs text-stone-500 uppercase font-semibold">
+          <label className="text-xs text-stone-500 dark:text-stone-400 uppercase font-semibold">
             Gruppenname
           </label>
           <input
-            className="w-full mt-1 p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm"
+            className="w-full mt-1 p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm dark:text-stone-100"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -44,7 +44,7 @@ export default function EditGroupModal({
 
         {/* Icons */}
         <div>
-          <label className="text-xs text-stone-500 uppercase font-semibold">
+          <label className="text-xs text-stone-500 dark:text-stone-400 uppercase font-semibold">
             Icon
           </label>
           <div className="grid grid-cols-6 gap-2 mt-2">
@@ -56,10 +56,10 @@ export default function EditGroupModal({
                 className={`p-2 rounded-xl border flex items-center justify-center ${
                   icon === ic.id
                     ? "bg-amber-100 border-amber-300"
-                    : "bg-stone-50 border-stone-300 hover:bg-stone-100"
+                    : "bg-stone-50 dark:bg-stone-900 border-stone-300 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-700"
                 }`}
               >
-                <span className="text-stone-700">{ic.icon}</span>
+                <span className="text-stone-700 dark:text-stone-200">{ic.icon}</span>
               </button>
             ))}
           </div>
@@ -67,7 +67,7 @@ export default function EditGroupModal({
 
         {/* Farben */}
         <div>
-          <label className="text-xs text-stone-500 uppercase font-semibold">
+          <label className="text-xs text-stone-500 dark:text-stone-400 uppercase font-semibold">
             Farbe
           </label>
           <div className="grid grid-cols-5 gap-2 mt-2">
@@ -79,7 +79,7 @@ export default function EditGroupModal({
                 className={`h-8 rounded-xl border ${
                   color === c
                     ? "border-amber-400 scale-95"
-                    : "border-stone-300"
+                    : "border-stone-300 dark:border-stone-600"
                 } ${c}`}
               />
             ))}
@@ -91,7 +91,7 @@ export default function EditGroupModal({
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 py-2 rounded-xl bg-stone-200 text-stone-700 font-semibold text-sm"
+            className="flex-1 py-2 rounded-xl bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm"
           >
             Abbrechen
           </button>

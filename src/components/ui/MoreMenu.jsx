@@ -103,11 +103,11 @@ function SortableTabItem({ id, willBeSwapped }) {
       {...listeners}
       className={`w-full flex items-center gap-3 p-3 rounded-xl select-none cursor-grab active:cursor-grabbing ${
         willBeSwapped
-          ? "bg-amber-100 border-2 border-amber-400 text-amber-700"
-          : "bg-white hover:bg-stone-100 text-stone-700"
+          ? "bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-400 text-amber-700 dark:text-amber-300"
+          : "bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200"
       }`}
     >
-      <div className="text-stone-400">
+      <div className="text-stone-400 dark:text-stone-500">
         <GripVertical size={16} />
       </div>
       <div className="relative">
@@ -457,7 +457,7 @@ export default function MoreMenu({
           setActiveTab(tabId);
           onClose();
         }}
-        className="w-full flex items-center gap-3 p-3 rounded-xl transition-colors bg-white hover:bg-stone-100 text-stone-700"
+        className="w-full flex items-center gap-3 p-3 rounded-xl transition-colors bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200"
       >
         <div className="relative">
           <Icon size={20} />
@@ -496,20 +496,20 @@ export default function MoreMenu({
 
       {/* Slide-in Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-out flex flex-col ${
+        className={`fixed top-0 right-0 h-full w-72 bg-white dark:bg-stone-900 shadow-2xl z-50 transform transition-transform duration-300 ease-out flex flex-col ${
           animateIn ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-stone-200">
-          <h2 className="text-lg font-bold text-stone-800">
+        <div className="flex items-center justify-between p-4 border-b border-stone-200 dark:border-stone-700">
+          <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">
             {customizeMode ? "Menü anpassen" : "Mehr"}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-stone-100"
+            className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800"
           >
-            <X size={20} className="text-stone-500" />
+            <X size={20} className="text-stone-500 dark:text-stone-400" />
           </button>
         </div>
 
@@ -525,10 +525,10 @@ export default function MoreMenu({
             >
               {/* Hauptmenü (max 4 Tabs) */}
               <div className="mb-6">
-                <p className="text-xs font-semibold text-stone-500 uppercase mb-2">
+                <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-2">
                   Hauptmenü (max. 4)
                   {isDraggingToFullMain && (
-                    <span className="ml-2 text-amber-600 normal-case">
+                    <span className="ml-2 text-amber-600 dark:text-amber-400 normal-case">
                       → Tauscht mit markiertem Element
                     </span>
                   )}
@@ -541,8 +541,8 @@ export default function MoreMenu({
                   <div
                     className={`space-y-2 min-h-[100px] rounded-xl p-2 ${
                       activeId && overContainer === "main" && mainTabs.length >= 4
-                        ? "bg-amber-50 border-2 border-dashed border-amber-400"
-                        : "bg-stone-50"
+                        ? "bg-amber-50 dark:bg-amber-900/20 border-2 border-dashed border-amber-400"
+                        : "bg-stone-50 dark:bg-stone-800"
                     }`}
                   >
                     {mainTabs.map((tabId, index) => (
@@ -558,7 +558,7 @@ export default function MoreMenu({
 
               {/* Mehr-Menü */}
               <div className="mb-6">
-                <p className="text-xs font-semibold text-stone-500 uppercase mb-2">
+                <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-2">
                   Im "Mehr"-Menü
                 </p>
                 <SortableContext
@@ -569,8 +569,8 @@ export default function MoreMenu({
                   <div
                     className={`space-y-2 min-h-[100px] rounded-xl p-2 transition-colors ${
                       activeId && overContainer === "more"
-                        ? "bg-amber-50 border-2 border-dashed border-amber-300"
-                        : "bg-stone-50"
+                        ? "bg-amber-50 dark:bg-amber-900/20 border-2 border-dashed border-amber-300"
+                        : "bg-stone-50 dark:bg-stone-800"
                     }`}
                   >
                     {moreTabs.map((tabId) => (
@@ -609,13 +609,13 @@ export default function MoreMenu({
                 </button>
                 <button
                   onClick={resetToDefaults}
-                  className="w-full py-2 rounded-xl bg-stone-100 text-stone-600 font-semibold text-sm hover:bg-stone-200"
+                  className="w-full py-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-700"
                 >
                   Zurücksetzen
                 </button>
                 <button
                   onClick={() => setCustomizeMode(false)}
-                  className="w-full py-2 text-stone-500 text-sm"
+                  className="w-full py-2 text-stone-500 dark:text-stone-400 text-sm"
                 >
                   Abbrechen
                 </button>
@@ -630,7 +630,7 @@ export default function MoreMenu({
               <div className="mb-4">
                 <button
                   onClick={() => setCustomizeMode(true)}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200"
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-700"
                 >
                   <Sliders size={16} />
                   Menü anpassen
@@ -638,7 +638,7 @@ export default function MoreMenu({
               </div>
 
               {/* Trennlinie */}
-              <div className="border-t border-stone-200 mb-4" />
+              <div className="border-t border-stone-200 dark:border-stone-700 mb-4" />
 
               {/* Normale Menü-Ansicht (unten) */}
               <div className="space-y-2">

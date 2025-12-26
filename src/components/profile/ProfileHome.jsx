@@ -89,8 +89,7 @@ export default function ProfileHome({ user, onNavigate, onLogout }) {
     <div className="space-y-5">
       {/* === IDENTITY HEADER - UI Review Update === */}
       <div
-        className="p-5 rounded-3xl shadow-sm border border-stone-200"
-        style={{ backgroundColor: "#f8f9fa" }}
+        className="p-5 rounded-3xl shadow-sm border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800"
       >
         <div className="flex items-center gap-4">
           {/* Avatar */}
@@ -100,7 +99,7 @@ export default function ProfileHome({ user, onNavigate, onLogout }) {
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-stone-800 truncate">
+            <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100 truncate">
               {user.name || "Benutzer"}
             </h2>
             <div className="flex flex-wrap items-center gap-2 mt-1">
@@ -113,7 +112,7 @@ export default function ProfileHome({ user, onNavigate, onLogout }) {
 
               {/* Kinder-Info (nur Eltern) - FETT */}
               {childrenInfo && (
-                <span className="text-xs text-stone-700 font-bold">{childrenInfo}</span>
+                <span className="text-xs text-stone-700 dark:text-stone-200 font-bold">{childrenInfo}</span>
               )}
             </div>
 
@@ -228,16 +227,16 @@ export default function ProfileHome({ user, onNavigate, onLogout }) {
 
       {/* Geburtstage heute (nur Team, nur wenn aktiviert und vorhanden) */}
       {isTeam && showBirthdayBox && (
-        <div className="bg-white p-4 rounded-2xl border border-amber-200 shadow-sm space-y-2">
+        <div className="bg-white dark:bg-stone-800 p-4 rounded-2xl border border-amber-200 dark:border-amber-700 shadow-sm space-y-2">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
+            <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300">
               <Cake size={18} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-stone-800">
+              <p className="text-sm font-semibold text-stone-800 dark:text-stone-100">
                 Geburtstage heute
               </p>
-              <p className="text-[11px] text-stone-500">
+              <p className="text-[11px] text-stone-500 dark:text-stone-400">
                 Kinder aus deiner Stammgruppe
               </p>
             </div>
@@ -252,7 +251,7 @@ export default function ProfileHome({ user, onNavigate, onLogout }) {
                   key={`${b.childName}-${idx}`}
                   className="flex items-center justify-between text-sm"
                 >
-                  <span className="text-stone-700">{b.childName}</span>
+                  <span className="text-stone-700 dark:text-stone-200">{b.childName}</span>
                   {styles && (
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${styles.chipClass}`}

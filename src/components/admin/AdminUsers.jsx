@@ -238,16 +238,16 @@ export default function AdminUsers() {
       <div className="space-y-3">
         {/* Sektion Header */}
         <div className="flex items-center gap-2 pt-2">
-          <div className="p-1.5 rounded-lg bg-stone-100 text-stone-600">
+          <div className="p-1.5 rounded-lg bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300">
             <Icon size={14} />
           </div>
-          <h3 className="text-sm font-bold text-stone-700">
+          <h3 className="text-sm font-bold text-stone-700 dark:text-stone-200">
             {sectionTitle} ({roleUsers.length})
           </h3>
         </div>
 
         {/* Benutzer-Karten */}
-        <div className="bg-white rounded-2xl border border-stone-200 shadow-sm divide-y divide-stone-100">
+        <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm divide-y divide-stone-100 dark:divide-stone-700">
           {roleUsers.map((u) => {
             const group = u.primaryGroup ? getGroupById(u.primaryGroup) : null;
             const summary = childSummary(u);
@@ -258,12 +258,12 @@ export default function AdminUsers() {
                 className="p-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-stone-100 text-stone-700">
+                  <div className="p-2 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200">
                     <Icon size={18} />
                   </div>
                   <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-semibold text-sm text-stone-800">
+                      <span className="font-semibold text-sm text-stone-800 dark:text-stone-100">
                         {u.name}
                       </span>
                       {u.mustResetPassword && (
@@ -274,7 +274,7 @@ export default function AdminUsers() {
                     </div>
 
                     {group && u.role === "team" && (
-                      <p className="text-xs text-stone-500 flex items-center gap-2">
+                      <p className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-2">
                         Stammgruppe:
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-semibold ${
@@ -287,7 +287,7 @@ export default function AdminUsers() {
                     )}
 
                     {summary && (
-                      <p className="text-xs text-stone-500">{summary}</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400">{summary}</p>
                     )}
                   </div>
                 </div>
@@ -296,7 +296,7 @@ export default function AdminUsers() {
                 <div className="flex items-center gap-2 pt-1 sm:pt-0">
                   <button
                     onClick={() => openEdit(u)}
-                    className="p-2 rounded-xl bg-stone-100 text-stone-700 hover:bg-stone-200 active:scale-95"
+                    className="p-2 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-600 active:scale-95"
                     title="Bearbeiten"
                   >
                     <Pencil size={16} />
@@ -336,9 +336,9 @@ export default function AdminUsers() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-stone-800">Benutzerverwaltung</h2>
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Benutzerverwaltung</h2>
 
-      <p className="text-xs text-stone-500 mb-2">
+      <p className="text-xs text-stone-500 dark:text-stone-400 mb-2">
         Hier verwaltest du alle Profile, Gruppen und Zugänge.
         Du kannst Benutzer bearbeiten, Passwörter zurücksetzen oder Accounts löschen.
       </p>
@@ -361,14 +361,14 @@ export default function AdminUsers() {
       {/* DELETE-BESTÄTIGUNG */}
       {confirmDeleteUser && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-xl border border-stone-200 space-y-4">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-sm shadow-xl border border-stone-200 dark:border-stone-700 space-y-4">
             <div className="flex items-center gap-3">
               <AlertTriangle className="text-red-500" size={22} />
-              <h3 className="text-sm font-bold text-stone-800">
+              <h3 className="text-sm font-bold text-stone-800 dark:text-stone-100">
                 Benutzer löschen?
               </h3>
             </div>
-            <p className="text-sm text-stone-600">
+            <p className="text-sm text-stone-600 dark:text-stone-300">
               Soll der Benutzer{" "}
               <span className="font-semibold">
                 {confirmDeleteUser.name}
@@ -378,7 +378,7 @@ export default function AdminUsers() {
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirmDeleteUser(null)}
-                className="flex-1 py-2 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200"
+                className="flex-1 py-2 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600"
               >
                 Abbrechen
               </button>
@@ -396,14 +396,14 @@ export default function AdminUsers() {
       {/* RESET-BESTÄTIGUNG */}
       {confirmResetUser && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-xl border border-stone-200 space-y-4">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-sm shadow-xl border border-stone-200 dark:border-stone-700 space-y-4">
             <div className="flex items-center gap-3">
               <KeyRound className="text-amber-500" size={22} />
-              <h3 className="text-sm font-bold text-stone-800">
+              <h3 className="text-sm font-bold text-stone-800 dark:text-stone-100">
                 Passwort zurücksetzen
               </h3>
             </div>
-            <p className="text-sm text-stone-600">
+            <p className="text-sm text-stone-600 dark:text-stone-300">
               Der Benutzer{" "}
               <span className="font-semibold">
                 {confirmResetUser.name}
@@ -413,7 +413,7 @@ export default function AdminUsers() {
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirmResetUser(null)}
-                className="flex-1 py-2 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200"
+                className="flex-1 py-2 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600"
               >
                 Abbrechen
               </button>

@@ -282,7 +282,7 @@ export default function GroupArea({ user }) {
     <div className="space-y-5">
       {/* HEADER-KARTE */}
       <div
-        className="p-6 rounded-3xl shadow-sm border border-stone-100 flex flex-col gap-3"
+        className="p-6 rounded-3xl shadow-sm border border-stone-100 dark:border-stone-700 flex flex-col gap-3"
         style={{ backgroundColor: currentGroup.headerColor }}
       >
         <div className="flex justify-between items-center">
@@ -294,10 +294,10 @@ export default function GroupArea({ user }) {
             </div>
 
             <div>
-              <h2 className="text-xl font-bold text-stone-800">
+              <h2 className="text-xl font-bold text-stone-800 dark:text-stone-100">
                 Gruppenbereich
               </h2>
-              <p className="text-xs text-stone-600">
+              <p className="text-xs text-stone-600 dark:text-stone-300">
                 {childrenView
                   ? "Übersicht zu allen Listen"
                   : `Gruppe ${currentGroup.name}`}
@@ -323,7 +323,7 @@ export default function GroupArea({ user }) {
 
       {/* LISTEN mit Drag & Drop für Staff */}
       {lists.length === 0 ? (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 text-center text-stone-500 text-sm">
+        <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 text-center text-stone-500 dark:text-stone-400 text-sm">
           Für diese Gruppe sind noch keine Listen angelegt.
         </div>
       ) : isStaff ? (

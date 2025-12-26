@@ -189,7 +189,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
       {onBack && (
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-stone-500 hover:text-stone-800"
+          className="flex items-center gap-2 text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200"
         >
           <ArrowLeft size={18} />
           <span className="text-sm font-medium">Zurück</span>
@@ -197,8 +197,8 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
       )}
 
       <div>
-        <h2 className="text-lg font-bold text-stone-800">Kinderakten</h2>
-        <p className="text-xs text-stone-500 mt-1">
+        <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Kinderakten</h2>
+        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
           {isEditable
             ? "Übersicht aller Kinder mit Stammdaten und Abholberechtigungen."
             : "Übersicht aller Kinder (nur Ansicht)."}
@@ -206,15 +206,15 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
       </div>
 
       {/* Statistik */}
-      <div className="bg-stone-50 rounded-2xl p-4 border border-stone-200">
+      <div className="bg-stone-50 dark:bg-stone-900 rounded-2xl p-4 border border-stone-200 dark:border-stone-700">
         <div className="grid grid-cols-2 gap-4 text-center">
           <div>
             <p className="text-2xl font-bold text-amber-600">{children.length}</p>
-            <p className="text-xs text-stone-500">Kinder gesamt</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">Kinder gesamt</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-stone-600">{groups.length}</p>
-            <p className="text-xs text-stone-500">Gruppen</p>
+            <p className="text-2xl font-bold text-stone-600 dark:text-stone-300">{groups.length}</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">Gruppen</p>
           </div>
         </div>
       </div>
@@ -229,20 +229,20 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
           return (
             <div
               key={group.id}
-              className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden"
+              className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm overflow-hidden"
             >
               {/* Gruppen-Header */}
               <button
                 onClick={() => toggleGroup(group.id)}
-                className="w-full p-4 flex items-center justify-between hover:bg-stone-50 transition-colors"
+                className="w-full p-4 flex items-center justify-between hover:bg-stone-50 dark:hover:bg-stone-700 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-xl ${styles.chipClass}`}>
                     <styles.Icon size={18} />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-semibold text-stone-800">{styles.name}</h3>
-                    <p className="text-xs text-stone-500">
+                    <h3 className="font-semibold text-stone-800 dark:text-stone-100">{styles.name}</h3>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">
                       {groupChildren.length}{" "}
                       {groupChildren.length === 1 ? "Kind" : "Kinder"}
                     </p>
@@ -259,7 +259,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
 
               {/* Gruppen-Inhalt */}
               {isExpanded && (
-                <div className="border-t border-stone-100 p-4 space-y-2">
+                <div className="border-t border-stone-100 dark:border-stone-700 p-4 space-y-2">
                   {groupChildren.length > 0 ? (
                     groupChildren.map((child) => {
                       const age = calculateAge(child.birthday);
@@ -267,17 +267,17 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                         <button
                           key={child.id}
                           onClick={() => openChildModal(child)}
-                          className="w-full flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-100 hover:bg-stone-100 transition-colors text-left"
+                          className="w-full flex items-center justify-between p-3 bg-stone-50 dark:bg-stone-900 rounded-xl border border-stone-100 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors text-left"
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center">
                               <UserCircle size={20} />
                             </div>
                             <div>
-                              <p className="text-sm font-semibold text-stone-800">
+                              <p className="text-sm font-semibold text-stone-800 dark:text-stone-100">
                                 {child.first_name}
                               </p>
-                              <p className="text-xs text-stone-500">
+                              <p className="text-xs text-stone-500 dark:text-stone-400">
                                 {age !== null ? `${age} Jahre` : "Alter unbekannt"}
                                 {child.profiles?.full_name &&
                                   ` • ${child.profiles.full_name}`}
@@ -307,7 +307,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                       );
                     })
                   ) : (
-                    <p className="text-sm text-stone-400 text-center py-4">
+                    <p className="text-sm text-stone-400 dark:text-stone-500 text-center py-4">
                       Keine Kinder in dieser Gruppe
                     </p>
                   )}
@@ -321,9 +321,9 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
       {/* VIEW/EDIT MODAL */}
       {viewModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 dark:border-stone-700 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
                 <FileText size={20} className="text-amber-500" />
                 Kinderakte
               </h3>
@@ -332,7 +332,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                   setViewModal(null);
                   setEditMode(false);
                 }}
-                className="p-1 rounded-lg hover:bg-stone-100"
+                className="p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700"
               >
                 <X size={20} className="text-stone-400" />
               </button>
@@ -340,14 +340,14 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
 
             {/* Eltern-Info (nur Anzeige) */}
             {viewModal.profiles && (
-              <div className="bg-stone-50 rounded-xl p-3 border border-stone-100">
-                <p className="text-xs font-semibold text-stone-500 uppercase mb-1">
+              <div className="bg-stone-50 dark:bg-stone-900 rounded-xl p-3 border border-stone-100 dark:border-stone-700">
+                <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Elternteil
                 </p>
-                <p className="text-sm text-stone-800">
+                <p className="text-sm text-stone-800 dark:text-stone-100">
                   {viewModal.profiles.full_name || "—"}
                 </p>
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-stone-500 dark:text-stone-400">
                   {viewModal.profiles.email || "—"}
                 </p>
               </div>
@@ -355,8 +355,8 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
 
             {/* Gruppen-Info */}
             {viewModal.group_id && (
-              <div className="bg-stone-50 rounded-xl p-3 border border-stone-100">
-                <p className="text-xs font-semibold text-stone-500 uppercase mb-1">
+              <div className="bg-stone-50 dark:bg-stone-900 rounded-xl p-3 border border-stone-100 dark:border-stone-700">
+                <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Gruppe
                 </p>
                 {(() => {
@@ -370,7 +370,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                       {styles.name}
                     </span>
                   ) : (
-                    <span className="text-sm text-stone-600">—</span>
+                    <span className="text-sm text-stone-600 dark:text-stone-300">—</span>
                   );
                 })()}
               </div>
@@ -379,7 +379,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
             <div className="space-y-3">
               {/* Name */}
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Name des Kindes
                 </label>
                 {editMode ? (
@@ -389,10 +389,10 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                     onChange={(e) =>
                       setFormData({ ...formData, first_name: e.target.value })
                     }
-                    className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                    className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                   />
                 ) : (
-                  <p className="p-3 rounded-xl bg-stone-50 border border-stone-100 text-sm text-stone-800">
+                  <p className="p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-100 dark:border-stone-700 text-sm text-stone-800 dark:text-stone-100">
                     {formData.first_name || "—"}
                   </p>
                 )}
@@ -400,7 +400,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
 
               {/* Geburtstag */}
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1 flex items-center gap-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1 flex items-center gap-1">
                   <Cake size={12} />
                   Geburtstag
                 </label>
@@ -411,13 +411,13 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                     onChange={(e) =>
                       setFormData({ ...formData, birthday: e.target.value })
                     }
-                    className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                    className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                   />
                 ) : (
-                  <p className="p-3 rounded-xl bg-stone-50 border border-stone-100 text-sm text-stone-800">
+                  <p className="p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-100 dark:border-stone-700 text-sm text-stone-800 dark:text-stone-100">
                     {formatBirthday(formData.birthday)}
                     {calculateAge(formData.birthday) !== null && (
-                      <span className="text-stone-500 ml-2">
+                      <span className="text-stone-500 dark:text-stone-400 ml-2">
                         ({calculateAge(formData.birthday)} Jahre)
                       </span>
                     )}
@@ -427,7 +427,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
 
               {/* Hinweise / Allergien */}
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Hinweise / Allergien
                 </label>
                 {editMode ? (
@@ -436,12 +436,12 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                     onChange={(e) =>
                       setFormData({ ...formData, notes: e.target.value })
                     }
-                    className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm resize-none"
+                    className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100 resize-none"
                     rows={3}
                     placeholder="Z.B. Allergien, Besonderheiten..."
                   />
                 ) : (
-                  <p className="p-3 rounded-xl bg-stone-50 border border-stone-100 text-sm text-stone-800 whitespace-pre-wrap">
+                  <p className="p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-100 dark:border-stone-700 text-sm text-stone-800 dark:text-stone-100 whitespace-pre-wrap">
                     {formData.notes || "—"}
                   </p>
                 )}
@@ -449,7 +449,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
 
               {/* Abholberechtigte */}
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1 flex items-center gap-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1 flex items-center gap-1">
                   <UsersIcon size={12} />
                   Abholberechtigte
                 </label>
@@ -462,12 +462,12 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                         authorized_pickups: e.target.value,
                       })
                     }
-                    className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm resize-none"
+                    className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100 resize-none"
                     rows={3}
                     placeholder="Namen der Personen, die das Kind abholen dürfen..."
                   />
                 ) : (
-                  <p className="p-3 rounded-xl bg-stone-50 border border-stone-100 text-sm text-stone-800 whitespace-pre-wrap">
+                  <p className="p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-100 dark:border-stone-700 text-sm text-stone-800 dark:text-stone-100 whitespace-pre-wrap">
                     {formData.authorized_pickups || "—"}
                   </p>
                 )}
@@ -483,7 +483,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                       setViewModal(null);
                       setEditMode(false);
                     }}
-                    className="flex-1 py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200 transition-colors"
+                    className="flex-1 py-3 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors"
                   >
                     Schließen
                   </button>
@@ -500,7 +500,7 @@ export default function AdminChildrenRecords({ user, readOnly = false, onBack })
                 <>
                   <button
                     onClick={() => setEditMode(false)}
-                    className="flex-1 py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200 transition-colors"
+                    className="flex-1 py-3 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors"
                   >
                     Abbrechen
                   </button>

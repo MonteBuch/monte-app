@@ -263,8 +263,8 @@ export default function AdminEmailDirectory({ user }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold text-stone-800">Email-Verzeichnis</h2>
-        <p className="text-xs text-stone-500 mt-1">
+        <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Email-Verzeichnis</h2>
+        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
           Verwalten Sie Email-Adressen von Eltern, die noch nicht in der App registriert sind.
           Diese erhalten News automatisch per Email.
         </p>
@@ -274,11 +274,11 @@ export default function AdminEmailDirectory({ user }) {
       <div className="flex gap-4 text-xs">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-green-500" />
-          <span className="text-stone-600">In App registriert</span>
+          <span className="text-stone-600 dark:text-stone-300">In App registriert</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-amber-500" />
-          <span className="text-stone-600">Nur Email (extern)</span>
+          <span className="text-stone-600 dark:text-stone-300">Nur Email (extern)</span>
         </div>
       </div>
 
@@ -293,26 +293,26 @@ export default function AdminEmailDirectory({ user }) {
           return (
             <div
               key={group.id}
-              className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden"
+              className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm overflow-hidden"
             >
               {/* Gruppen-Header */}
               <button
                 onClick={() => toggleGroup(group.id)}
-                className="w-full p-4 flex items-center justify-between hover:bg-stone-50 transition-colors"
+                className="w-full p-4 flex items-center justify-between hover:bg-stone-50 dark:hover:bg-stone-700 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-xl ${styles.chipClass}`}>
                     <styles.Icon size={18} />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-semibold text-stone-800">{styles.name}</h3>
-                    <p className="text-xs text-stone-500">
+                    <h3 className="font-semibold text-stone-800 dark:text-stone-100">{styles.name}</h3>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">
                       {registeredInGroup.length} registriert, {externalEmails.length} extern
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-stone-600">
+                  <span className="text-sm font-medium text-stone-600 dark:text-stone-300">
                     {totalCount} {totalCount === 1 ? "Kontakt" : "Kontakte"}
                   </span>
                   {isExpanded ? (
@@ -325,11 +325,11 @@ export default function AdminEmailDirectory({ user }) {
 
               {/* Gruppen-Inhalt */}
               {isExpanded && (
-                <div className="border-t border-stone-100 p-4 space-y-3">
+                <div className="border-t border-stone-100 dark:border-stone-700 p-4 space-y-3">
                   {/* Registrierte Benutzer */}
                   {registeredInGroup.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-xs font-semibold text-stone-500 uppercase flex items-center gap-1">
+                      <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase flex items-center gap-1">
                         <UserCheck size={12} className="text-green-500" />
                         Registrierte Eltern
                       </p>
@@ -341,10 +341,10 @@ export default function AdminEmailDirectory({ user }) {
                           <div className="flex items-center gap-3">
                             <div className="w-2 h-2 rounded-full bg-green-500" />
                             <div>
-                              <p className="text-sm font-medium text-stone-800">
+                              <p className="text-sm font-medium text-stone-800 dark:text-stone-100">
                                 {entry.parent_name || entry.email}
                               </p>
-                              <p className="text-xs text-stone-500">
+                              <p className="text-xs text-stone-500 dark:text-stone-400">
                                 {entry.email}
                                 {entry.child_name && ` • Kind: ${entry.child_name}`}
                               </p>
@@ -361,7 +361,7 @@ export default function AdminEmailDirectory({ user }) {
                   {/* Externe Emails */}
                   {externalEmails.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-xs font-semibold text-stone-500 uppercase flex items-center gap-1">
+                      <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase flex items-center gap-1">
                         <UserX size={12} className="text-amber-500" />
                         Externe Emails
                       </p>
@@ -373,15 +373,15 @@ export default function AdminEmailDirectory({ user }) {
                           <div className="flex items-center gap-3">
                             <div className="w-2 h-2 rounded-full bg-amber-500" />
                             <div>
-                              <p className="text-sm font-medium text-stone-800">
+                              <p className="text-sm font-medium text-stone-800 dark:text-stone-100">
                                 {entry.parent_name || entry.email}
                               </p>
-                              <p className="text-xs text-stone-500">
+                              <p className="text-xs text-stone-500 dark:text-stone-400">
                                 {entry.email}
                                 {entry.child_name && ` • Kind: ${entry.child_name}`}
                               </p>
                               {entry.notes && (
-                                <p className="text-xs text-stone-400 italic mt-1">
+                                <p className="text-xs text-stone-400 dark:text-stone-500 italic mt-1">
                                   {entry.notes}
                                 </p>
                               )}
@@ -410,7 +410,7 @@ export default function AdminEmailDirectory({ user }) {
 
                   {/* Keine Kontakte */}
                   {totalCount === 0 && (
-                    <p className="text-sm text-stone-400 text-center py-4">
+                    <p className="text-sm text-stone-400 dark:text-stone-500 text-center py-4">
                       Keine Kontakte in dieser Gruppe
                     </p>
                   )}
@@ -431,26 +431,26 @@ export default function AdminEmailDirectory({ user }) {
       </div>
 
       {/* Statistik */}
-      <div className="bg-stone-50 rounded-2xl p-4 border border-stone-200">
-        <h3 className="font-semibold text-stone-700 mb-3">Übersicht</h3>
+      <div className="bg-stone-50 dark:bg-stone-900 rounded-2xl p-4 border border-stone-200 dark:border-stone-700">
+        <h3 className="font-semibold text-stone-700 dark:text-stone-200 mb-3">Übersicht</h3>
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
             <p className="text-2xl font-bold text-green-600">
               {registeredEmails.length}
             </p>
-            <p className="text-xs text-stone-500">Registriert</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">Registriert</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-amber-600">
               {directory.length}
             </p>
-            <p className="text-xs text-stone-500">Extern</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">Extern</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-stone-700">
+            <p className="text-2xl font-bold text-stone-700 dark:text-stone-200">
               {registeredEmails.length + directory.length}
             </p>
-            <p className="text-xs text-stone-500">Gesamt</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">Gesamt</p>
           </div>
         </div>
       </div>
@@ -458,15 +458,15 @@ export default function AdminEmailDirectory({ user }) {
       {/* ADD MODAL */}
       {addModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 space-y-4">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 dark:border-stone-700 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
                 <Mail size={20} className="text-amber-500" />
                 Email hinzufügen
               </h3>
               <button
                 onClick={() => setAddModal(null)}
-                className="p-1 rounded-lg hover:bg-stone-100"
+                className="p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700"
               >
                 <X size={20} className="text-stone-400" />
               </button>
@@ -474,53 +474,53 @@ export default function AdminEmailDirectory({ user }) {
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Email-Adresse *
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                   placeholder="eltern@beispiel.de"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Name des Elternteils
                 </label>
                 <input
                   type="text"
                   value={formData.parent_name}
                   onChange={(e) => setFormData({ ...formData, parent_name: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                   placeholder="Max Mustermann"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Name des Kindes
                 </label>
                 <input
                   type="text"
                   value={formData.child_name}
                   onChange={(e) => setFormData({ ...formData, child_name: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                   placeholder="Lisa"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Notizen
                 </label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm resize-none"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100 resize-none"
                   rows={2}
                   placeholder="Optionale Notizen..."
                 />
@@ -530,7 +530,7 @@ export default function AdminEmailDirectory({ user }) {
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setAddModal(null)}
-                className="flex-1 py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200 transition-colors"
+                className="flex-1 py-3 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors"
               >
                 Abbrechen
               </button>
@@ -550,15 +550,15 @@ export default function AdminEmailDirectory({ user }) {
       {/* EDIT MODAL */}
       {editModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 space-y-4">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 dark:border-stone-700 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
                 <Edit size={20} className="text-amber-500" />
                 Email bearbeiten
               </h3>
               <button
                 onClick={() => setEditModal(null)}
-                className="p-1 rounded-lg hover:bg-stone-100"
+                className="p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700"
               >
                 <X size={20} className="text-stone-400" />
               </button>
@@ -566,50 +566,50 @@ export default function AdminEmailDirectory({ user }) {
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Email-Adresse *
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Name des Elternteils
                 </label>
                 <input
                   type="text"
                   value={formData.parent_name}
                   onChange={(e) => setFormData({ ...formData, parent_name: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Name des Kindes
                 </label>
                 <input
                   type="text"
                   value={formData.child_name}
                   onChange={(e) => setFormData({ ...formData, child_name: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Notizen
                 </label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm resize-none"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100 resize-none"
                   rows={2}
                 />
               </div>
@@ -618,7 +618,7 @@ export default function AdminEmailDirectory({ user }) {
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setEditModal(null)}
-                className="flex-1 py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200 transition-colors"
+                className="flex-1 py-3 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors"
               >
                 Abbrechen
               </button>
@@ -638,21 +638,21 @@ export default function AdminEmailDirectory({ user }) {
       {/* DELETE CONFIRM MODAL */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-xl border border-stone-200 space-y-4">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-sm shadow-xl border border-stone-200 dark:border-stone-700 space-y-4">
             <div className="flex items-center gap-3">
               <AlertTriangle className="text-red-500" size={22} />
-              <h3 className="text-sm font-bold text-stone-800">
+              <h3 className="text-sm font-bold text-stone-800 dark:text-stone-100">
                 Email löschen?
               </h3>
             </div>
-            <p className="text-sm text-stone-600">
+            <p className="text-sm text-stone-600 dark:text-stone-300">
               Soll <span className="font-semibold">{deleteConfirm.email}</span> wirklich
               aus dem Verzeichnis entfernt werden?
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 py-2 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200"
+                className="flex-1 py-2 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600"
               >
                 Abbrechen
               </button>

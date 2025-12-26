@@ -99,26 +99,26 @@ export default function SystemTools({ onBack }) {
       {/* BACK */}
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-stone-500 text-sm"
+        className="flex items-center gap-2 text-stone-500 dark:text-stone-400 text-sm"
       >
         <ArrowLeft size={18} />
         Zurück
       </button>
 
-      <h2 className="text-lg font-bold text-stone-800">System-Tools</h2>
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">System-Tools</h2>
 
-      <p className="text-sm text-stone-600 leading-snug">
+      <p className="text-sm text-stone-600 dark:text-stone-300 leading-snug">
         Werkzeuge zur Verwaltung und Sicherung der App-Daten.
         Die Daten werden in Supabase gespeichert.
       </p>
 
       {/* EXPORT */}
-      <div className="bg-white p-5 border border-stone-200 rounded-2xl shadow-sm space-y-3">
+      <div className="bg-white dark:bg-stone-800 p-5 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <Download size={22} className="text-amber-600" />
           <div>
-            <p className="font-semibold text-stone-800">Daten exportieren</p>
-            <p className="text-[12px] text-stone-500">
+            <p className="font-semibold text-stone-800 dark:text-stone-100">Daten exportieren</p>
+            <p className="text-[12px] text-stone-500 dark:text-stone-400">
               Alle Daten als JSON-Backup speichern
             </p>
           </div>
@@ -141,12 +141,12 @@ export default function SystemTools({ onBack }) {
       </div>
 
       {/* CACHE LÖSCHEN */}
-      <div className="bg-white p-5 border border-stone-200 rounded-2xl shadow-sm space-y-3">
+      <div className="bg-white dark:bg-stone-800 p-5 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-sm space-y-3">
         <div className="flex items-center gap-3">
           <RefreshCw size={22} className="text-blue-600" />
           <div>
-            <p className="font-semibold text-stone-800">Lokalen Cache löschen</p>
-            <p className="text-[12px] text-stone-500">
+            <p className="font-semibold text-stone-800 dark:text-stone-100">Lokalen Cache löschen</p>
+            <p className="text-[12px] text-stone-500 dark:text-stone-400">
               Löscht gespeicherte Sessions und Cache-Daten
             </p>
           </div>
@@ -161,14 +161,14 @@ export default function SystemTools({ onBack }) {
       </div>
 
       {/* INFO */}
-      <div className="bg-amber-50 p-4 border border-amber-200 rounded-2xl">
+      <div className="bg-amber-50 dark:bg-amber-900/20 p-4 border border-amber-200 dark:border-amber-900 rounded-2xl">
         <div className="flex items-start gap-3">
           <Database size={20} className="text-amber-600 mt-0.5" />
           <div>
-            <p className="font-semibold text-sm text-stone-800">
+            <p className="font-semibold text-sm text-stone-800 dark:text-stone-100">
               Supabase-Datenbank
             </p>
-            <p className="text-[12px] text-stone-600 mt-1">
+            <p className="text-[12px] text-stone-600 dark:text-stone-300 mt-1">
               Alle Benutzerdaten werden sicher in Supabase gespeichert.
               Für Datenlöschung oder erweiterte Verwaltung nutze das
               Supabase Dashboard.
@@ -180,15 +180,15 @@ export default function SystemTools({ onBack }) {
       {/* CONFIRM: CACHE LÖSCHEN */}
       {confirmReset && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-6 rounded-2xl max-w-sm w-full space-y-4 border border-stone-200 shadow-xl">
+          <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl max-w-sm w-full space-y-4 border border-stone-200 dark:border-stone-700 shadow-xl">
             <div className="flex items-center gap-2">
               <AlertTriangle size={18} className="text-blue-600" />
-              <h3 className="font-bold text-sm text-stone-800">
+              <h3 className="font-bold text-sm text-stone-800 dark:text-stone-100">
                 Lokalen Cache löschen?
               </h3>
             </div>
 
-            <p className="text-sm text-stone-600">
+            <p className="text-sm text-stone-600 dark:text-stone-300">
               Der lokale Browser-Cache wird gelöscht. Du wirst abgemeldet
               und musst dich neu anmelden. Deine Daten in Supabase
               bleiben erhalten.
@@ -197,7 +197,7 @@ export default function SystemTools({ onBack }) {
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setConfirmReset(false)}
-                className="flex-1 py-2 rounded-xl bg-stone-200 text-stone-700 text-sm font-semibold"
+                className="flex-1 py-2 rounded-xl bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 text-sm font-semibold"
               >
                 Abbrechen
               </button>

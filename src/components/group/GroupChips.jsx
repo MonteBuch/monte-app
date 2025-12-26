@@ -41,7 +41,7 @@ export default function GroupChips({
               className={`flex items-center gap-2 px-3 py-2 rounded-2xl border text-xs font-bold transition ${
                 isActive
                   ? `${color} border-transparent shadow-sm`
-                  : "bg-stone-50 text-stone-600 border-stone-300 hover:bg-stone-100"
+                  : "bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-700"
               }`}
             >
               <Icon size={14} />
@@ -76,7 +76,7 @@ export default function GroupChips({
               className={`flex items-center gap-2 px-3 py-2 rounded-2xl border text-xs font-bold transition ${
                 isActive
                   ? `${color} border-transparent shadow-sm`
-                  : "bg-stone-50 text-stone-600 border-stone-300 hover:bg-stone-100"
+                  : "bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-700"
               }`}
             >
               <Icon size={14} />

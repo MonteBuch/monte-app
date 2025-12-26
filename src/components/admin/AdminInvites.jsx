@@ -143,11 +143,11 @@ export default function AdminInvites({ user }) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold text-stone-800">Einladungslinks</h2>
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Einladungslinks</h2>
 
       {/* Neuen Link erstellen */}
-      <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-        <h3 className="font-semibold text-stone-700 flex items-center gap-2">
+      <div className="bg-white dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm space-y-4">
+        <h3 className="font-semibold text-stone-700 dark:text-stone-200 flex items-center gap-2">
           <Plus size={18} />
           Neuen Einladungslink erstellen
         </h3>
@@ -155,7 +155,7 @@ export default function AdminInvites({ user }) {
         <div className="grid grid-cols-2 gap-4">
           {/* Rolle */}
           <div>
-            <label className="block text-xs uppercase text-stone-500 font-semibold mb-1">
+            <label className="block text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold mb-1">
               Rolle
             </label>
             <select
@@ -163,7 +163,7 @@ export default function AdminInvites({ user }) {
               onChange={(e) =>
                 setNewInvite((prev) => ({ ...prev, role: e.target.value }))
               }
-              className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+              className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
             >
               <option value="parent">Eltern</option>
               <option value="team">Team</option>
@@ -173,7 +173,7 @@ export default function AdminInvites({ user }) {
 
           {/* Gültigkeit */}
           <div>
-            <label className="block text-xs uppercase text-stone-500 font-semibold mb-1">
+            <label className="block text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold mb-1">
               Gültig für
             </label>
             <select
@@ -181,7 +181,7 @@ export default function AdminInvites({ user }) {
               onChange={(e) =>
                 setNewInvite((prev) => ({ ...prev, expiresIn: e.target.value }))
               }
-              className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+              className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
             >
               <option value="1">1 Tag</option>
               <option value="7">7 Tage</option>
@@ -192,7 +192,7 @@ export default function AdminInvites({ user }) {
 
           {/* Max. Verwendungen */}
           <div>
-            <label className="block text-xs uppercase text-stone-500 font-semibold mb-1">
+            <label className="block text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold mb-1">
               Max.<br />Verwendungen
             </label>
             <select
@@ -200,7 +200,7 @@ export default function AdminInvites({ user }) {
               onChange={(e) =>
                 setNewInvite((prev) => ({ ...prev, maxUses: e.target.value }))
               }
-              className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+              className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
             >
               <option value="1">Einmalig</option>
               <option value="5">5x</option>
@@ -212,7 +212,7 @@ export default function AdminInvites({ user }) {
 
           {/* Beschreibung */}
           <div>
-            <label className="block text-xs uppercase text-stone-500 font-semibold mb-1">
+            <label className="block text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold mb-1">
               Beschreibung<br />(optional)
             </label>
             <input
@@ -222,7 +222,7 @@ export default function AdminInvites({ user }) {
                 setNewInvite((prev) => ({ ...prev, label: e.target.value }))
               }
               placeholder="z. B. Neue Eltern"
-              className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+              className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
             />
           </div>
         </div>
@@ -245,10 +245,10 @@ export default function AdminInvites({ user }) {
 
       {/* Bestehende Links */}
       <div className="space-y-3">
-        <h3 className="font-semibold text-stone-700">Aktive Einladungen</h3>
+        <h3 className="font-semibold text-stone-700 dark:text-stone-200">Aktive Einladungen</h3>
 
         {invites.length === 0 ? (
-          <div className="bg-stone-50 p-6 rounded-2xl text-center text-stone-500 text-sm">
+          <div className="bg-stone-50 dark:bg-stone-900 p-6 rounded-2xl text-center text-stone-500 dark:text-stone-400 text-sm">
             Keine Einladungslinks vorhanden
           </div>
         ) : (
@@ -262,10 +262,10 @@ export default function AdminInvites({ user }) {
             return (
               <div
                 key={invite.id}
-                className={`bg-white p-4 rounded-2xl border shadow-sm ${
+                className={`bg-white dark:bg-stone-800 p-4 rounded-2xl border shadow-sm ${
                   inactive
-                    ? "border-stone-200 opacity-60"
-                    : "border-stone-200"
+                    ? "border-stone-200 dark:border-stone-700 opacity-60"
+                    : "border-stone-200 dark:border-stone-700"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -279,19 +279,19 @@ export default function AdminInvites({ user }) {
                         {roleConfig.label}
                       </span>
                       {invite.label && (
-                        <span className="text-sm text-stone-600">
+                        <span className="text-sm text-stone-600 dark:text-stone-300">
                           {invite.label}
                         </span>
                       )}
                     </div>
 
                     {/* Token (gekürzt) */}
-                    <code className="text-xs bg-stone-100 px-2 py-1 rounded text-stone-600 font-mono">
+                    <code className="text-xs bg-stone-100 dark:bg-stone-700 px-2 py-1 rounded text-stone-600 dark:text-stone-300 font-mono">
                       ...{invite.token.slice(-6)}
                     </code>
 
                     {/* Status */}
-                    <div className="flex items-center gap-4 mt-2 text-xs text-stone-500">
+                    <div className="flex items-center gap-4 mt-2 text-xs text-stone-500 dark:text-stone-400">
                       <span className="flex items-center gap-1">
                         <Clock size={12} />
                         {expired ? (
@@ -317,7 +317,7 @@ export default function AdminInvites({ user }) {
                     {!inactive && (
                       <button
                         onClick={() => copyLink(invite.token)}
-                        className="p-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-600 transition-colors"
+                        className="p-2 rounded-lg bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 text-stone-600 dark:text-stone-300 transition-colors"
                         title="Link kopieren"
                       >
                         {copiedId === invite.token ? (

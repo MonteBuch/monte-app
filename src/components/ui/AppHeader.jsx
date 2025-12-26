@@ -7,8 +7,8 @@ export default function AppHeader({ user }) {
 
   return (
     <header className="
-      bg-white/90 backdrop-blur
-      border-b border-stone-200
+      bg-white/90 dark:bg-stone-900/90 backdrop-blur
+      border-b border-stone-200 dark:border-stone-700
       px-4 py-3
       sticky top-0 z-40
       flex items-center justify-between
@@ -19,10 +19,10 @@ export default function AppHeader({ user }) {
         <KitaLogo size={36} />
 
         <div className="leading-tight">
-          <h1 className="text-lg font-bold text-stone-800">
+          <h1 className="text-lg font-bold text-stone-800 dark:text-stone-100">
             Montessori Kinderhaus
           </h1>
-          <p className="text-xs text-stone-500">
+          <p className="text-xs text-stone-500 dark:text-stone-400">
             {user.username}
           </p>
         </div>
@@ -31,7 +31,7 @@ export default function AppHeader({ user }) {
       {/* Badge rechts */}
       {(isTeam || isAdmin) && (
         <span className="
-          px-3 py-1 rounded-xl bg-black text-white text-xs font-semibold
+          px-3 py-1 rounded-xl bg-black dark:bg-stone-700 text-white text-xs font-semibold
         ">
           {isAdmin ? "Admin" : "Team"}
         </span>

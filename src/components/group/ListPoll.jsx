@@ -144,7 +144,7 @@ export default function ListPoll({ list, user, isAdmin, reload }) {
 
   if (items.length === 0) {
     return (
-      <p className="text-xs text-stone-400">Noch keine Abstimmungsoptionen.</p>
+      <p className="text-xs text-stone-400 dark:text-stone-500">Noch keine Abstimmungsoptionen.</p>
     );
   }
 
@@ -159,8 +159,8 @@ export default function ListPoll({ list, user, isAdmin, reload }) {
         <div
           className={`flex items-center gap-1.5 px-2 py-1 rounded-lg ${
             isAnonymous
-              ? "bg-stone-100 text-stone-600"
-              : "bg-blue-50 text-blue-700"
+              ? "bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300"
+              : "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
           }`}
         >
           {isAnonymous ? <EyeOff size={12} /> : <Eye size={12} />}
@@ -176,7 +176,7 @@ export default function ListPoll({ list, user, isAdmin, reload }) {
 
         {/* Teilnahme-Statistik - nur wenn erlaubt */}
         {showStats && parentCount > 0 && (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-50 text-amber-700">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
             <Users size={12} />
             <span>
               {votedUserIds.length} von {parentCount} abgestimmt
@@ -214,19 +214,19 @@ export default function ListPoll({ list, user, isAdmin, reload }) {
             return (
               <div
                 key={idx}
-                className={`${baseClasses} bg-stone-50 border-stone-200 text-stone-700`}
+                className={`${baseClasses} bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-200`}
               >
                 <span>{item.label}</span>
-                <span className="text-[10px] text-stone-500 mt-1">{voteText}</span>
+                <span className="text-[10px] text-stone-500 dark:text-stone-400 mt-1">{voteText}</span>
 
                 {/* Voter-Namen anzeigen wenn nicht anonym */}
                 {!isAnonymous && votes.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-stone-200 w-full">
+                  <div className="mt-2 pt-2 border-t border-stone-200 dark:border-stone-700 w-full">
                     <div className="flex flex-wrap justify-center gap-1">
                       {votes.map((voterId) => (
                         <span
                           key={voterId}
-                          className="text-[9px] bg-white px-1.5 py-0.5 rounded border border-stone-200"
+                          className="text-[9px] bg-white dark:bg-stone-800 px-1.5 py-0.5 rounded border border-stone-200 dark:border-stone-700"
                         >
                           {voterNames[voterId] || "Lädt..."}
                         </span>
@@ -246,11 +246,11 @@ export default function ListPoll({ list, user, isAdmin, reload }) {
               className={
                 hasMyVote
                   ? `${baseClasses} bg-amber-500 border-amber-600 text-white`
-                  : `${baseClasses} bg-stone-50 border-stone-200 text-stone-700 hover:bg-amber-100`
+                  : `${baseClasses} bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-200 hover:bg-amber-100 dark:hover:bg-amber-900/30`
               }
             >
               <span>{item.label}</span>
-              <span className={`text-[10px] mt-1 ${hasMyVote ? "text-amber-100" : "text-stone-500"}`}>
+              <span className={`text-[10px] mt-1 ${hasMyVote ? "text-amber-100" : "text-stone-500 dark:text-stone-400"}`}>
                 {voteText}
               </span>
             </button>

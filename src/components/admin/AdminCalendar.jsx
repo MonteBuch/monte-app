@@ -261,8 +261,8 @@ export default function AdminCalendar({ user, onBack }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-stone-800">Terminverwaltung</h2>
-          <p className="text-xs text-stone-500 mt-1">
+          <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Terminverwaltung</h2>
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
             Jahresplanung und wichtige Termine verwalten
           </p>
         </div>
@@ -270,17 +270,17 @@ export default function AdminCalendar({ user, onBack }) {
           <button
             onClick={() => setSelectedYear((y) => Math.max(minYear, y - 1))}
             disabled={selectedYear <= minYear}
-            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronLeft size={20} />
           </button>
-          <span className="text-lg font-bold text-stone-800 min-w-[60px] text-center">
+          <span className="text-lg font-bold text-stone-800 dark:text-stone-100 min-w-[60px] text-center">
             {selectedYear}
           </span>
           <button
             onClick={() => setSelectedYear((y) => Math.min(maxYear, y + 1))}
             disabled={selectedYear >= maxYear}
-            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronRight size={20} />
           </button>
@@ -297,23 +297,23 @@ export default function AdminCalendar({ user, onBack }) {
       </button>
 
       {/* Statistik */}
-      <div className="bg-stone-50 rounded-2xl p-4 border border-stone-200">
+      <div className="bg-stone-50 dark:bg-stone-900 rounded-2xl p-4 border border-stone-200 dark:border-stone-700">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
             <p className="text-2xl font-bold text-amber-600">{events.length}</p>
-            <p className="text-xs text-stone-500">Termine gesamt</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">Termine gesamt</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-red-600">
               {events.filter((e) => e.category === "closed").length}
             </p>
-            <p className="text-xs text-stone-500">Schließtage</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">Schließtage</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-purple-600">
               {events.filter((e) => e.category === "parent_event").length}
             </p>
-            <p className="text-xs text-stone-500">Versammlungen</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">Versammlungen</p>
           </div>
         </div>
       </div>
@@ -327,12 +327,12 @@ export default function AdminCalendar({ user, onBack }) {
           return (
             <div
               key={monthIdx}
-              className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden"
+              className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm overflow-hidden"
             >
               {/* Monats-Header */}
-              <div className="px-4 py-3 bg-stone-50 border-b border-stone-100 flex items-center justify-between">
-                <h3 className="font-bold text-stone-700">{monthName}</h3>
-                <span className="text-xs text-stone-500">
+              <div className="px-4 py-3 bg-stone-50 dark:bg-stone-900 border-b border-stone-100 dark:border-stone-700 flex items-center justify-between">
+                <h3 className="font-bold text-stone-700 dark:text-stone-200">{monthName}</h3>
+                <span className="text-xs text-stone-500 dark:text-stone-400">
                   {monthEvents.length} {monthEvents.length === 1 ? "Termin" : "Termine"}
                 </span>
               </div>
@@ -353,14 +353,14 @@ export default function AdminCalendar({ user, onBack }) {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
                                 <span className={`w-2 h-2 rounded-full ${cat.color}`} />
-                                <span className="text-sm font-semibold text-stone-800">
+                                <span className="text-sm font-semibold text-stone-800 dark:text-stone-100">
                                   {event.title}
                                 </span>
                                 <span className={`text-[10px] px-1.5 py-0.5 rounded ${cat.lightColor} ${cat.textColor} font-medium`}>
                                   {cat.label}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-2 text-xs text-stone-600 pl-4">
+                              <div className="flex items-center gap-2 text-xs text-stone-600 dark:text-stone-300 pl-4">
                                 <span>{formatDate(event.date_start, event.date_end)}</span>
                                 {event.time_info && (
                                   <>
@@ -370,7 +370,7 @@ export default function AdminCalendar({ user, onBack }) {
                                 )}
                               </div>
                               {event.notes && (
-                                <p className="text-xs text-stone-500 pl-4 mt-1 truncate">
+                                <p className="text-xs text-stone-500 dark:text-stone-400 pl-4 mt-1 truncate">
                                   {event.notes}
                                 </p>
                               )}
@@ -378,7 +378,7 @@ export default function AdminCalendar({ user, onBack }) {
                             <div className="flex items-center gap-1">
                               <button
                                 onClick={() => openEditModal(event)}
-                                className="p-2 rounded-lg hover:bg-white/50 text-stone-600"
+                                className="p-2 rounded-lg hover:bg-white/50 dark:hover:bg-stone-700/50 text-stone-600 dark:text-stone-300"
                               >
                                 <Edit size={16} />
                               </button>
@@ -395,7 +395,7 @@ export default function AdminCalendar({ user, onBack }) {
                     })}
                   </div>
                 ) : (
-                  <p className="text-sm text-stone-400 text-center py-4">
+                  <p className="text-sm text-stone-400 dark:text-stone-500 text-center py-4">
                     Keine Termine in diesem Monat
                   </p>
                 )}
@@ -408,15 +408,15 @@ export default function AdminCalendar({ user, onBack }) {
       {/* EDIT/NEW MODAL */}
       {editModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 dark:border-stone-700 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
                 <CalendarIcon size={20} className="text-amber-500" />
                 {editModal === "new" ? "Neuer Termin" : "Termin bearbeiten"}
               </h3>
               <button
                 onClick={() => setEditModal(null)}
-                className="p-1 rounded-lg hover:bg-stone-100"
+                className="p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700"
               >
                 <X size={20} className="text-stone-400" />
               </button>
@@ -425,27 +425,27 @@ export default function AdminCalendar({ user, onBack }) {
             <div className="space-y-3">
               {/* Titel */}
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Titel *
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                   placeholder="z.B. Teamsitzung"
                 />
               </div>
 
               {/* Kategorie */}
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Kategorie
                 </label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                 >
                   {Object.entries(CATEGORIES).map(([key, cat]) => (
                     <option key={key} value={key}>
@@ -457,48 +457,48 @@ export default function AdminCalendar({ user, onBack }) {
 
               {/* Datum Start */}
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Datum (Start) *
                 </label>
                 <input
                   type="date"
                   value={formData.date_start}
                   onChange={(e) => setFormData({ ...formData, date_start: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                 />
               </div>
 
               {/* Datum Ende (optional) */}
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Datum (Ende) — optional für mehrtägige Events
                 </label>
                 <input
                   type="date"
                   value={formData.date_end}
                   onChange={(e) => setFormData({ ...formData, date_end: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                   min={formData.date_start}
                 />
               </div>
 
               {/* Uhrzeit / Zeit-Info */}
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Uhrzeit / Zeitangabe — optional
                 </label>
                 <input
                   type="text"
                   value={formData.time_info}
                   onChange={(e) => setFormData({ ...formData, time_info: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm"
+                  className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-sm dark:text-stone-100"
                   placeholder="z.B. Ab 16 Uhr, 15-17 Uhr, Vormittags"
                 />
               </div>
 
               {/* Notizen */}
               <div>
-                <label className="block text-xs font-semibold text-stone-500 uppercase mb-1">
+                <label className="block text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-1">
                   Notizen — optional
                 </label>
                 <textarea
@@ -515,7 +515,7 @@ export default function AdminCalendar({ user, onBack }) {
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setEditModal(null)}
-                className="flex-1 py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200 transition-colors"
+                className="flex-1 py-3 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors"
               >
                 Abbrechen
               </button>
@@ -539,19 +539,19 @@ export default function AdminCalendar({ user, onBack }) {
       {/* DELETE CONFIRM MODAL */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-xl border border-stone-200 space-y-4">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-sm shadow-xl border border-stone-200 dark:border-stone-700 space-y-4">
             <div className="flex items-center gap-3">
               <AlertTriangle className="text-red-500" size={22} />
-              <h3 className="text-sm font-bold text-stone-800">Termin löschen?</h3>
+              <h3 className="text-sm font-bold text-stone-800 dark:text-stone-100">Termin löschen?</h3>
             </div>
-            <p className="text-sm text-stone-600">
+            <p className="text-sm text-stone-600 dark:text-stone-300">
               Soll <span className="font-semibold">"{deleteConfirm.title}"</span> wirklich
               gelöscht werden?
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 py-2 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200"
+                className="flex-1 py-2 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600"
               >
                 Abbrechen
               </button>

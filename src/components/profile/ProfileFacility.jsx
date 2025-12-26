@@ -43,28 +43,28 @@ export default function ProfileFacility({ onBack }) {
       {/* Header mit Zurück */}
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-stone-600 hover:text-stone-800 active:scale-95"
+        className="flex items-center gap-2 text-stone-600 dark:text-stone-300 hover:text-stone-800 dark:hover:text-stone-100 active:scale-95"
       >
         <ArrowLeft size={20} />
         <span className="font-semibold text-sm">Zurück</span>
       </button>
 
       {/* Titel */}
-      <h2 className="text-lg font-bold text-stone-800">
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">
         Einrichtungsinformationen
       </h2>
 
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-5 space-y-5">
+      <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm p-5 space-y-5">
 
         {/* Name */}
         {facility.name && (
           <div className="flex items-start gap-3">
-            <Info size={20} className="text-stone-500 mt-1" />
+            <Info size={20} className="text-stone-500 dark:text-stone-400 mt-1" />
             <div>
-              <p className="text-xs uppercase text-stone-500 font-semibold">
+              <p className="text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold">
                 Name der Einrichtung
               </p>
-              <p className="text-sm text-stone-800 mt-1">{facility.name}</p>
+              <p className="text-sm text-stone-800 dark:text-stone-100 mt-1">{facility.name}</p>
             </div>
           </div>
         )}
@@ -72,12 +72,12 @@ export default function ProfileFacility({ onBack }) {
         {/* Adresse */}
         {facility.address && (
           <div className="flex items-start gap-3">
-            <MapPin size={20} className="text-stone-500 mt-1" />
+            <MapPin size={20} className="text-stone-500 dark:text-stone-400 mt-1" />
             <div>
-              <p className="text-xs uppercase text-stone-500 font-semibold">
+              <p className="text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold">
                 Adresse
               </p>
-              <p className="text-sm text-stone-800 mt-1 whitespace-pre-wrap">
+              <p className="text-sm text-stone-800 dark:text-stone-100 mt-1 whitespace-pre-wrap">
                 {facility.address}
               </p>
             </div>
@@ -87,12 +87,12 @@ export default function ProfileFacility({ onBack }) {
         {/* Telefon */}
         {facility.phone && (
           <div className="flex items-start gap-3">
-            <Phone size={20} className="text-stone-500 mt-1" />
+            <Phone size={20} className="text-stone-500 dark:text-stone-400 mt-1" />
             <div>
-              <p className="text-xs uppercase text-stone-500 font-semibold">
+              <p className="text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold">
                 Telefonnummer
               </p>
-              <p className="text-sm text-stone-800 mt-1">
+              <p className="text-sm text-stone-800 dark:text-stone-100 mt-1">
                 {facility.phone}
               </p>
             </div>
@@ -102,12 +102,12 @@ export default function ProfileFacility({ onBack }) {
         {/* Email */}
         {facility.email && (
           <div className="flex items-start gap-3">
-            <Mail size={20} className="text-stone-500 mt-1" />
+            <Mail size={20} className="text-stone-500 dark:text-stone-400 mt-1" />
             <div>
-              <p className="text-xs uppercase text-stone-500 font-semibold">
+              <p className="text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold">
                 E-Mailadresse
               </p>
-              <p className="text-sm text-stone-800 mt-1 break-all">
+              <p className="text-sm text-stone-800 dark:text-stone-100 mt-1 break-all">
                 {facility.email}
               </p>
             </div>
@@ -117,12 +117,12 @@ export default function ProfileFacility({ onBack }) {
         {/* Öffnungszeiten */}
         {facility.opening_hours && (
           <div className="flex items-start gap-3">
-            <Clock size={20} className="text-stone-500 mt-1" />
+            <Clock size={20} className="text-stone-500 dark:text-stone-400 mt-1" />
             <div>
-              <p className="text-xs uppercase text-stone-500 font-semibold">
+              <p className="text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold">
                 Öffnungszeiten
               </p>
-              <p className="text-sm text-stone-800 mt-1">
+              <p className="text-sm text-stone-800 dark:text-stone-100 mt-1">
                 {facility.opening_hours}
               </p>
             </div>
@@ -132,12 +132,12 @@ export default function ProfileFacility({ onBack }) {
         {/* Hinweistext */}
         {facility.info_text && (
           <div className="flex items-start gap-3">
-            <Info size={20} className="text-stone-500 mt-1" />
+            <Info size={20} className="text-stone-500 dark:text-stone-400 mt-1" />
             <div>
-              <p className="text-xs uppercase text-stone-500 font-semibold">
+              <p className="text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold">
                 Hinweise
               </p>
-              <p className="text-sm text-stone-800 mt-1 whitespace-pre-wrap">
+              <p className="text-sm text-stone-800 dark:text-stone-100 mt-1 whitespace-pre-wrap">
                 {facility.info_text}
               </p>
             </div>

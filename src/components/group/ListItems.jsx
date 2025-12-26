@@ -168,7 +168,7 @@ export default function ListItems({
     <div className="space-y-2">
       {/* Duty-Listen Header */}
       {isDatedDuty && (
-        <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg mb-2">
+        <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg mb-2">
           <Calendar size={12} />
           <span>Wiederkehrende Termine</span>
         </div>
@@ -194,16 +194,16 @@ export default function ListItems({
               className={`flex items-center justify-between px-3 py-2 rounded-xl border text-sm transition ${
                 assigned
                   ? isMine
-                    ? "bg-amber-100 border-amber-200 text-amber-900"
-                    : "bg-stone-50 border-stone-200 text-stone-600"
-                  : "bg-stone-50 border-stone-200 text-stone-700"
+                    ? "bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200"
+                    : "bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300"
+                  : "bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-200"
               }`}
             >
               {/* LABEL */}
               <span className="flex-1 font-medium">{item.label}</span>
 
               {/* RECHTE SEITE */}
-              <div className="flex items-center gap-2 text-[10px] text-stone-500">
+              <div className="flex items-center gap-2 text-[10px] text-stone-500 dark:text-stone-400">
                 {/* Textanzeige: Du / Name des Kindes / nichts bei freien Einträgen */}
                 {assigned && <span>{displayName}</span>}
 
@@ -211,7 +211,7 @@ export default function ListItems({
                 {!isAdmin && (!assigned || assigned === user.id) && (
                   <button
                     onClick={() => toggleAssign(item.originalIndex)}
-                    className="px-2 py-0.5 bg-white border border-stone-200 rounded-lg hover:bg-stone-100 text-[10px] font-bold"
+                    className="px-2 py-0.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700 text-[10px] font-bold text-stone-700 dark:text-stone-200"
                   >
                     {assigned === user.id ? "Abgeben" : "Eintragen"}
                   </button>
@@ -235,22 +235,22 @@ export default function ListItems({
       ) : (
         // Platzhalter für leere Listen
         !isDutyList ? (
-          <div className="flex flex-col items-center justify-center py-6 px-4 bg-stone-50 rounded-xl border border-dashed border-stone-200 text-center">
-            <p className="text-sm text-stone-500">Noch keine Einträge vorhanden</p>
+          <div className="flex flex-col items-center justify-center py-6 px-4 bg-stone-50 dark:bg-stone-900 rounded-xl border border-dashed border-stone-200 dark:border-stone-700 text-center">
+            <p className="text-sm text-stone-500 dark:text-stone-400">Noch keine Einträge vorhanden</p>
             {!isAdmin && (
-              <p className="text-xs text-stone-400 mt-1">
+              <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
                 Füge unten den ersten Eintrag hinzu
               </p>
             )}
           </div>
         ) : (
-          <p className="text-xs text-stone-400 py-1">Noch keine Einträge.</p>
+          <p className="text-xs text-stone-400 dark:text-stone-500 py-1">Noch keine Einträge.</p>
         )
       )}
 
       {/* Ausgeblendete Termine Info */}
       {hiddenCount > 0 && (
-        <div className="text-xs text-stone-400 text-center py-1">
+        <div className="text-xs text-stone-400 dark:text-stone-500 text-center py-1">
           + {hiddenCount} weitere Termine
         </div>
       )}
@@ -259,7 +259,7 @@ export default function ListItems({
       {!isAdmin && !isDutyList && (
         <div className="flex items-center gap-2 mt-2">
           <input
-            className="flex-1 p-2 bg-stone-50 border border-stone-200 rounded-lg text-sm"
+            className="flex-1 p-2 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg text-sm text-stone-900 dark:text-stone-100"
             placeholder="Eintrag hinzufügen…"
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}

@@ -283,10 +283,10 @@ export default function ChatRoom({ group, user, participation, onBack }) {
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)]">
       {/* Header */}
-      <div className="flex items-center gap-3 pb-4 border-b border-stone-200">
+      <div className="flex items-center gap-3 pb-4 border-b border-stone-200 dark:border-stone-700">
         <button
           onClick={onBack}
-          className="p-2 rounded-lg hover:bg-stone-100 text-stone-600"
+          className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300"
         >
           <ArrowLeft size={20} />
         </button>
@@ -294,8 +294,8 @@ export default function ChatRoom({ group, user, participation, onBack }) {
           <styles.Icon size={18} />
         </div>
         <div>
-          <h2 className="font-bold text-stone-800">{styles.name}</h2>
-          <p className="text-xs text-stone-500">Gruppenchat</p>
+          <h2 className="font-bold text-stone-800 dark:text-stone-100">{styles.name}</h2>
+          <p className="text-xs text-stone-500 dark:text-stone-400">Gruppenchat</p>
         </div>
       </div>
 
@@ -303,7 +303,7 @@ export default function ChatRoom({ group, user, participation, onBack }) {
       <div className="flex-1 overflow-y-auto py-4 space-y-3">
         {messages.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-stone-400 text-sm">
+            <p className="text-stone-400 dark:text-stone-500 text-sm">
               Noch keine Nachrichten. Starte die Unterhaltung!
             </p>
           </div>
@@ -324,7 +324,7 @@ export default function ChatRoom({ group, user, participation, onBack }) {
                 <div className={`max-w-[80%] ${isOwn ? "order-1" : ""}`}>
                   {/* Absender-Name (nur bei fremden Nachrichten) */}
                   {!isOwn && (
-                    <p className="text-xs font-semibold text-stone-600 mb-1 px-1">
+                    <p className="text-xs font-semibold text-stone-600 dark:text-stone-400 mb-1 px-1">
                       {userNames[message.user_id] || "Unbekannt"}
                     </p>
                   )}
@@ -334,8 +334,8 @@ export default function ChatRoom({ group, user, participation, onBack }) {
                     <div
                       className={`text-xs px-3 py-1.5 mb-1 rounded-t-xl border-l-2 ${
                         isOwn
-                          ? "bg-amber-100 border-amber-400 text-amber-800"
-                          : "bg-stone-100 border-stone-400 text-stone-600"
+                          ? "bg-amber-100 dark:bg-amber-900/50 border-amber-400 text-amber-800 dark:text-amber-200"
+                          : "bg-stone-100 dark:bg-stone-700 border-stone-400 dark:border-stone-500 text-stone-600 dark:text-stone-300"
                       }`}
                     >
                       <p className="font-semibold text-[10px]">
@@ -350,7 +350,7 @@ export default function ChatRoom({ group, user, participation, onBack }) {
                     className={`px-4 py-2.5 rounded-2xl ${
                       isOwn
                         ? "bg-amber-500 text-white rounded-br-sm"
-                        : "bg-white border border-stone-200 text-stone-800 rounded-bl-sm"
+                        : "bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600 text-stone-800 dark:text-stone-100 rounded-bl-sm"
                     }`}
                   >
                     <p className="text-sm whitespace-pre-wrap break-words">
@@ -364,7 +364,7 @@ export default function ChatRoom({ group, user, participation, onBack }) {
                       isOwn ? "justify-end" : "justify-start"
                     }`}
                   >
-                    <span className="text-[10px] text-stone-400">
+                    <span className="text-[10px] text-stone-400 dark:text-stone-500">
                       {formatTime(message.created_at)}
                     </span>
 
@@ -373,7 +373,7 @@ export default function ChatRoom({ group, user, participation, onBack }) {
                       <button
                         onClick={() => toggleLike(message.id)}
                         className={`flex items-center gap-1 text-[10px] ${
-                          hasLiked ? "text-red-500" : "text-stone-400 hover:text-red-500"
+                          hasLiked ? "text-red-500" : "text-stone-400 dark:text-stone-500 hover:text-red-500"
                         }`}
                       >
                         <Heart
@@ -396,7 +396,7 @@ export default function ChatRoom({ group, user, participation, onBack }) {
                     {!isOwn && (
                       <button
                         onClick={() => setReplyTo(message)}
-                        className="text-stone-400 hover:text-stone-600"
+                        className="text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300"
                       >
                         <Reply size={12} />
                       </button>
@@ -412,26 +412,26 @@ export default function ChatRoom({ group, user, participation, onBack }) {
 
       {/* Reply Preview */}
       {replyTo && (
-        <div className="flex items-center justify-between px-4 py-2 bg-stone-100 border-t border-stone-200">
+        <div className="flex items-center justify-between px-4 py-2 bg-stone-100 dark:bg-stone-700 border-t border-stone-200 dark:border-stone-600">
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-stone-600">
+            <p className="text-xs font-semibold text-stone-600 dark:text-stone-300">
               Antwort auf {userNames[replyTo.user_id] || "Unbekannt"}
             </p>
-            <p className="text-xs text-stone-500 truncate">{replyTo.content}</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400 truncate">{replyTo.content}</p>
           </div>
           <button
             onClick={() => setReplyTo(null)}
-            className="p-1 rounded hover:bg-stone-200"
+            className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-600"
           >
-            <X size={16} className="text-stone-500" />
+            <X size={16} className="text-stone-500 dark:text-stone-400" />
           </button>
         </div>
       )}
 
       {/* Input */}
-      <div className="pt-4 border-t border-stone-200">
+      <div className="pt-4 border-t border-stone-200 dark:border-stone-700">
         <div className="flex items-end gap-2">
-          <div className="flex-1 bg-white border border-stone-200 rounded-2xl overflow-hidden">
+          <div className="flex-1 bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600 rounded-2xl overflow-hidden">
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
@@ -443,7 +443,7 @@ export default function ChatRoom({ group, user, participation, onBack }) {
               }}
               placeholder="Nachricht schreiben..."
               rows={1}
-              className="w-full px-4 py-3 text-sm resize-none focus:outline-none"
+              className="w-full px-4 py-3 text-sm resize-none focus:outline-none bg-transparent text-stone-900 dark:text-stone-100"
               style={{ minHeight: "44px", maxHeight: "120px" }}
             />
           </div>

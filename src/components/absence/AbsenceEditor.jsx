@@ -11,8 +11,8 @@ function ReasonButton({ value, label, reason, setReason }) {
       onClick={() => setReason(value)}
       className={`w-full px-4 py-3 rounded-2xl text-sm font-semibold border transition ${
         active
-          ? "bg-amber-100 text-amber-900 border-amber-500 shadow-sm"
-          : "bg-stone-50 text-stone-700 border-stone-300 hover:bg-stone-100"
+          ? "bg-amber-100 text-amber-900 border-amber-500 shadow-sm dark:bg-amber-900/50 dark:text-amber-100 dark:border-amber-600"
+          : "bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 border-stone-300 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-700"
       }`}
     >
       {label}
@@ -109,7 +109,7 @@ export default function AbsenceEditor({
   const minDateTo = dateFrom && dateFrom > todayIso ? dateFrom : todayIso;
 
   return (
-    <div className="bg-white p-4 rounded-2xl shadow-sm border border-stone-200 space-y-5">
+    <div className="bg-white dark:bg-stone-800 p-4 rounded-2xl shadow-sm border border-stone-200 dark:border-stone-700 space-y-5">
       {/* Kopf */}
       <div className="flex items-center gap-3">
         <div
@@ -120,9 +120,9 @@ export default function AbsenceEditor({
           <group.Icon size={18} />
         </div>
         <div>
-          <p className="text-sm font-semibold text-stone-900">{child.name}</p>
+          <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{child.name}</p>
           {group && (
-            <p className="text-[11px] font-medium text-stone-500 flex items-center gap-1">
+            <p className="text-[11px] font-medium text-stone-500 dark:text-stone-400 flex items-center gap-1">
               <span className="inline-block w-2 h-2 rounded-full bg-amber-400" />
               {group.name}
             </p>
@@ -131,14 +131,14 @@ export default function AbsenceEditor({
       </div>
 
       {/* Einzeltag / Zeitraum */}
-      <div className="bg-stone-50 rounded-2xl p-1 flex gap-1">
+      <div className="bg-stone-50 dark:bg-stone-900 rounded-2xl p-1 flex gap-1">
         <button
           type="button"
           onClick={() => setType("single")}
           className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition ${
             type === "single"
-              ? "bg-amber-100 text-amber-900 border-amber-500 shadow-sm"
-              : "bg-stone-50 text-stone-700 border-transparent hover:bg-stone-100"
+              ? "bg-amber-100 text-amber-900 border-amber-500 shadow-sm dark:bg-amber-900/50 dark:text-amber-100 dark:border-amber-600"
+              : "bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 border-transparent hover:bg-stone-100 dark:hover:bg-stone-700"
           }`}
         >
           Einzeltag
@@ -149,8 +149,8 @@ export default function AbsenceEditor({
           onClick={() => setType("range")}
           className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition ${
             type === "range"
-              ? "bg-amber-100 text-amber-900 border-amber-500 shadow-sm"
-              : "bg-stone-50 text-stone-700 border-transparent hover:bg-stone-100"
+              ? "bg-amber-100 text-amber-900 border-amber-500 shadow-sm dark:bg-amber-900/50 dark:text-amber-100 dark:border-amber-600"
+              : "bg-stone-50 dark:bg-stone-900 text-stone-700 dark:text-stone-200 border-transparent hover:bg-stone-100 dark:hover:bg-stone-700"
           }`}
         >
           Zeitraum
@@ -161,35 +161,35 @@ export default function AbsenceEditor({
       <div className="space-y-3">
         {type === "single" ? (
           <div className="flex flex-col">
-            <label className="text-xs text-stone-600 mb-1">Datum</label>
+            <label className="text-xs text-stone-600 dark:text-stone-300 mb-1">Datum</label>
             <input
               type="date"
               value={dateFrom}
               min={todayIso}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm"
+              className="p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm text-stone-900 dark:text-stone-100"
             />
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex flex-col">
-              <label className="text-xs text-stone-600 mb-1">Von</label>
+              <label className="text-xs text-stone-600 dark:text-stone-300 mb-1">Von</label>
               <input
                 type="date"
                 value={dateFrom}
                 min={todayIso}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm"
+                className="p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm text-stone-900 dark:text-stone-100"
               />
             </div>
             <div className="flex flex-col">
-              <label className="text-xs text-stone-600 mb-1">Bis</label>
+              <label className="text-xs text-stone-600 dark:text-stone-300 mb-1">Bis</label>
               <input
                 type="date"
                 value={dateTo}
                 min={minDateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm"
+                className="p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm text-stone-900 dark:text-stone-100"
               />
             </div>
           </div>
@@ -198,7 +198,7 @@ export default function AbsenceEditor({
 
       {/* Grund */}
       <div className="space-y-2">
-        <p className="text-xs font-semibold text-stone-700 uppercase tracking-wide">
+        <p className="text-xs font-semibold text-stone-700 dark:text-stone-200 uppercase tracking-wide">
           Grund
         </p>
 
@@ -211,14 +211,14 @@ export default function AbsenceEditor({
 
         {/* Hinweis-Feld - immer sichtbar */}
         <div className="mt-2">
-          <label className="text-xs text-stone-600 mb-1 block">
+          <label className="text-xs text-stone-600 dark:text-stone-300 mb-1 block">
             Hinweis (optional)
           </label>
           <textarea
             rows={2}
             value={otherText}
             onChange={(e) => setOtherText(e.target.value)}
-            className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm resize-none"
+            className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm text-stone-900 dark:text-stone-100 resize-none"
             placeholder="Zusätzliche Informationen für das Team …"
           />
         </div>
@@ -238,7 +238,7 @@ export default function AbsenceEditor({
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 bg-stone-200 text-stone-700 rounded-xl font-semibold text-sm hover:bg-stone-300"
+            className="px-4 py-2 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 rounded-xl font-semibold text-sm hover:bg-stone-300 dark:hover:bg-stone-600"
           >
             Abbrechen
           </button>

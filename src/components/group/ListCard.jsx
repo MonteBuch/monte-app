@@ -51,7 +51,7 @@ export default function ListCard({ list, isAdmin, user, group, reload, dragHandl
   };
 
   return (
-    <div className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 space-y-3">
+    <div className="bg-white dark:bg-stone-800 p-4 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 space-y-3">
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
@@ -59,21 +59,21 @@ export default function ListCard({ list, isAdmin, user, group, reload, dragHandl
           {dragHandleProps && (
             <div
               {...dragHandleProps}
-              className="cursor-grab active:cursor-grabbing text-stone-300 hover:text-stone-500 transition -ml-1 mr-1"
+              className="cursor-grab active:cursor-grabbing text-stone-300 dark:text-stone-600 hover:text-stone-500 dark:hover:text-stone-400 transition -ml-1 mr-1"
             >
               <GripVertical size={18} />
             </div>
           )}
 
-          <div className="bg-stone-100 text-stone-700 rounded-full p-2">
+          <div className="bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 rounded-full p-2">
             {meta.icon}
           </div>
 
           <div>
-            <h3 className="font-bold text-stone-800 text-sm">
+            <h3 className="font-bold text-stone-800 dark:text-stone-100 text-sm">
               {list.title}
             </h3>
-            <p className="text-[10px] text-stone-500 uppercase tracking-wide">
+            <p className="text-[10px] text-stone-500 dark:text-stone-400 uppercase tracking-wide">
               {meta.label}
             </p>
           </div>

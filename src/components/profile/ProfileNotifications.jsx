@@ -134,14 +134,14 @@ export default function ProfileNotifications({ user, onBack }) {
     <div className="space-y-6">
       {/* BACK */}
       <button
-        className="flex items-center text-stone-500 gap-2 text-sm"
+        className="flex items-center text-stone-500 dark:text-stone-400 gap-2 text-sm"
         onClick={onBack}
       >
         <ArrowLeft size={18} />
         Zurück
       </button>
 
-      <h2 className="text-lg font-bold text-stone-800">
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">
         Benachrichtigungen
       </h2>
 
@@ -153,9 +153,9 @@ export default function ProfileNotifications({ user, onBack }) {
           return (
             <div
               key={c}
-              className="bg-white p-5 rounded-2xl border border-stone-200 space-y-3"
+              className="bg-white dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700 space-y-3"
             >
-              <p className="font-semibold text-sm text-stone-800">
+              <p className="font-semibold text-sm text-stone-800 dark:text-stone-100">
                 {labelMap[c]}
               </p>
 
@@ -167,7 +167,7 @@ export default function ProfileNotifications({ user, onBack }) {
                     className={`py-2 rounded-xl text-xs font-semibold border transition ${
                       prefs[c] === opt
                         ? "bg-amber-500 text-white border-amber-600"
-                        : "bg-stone-50 text-stone-600 border-stone-300 hover:bg-stone-100"
+                        : "bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-700"
                     }`}
                   >
                     {optionText[opt]}

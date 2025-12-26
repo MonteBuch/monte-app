@@ -51,28 +51,28 @@ export default function AdminUserModal({ user, groups = [], onCancel, onSave }) 
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-      <div className="bg-white p-6 rounded-2xl w-full max-w-lg space-y-6 border border-stone-200 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl w-full max-w-lg space-y-6 border border-stone-200 dark:border-stone-700 shadow-xl max-h-[90vh] overflow-y-auto">
 
         {/* Back Button */}
         <button
           onClick={onCancel}
-          className="flex items-center gap-2 text-stone-600 hover:text-stone-800 active:scale-95"
+          className="flex items-center gap-2 text-stone-600 dark:text-stone-300 hover:text-stone-800 dark:hover:text-stone-100 active:scale-95"
         >
           <ArrowLeft size={20} />
           <span className="font-semibold text-sm">Zurück</span>
         </button>
 
-        <h3 className="text-lg font-bold text-stone-800">
+        <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100">
           Benutzer bearbeiten
         </h3>
 
         {/* Name */}
         <div className="space-y-1">
-          <label className="text-xs uppercase text-stone-500 font-semibold">
+          <label className="text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold">
             Name
           </label>
           <input
-            className="w-full p-3 rounded-xl bg-stone-50 border border-stone-300 text-sm"
+            className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 text-sm dark:text-stone-100"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -81,12 +81,12 @@ export default function AdminUserModal({ user, groups = [], onCancel, onSave }) 
         {/* Gruppe (nur Team - Admin hat keine Stammgruppe) */}
         {user.role === "team" && (
           <div className="space-y-1">
-            <label className="text-xs uppercase text-stone-500 font-semibold">
+            <label className="text-xs uppercase text-stone-500 dark:text-stone-400 font-semibold">
               Stammgruppe
             </label>
 
             <select
-              className="w-full p-3 rounded-xl bg-stone-50 border border-stone-300 text-sm"
+              className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 text-sm dark:text-stone-100"
               value={primaryGroup}
               onChange={(e) => setPrimaryGroup(e.target.value)}
             >
@@ -103,24 +103,24 @@ export default function AdminUserModal({ user, groups = [], onCancel, onSave }) 
         {/* Kinderdaten (nur Eltern) */}
         {user.role === "parent" && (
           <div className="space-y-3 pt-3">
-            <h4 className="text-md font-semibold text-stone-800">
+            <h4 className="text-md font-semibold text-stone-800 dark:text-stone-100">
               Kinder
             </h4>
 
             {children.map((c) => (
               <div
                 key={c.id}
-                className="bg-stone-50 p-4 rounded-xl border border-stone-200 flex justify-between items-start"
+                className="bg-stone-50 dark:bg-stone-900 p-4 rounded-xl border border-stone-200 dark:border-stone-700 flex justify-between items-start"
               >
                 <div className="space-y-2 w-full pr-3">
 
                   {/* Name */}
                   <div className="space-y-1">
-                    <label className="text-xs text-stone-500">
+                    <label className="text-xs text-stone-500 dark:text-stone-400">
                       Name
                     </label>
                     <input
-                      className="w-full p-2 rounded-lg border border-stone-300 bg-white text-sm"
+                      className="w-full p-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm dark:text-stone-100"
                       value={c.name}
                       onChange={(e) =>
                         updateChild(c.id, "name", e.target.value)
@@ -130,11 +130,11 @@ export default function AdminUserModal({ user, groups = [], onCancel, onSave }) 
 
                   {/* Gruppe */}
                   <div className="space-y-1">
-                    <label className="text-xs text-stone-500">
+                    <label className="text-xs text-stone-500 dark:text-stone-400">
                       Gruppe
                     </label>
                     <select
-                      className="w-full p-2 rounded-lg border border-stone-300 bg-white text-sm"
+                      className="w-full p-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm dark:text-stone-100"
                       value={c.group}
                       onChange={(e) =>
                         updateChild(c.id, "group", e.target.value)
@@ -149,7 +149,7 @@ export default function AdminUserModal({ user, groups = [], onCancel, onSave }) 
                   </div>
 
                   {/* Hinweis auf Kinderakten */}
-                  <p className="text-[11px] text-stone-400 mt-2">
+                  <p className="text-[11px] text-stone-400 dark:text-stone-500 mt-2">
                     Geburtstag, Hinweise und Abholberechtigte werden in den Kinderakten verwaltet.
                   </p>
                 </div>

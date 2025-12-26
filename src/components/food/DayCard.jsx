@@ -22,7 +22,7 @@ export default function DayCard({
   onOpenLov
 }) {
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-[#f2eee4] overflow-hidden mb-4">
+    <div className="bg-white dark:bg-stone-800 rounded-3xl shadow-sm border border-[#f2eee4] dark:border-stone-700 overflow-hidden mb-4">
 
       {/* HEADER */}
       <div className="flex items-center gap-3 px-5 py-3">
@@ -35,7 +35,7 @@ export default function DayCard({
         </div>
 
         <div>
-          <p className="text-[10px] font-bold text-stone-400 tracking-[0.14em]">
+          <p className="text-[10px] font-bold text-stone-400 dark:text-stone-400 tracking-[0.14em]">
             TAGESMENÜ
           </p>
         </div>

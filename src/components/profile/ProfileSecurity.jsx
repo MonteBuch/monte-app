@@ -100,27 +100,27 @@ export default function ProfileSecurity({
     <div className="space-y-6">
       {/* BACK */}
       <button
-        className="flex items-center text-stone-500 gap-2 text-sm"
+        className="flex items-center text-stone-500 dark:text-stone-400 gap-2 text-sm"
         onClick={onBack}
       >
         <ArrowLeft size={18} />
         Zurück
       </button>
 
-      <h2 className="text-lg font-bold text-stone-800">Sicherheit</h2>
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Sicherheit</h2>
 
       {/* BIOMETRIC */}
-      <div className="bg-white p-5 rounded-2xl border border-stone-200 space-y-3">
+      <div className="bg-white dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700 space-y-3">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-xl ${biometric ? "bg-amber-100 text-amber-600" : "bg-stone-100 text-stone-400"}`}>
+            <div className={`p-2 rounded-xl ${biometric ? "bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-300" : "bg-stone-100 dark:bg-stone-700 text-stone-400"}`}>
               <Fingerprint size={20} />
             </div>
             <div>
-              <p className="font-semibold text-sm text-stone-800">
+              <p className="font-semibold text-sm text-stone-800 dark:text-stone-100">
                 {biometricTypeName}
               </p>
-              <p className="text-xs text-stone-500 mt-0.5">
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                 {biometricAvailable
                   ? "Schneller anmelden ohne Passwort"
                   : "Nicht verfügbar auf diesem Gerät"}
@@ -136,13 +136,13 @@ export default function ProfileSecurity({
               className={`px-4 py-2 rounded-xl font-bold text-xs transition ${
                 biometric
                   ? "bg-amber-500 text-white"
-                  : "bg-stone-200 text-stone-600"
+                  : "bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300"
               }`}
             >
               {biometric ? "AN" : "AUS"}
             </button>
           ) : (
-            <span className="text-xs text-stone-400 bg-stone-100 px-3 py-1.5 rounded-lg">
+            <span className="text-xs text-stone-400 bg-stone-100 dark:bg-stone-700 px-3 py-1.5 rounded-lg">
               Nicht verfügbar
             </span>
           )}
@@ -158,9 +158,9 @@ export default function ProfileSecurity({
       {/* PW CHANGE */}
       <form
         onSubmit={handlePw}
-        className="bg-white p-5 rounded-2xl border border-stone-200 space-y-3"
+        className="bg-white dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700 space-y-3"
       >
-        <p className="font-semibold text-sm text-stone-800">
+        <p className="font-semibold text-sm text-stone-800 dark:text-stone-100">
           Passwort ändern
         </p>
 
@@ -169,7 +169,7 @@ export default function ProfileSecurity({
           placeholder="Neues Passwort"
           value={newPw1}
           onChange={(e) => setNewPw1(e.target.value)}
-          className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl"
+          className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-stone-900 dark:text-stone-100"
           minLength={6}
         />
         <input
@@ -177,7 +177,7 @@ export default function ProfileSecurity({
           placeholder="Neues Passwort wiederholen"
           value={newPw2}
           onChange={(e) => setNewPw2(e.target.value)}
-          className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl"
+          className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-stone-900 dark:text-stone-100"
           minLength={6}
         />
 

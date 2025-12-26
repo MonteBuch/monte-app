@@ -106,27 +106,27 @@ export default function AdminFacility() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold text-stone-800">Einrichtungsinformationen</h2>
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Einrichtungsinformationen</h2>
 
-      <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-5 space-y-5">
+      <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-sm p-5 space-y-5">
 
         {/* Name */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-stone-500 uppercase flex items-center gap-1">
+          <label className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase flex items-center gap-1">
             <Info size={14} />
             Name der Einrichtung
           </label>
           <input
             value={form.name}
             onChange={(e) => handleChange("name", e.target.value)}
-            className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm"
+            className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm dark:text-stone-100"
             placeholder="z. B. Montessori Kinderhaus Berlin-Buch"
           />
         </div>
 
         {/* Adresse */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-stone-500 uppercase flex items-center gap-1">
+          <label className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase flex items-center gap-1">
             <MapPin size={14} />
             Adresse
           </label>
@@ -134,56 +134,56 @@ export default function AdminFacility() {
             rows={2}
             value={form.address}
             onChange={(e) => handleChange("address", e.target.value)}
-            className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm resize-none"
+            className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm dark:text-stone-100 resize-none"
             placeholder="Straße, Hausnummer, PLZ, Ort"
           />
         </div>
 
         {/* Telefon */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-stone-500 uppercase flex items-center gap-1">
+          <label className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase flex items-center gap-1">
             <Phone size={14} />
             Telefonnummer
           </label>
           <input
             value={form.phone}
             onChange={(e) => handleChange("phone", e.target.value)}
-            className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm"
+            className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm dark:text-stone-100"
             placeholder="030 / 1234567"
           />
         </div>
 
         {/* Email */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-stone-500 uppercase flex items-center gap-1">
+          <label className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase flex items-center gap-1">
             <Mail size={14} />
             E-Mailadresse
           </label>
           <input
             value={form.email}
             onChange={(e) => handleChange("email", e.target.value)}
-            className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm"
+            className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm dark:text-stone-100"
             placeholder="kontakt@kita.de"
           />
         </div>
 
         {/* Öffnungszeiten */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-stone-500 uppercase flex items-center gap-1">
+          <label className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase flex items-center gap-1">
             <Clock size={14} />
             Öffnungszeiten
           </label>
           <input
             value={form.opening_hours}
             onChange={(e) => handleChange("opening_hours", e.target.value)}
-            className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm"
+            className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm dark:text-stone-100"
             placeholder="Mo–Fr 07:00–17:00"
           />
         </div>
 
         {/* Info-Text */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-stone-500 uppercase flex items-center gap-1">
+          <label className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase flex items-center gap-1">
             <Info size={14} />
             Hinweistext für Eltern
           </label>
@@ -191,7 +191,7 @@ export default function AdminFacility() {
             rows={4}
             value={form.info_text}
             onChange={(e) => handleChange("info_text", e.target.value)}
-            className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm resize-none"
+            className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm dark:text-stone-100 resize-none"
             placeholder="Wichtige Hinweise, z. B. zur Abwesenheitsmeldung"
           />
         </div>

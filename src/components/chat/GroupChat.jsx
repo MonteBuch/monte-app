@@ -176,9 +176,9 @@ export default function GroupChat({ user }) {
   if (groups.length === 0) {
     return (
       <div className="text-center py-12">
-        <MessageCircle size={48} className="text-stone-300 mx-auto mb-4" />
-        <h2 className="text-lg font-bold text-stone-800 mb-2">Kein Gruppenchat verfügbar</h2>
-        <p className="text-sm text-stone-500">
+        <MessageCircle size={48} className="text-stone-300 dark:text-stone-600 mx-auto mb-4" />
+        <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100 mb-2">Kein Gruppenchat verfügbar</h2>
+        <p className="text-sm text-stone-500 dark:text-stone-400">
           Der Gruppenchat ist für Eltern mit Kindern in einer Gruppe verfügbar.
         </p>
       </div>
@@ -190,17 +190,17 @@ export default function GroupChat({ user }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
             <MessageCircle size={20} className="text-amber-500" />
             Gruppenchat
           </h2>
-          <p className="text-xs text-stone-500 mt-1">
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
             Tausche dich mit anderen Eltern aus
           </p>
         </div>
         <button
           onClick={() => setSettingsModal(true)}
-          className="p-2 rounded-lg hover:bg-stone-100 text-stone-600"
+          className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300"
           title="Chat-Einstellungen"
         >
           <Settings size={20} />
@@ -208,12 +208,12 @@ export default function GroupChat({ user }) {
       </div>
 
       {/* Info-Box */}
-      <div className="bg-amber-50 rounded-2xl p-4 border border-amber-200">
+      <div className="bg-amber-50 dark:bg-amber-900/30 rounded-2xl p-4 border border-amber-200 dark:border-amber-700">
         <div className="flex items-start gap-3">
-          <AlertTriangle size={18} className="text-amber-600 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-amber-800">
+          <AlertTriangle size={18} className="text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-amber-800 dark:text-amber-200">
             <p className="font-semibold mb-1">Hinweis zum Gruppenchat</p>
-            <p className="text-xs text-amber-700">
+            <p className="text-xs text-amber-700 dark:text-amber-300">
               Der Chat ist nur für Eltern sichtbar. Team und Leitung haben keinen Zugriff.
               Du kannst den Chat jederzeit aktivieren oder deaktivieren.
             </p>
@@ -232,22 +232,22 @@ export default function GroupChat({ user }) {
           return (
             <div
               key={group.id}
-              className={`bg-white rounded-2xl border shadow-sm overflow-hidden ${
-                isActive ? "border-stone-200" : "border-stone-100 opacity-60"
+              className={`bg-white dark:bg-stone-800 rounded-2xl border shadow-sm overflow-hidden ${
+                isActive ? "border-stone-200 dark:border-stone-700" : "border-stone-100 dark:border-stone-700 opacity-60"
               }`}
             >
               <button
                 onClick={() => openChat(group)}
                 disabled={!isActive}
-                className="w-full p-4 flex items-center justify-between hover:bg-stone-50 transition-colors disabled:cursor-not-allowed"
+                className="w-full p-4 flex items-center justify-between hover:bg-stone-50 dark:hover:bg-stone-700 transition-colors disabled:cursor-not-allowed"
               >
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-xl ${styles.chipClass}`}>
                     <styles.Icon size={18} />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-semibold text-stone-800">{styles.name}</h3>
-                    <p className="text-xs text-stone-500">
+                    <h3 className="font-semibold text-stone-800 dark:text-stone-100">{styles.name}</h3>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">
                       {isActive ? "Chat aktiv" : "Chat nicht aktiviert"}
                     </p>
                   </div>
@@ -259,7 +259,7 @@ export default function GroupChat({ user }) {
                     </span>
                   )}
                   {isActive && (
-                    <ChevronRight size={20} className="text-stone-400" />
+                    <ChevronRight size={20} className="text-stone-400 dark:text-stone-500" />
                   )}
                 </div>
               </button>
@@ -283,21 +283,21 @@ export default function GroupChat({ user }) {
       {/* Settings Modal */}
       {settingsModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 space-y-4">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 dark:border-stone-700 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
                 <Settings size={20} className="text-amber-500" />
                 Chat-Einstellungen
               </h3>
               <button
                 onClick={() => setSettingsModal(false)}
-                className="p-1 rounded-lg hover:bg-stone-100"
+                className="p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700"
               >
-                <X size={20} className="text-stone-400" />
+                <X size={20} className="text-stone-400 dark:text-stone-500" />
               </button>
             </div>
 
-            <p className="text-sm text-stone-600">
+            <p className="text-sm text-stone-600 dark:text-stone-300">
               Aktiviere oder deaktiviere den Gruppenchat für einzelne Gruppen.
               Bei Deaktivierung werden keine Nachrichten mehr angezeigt.
             </p>
@@ -311,13 +311,13 @@ export default function GroupChat({ user }) {
                 return (
                   <div
                     key={group.id}
-                    className="flex items-center justify-between p-3 bg-stone-50 rounded-xl"
+                    className="flex items-center justify-between p-3 bg-stone-50 dark:bg-stone-900 rounded-xl"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`p-1.5 rounded-lg ${styles.chipClass}`}>
                         <styles.Icon size={14} />
                       </div>
-                      <span className="text-sm font-medium text-stone-800">
+                      <span className="text-sm font-medium text-stone-800 dark:text-stone-100">
                         {styles.name}
                       </span>
                     </div>
@@ -325,8 +325,8 @@ export default function GroupChat({ user }) {
                       onClick={() => toggleChatParticipation(group.id, !isActive)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                         isActive
-                          ? "bg-green-100 text-green-700 hover:bg-green-200"
-                          : "bg-stone-200 text-stone-600 hover:bg-stone-300"
+                          ? "bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/70"
+                          : "bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-600"
                       }`}
                     >
                       {isActive ? (
@@ -345,7 +345,7 @@ export default function GroupChat({ user }) {
 
             <button
               onClick={() => setSettingsModal(false)}
-              className="w-full py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200 transition-colors"
+              className="w-full py-3 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors"
             >
               Schließen
             </button>

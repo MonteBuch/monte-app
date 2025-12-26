@@ -183,24 +183,24 @@ export default function ProfileChildren({
   return (
     <div className="space-y-6">
       <button
-        className="flex items-center text-stone-500 gap-2 text-sm"
+        className="flex items-center text-stone-500 dark:text-stone-400 gap-2 text-sm"
         onClick={onBack}
       >
         <ArrowLeft size={18} />
         Zurück
       </button>
 
-      <h2 className="text-lg font-bold text-stone-800">
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">
         {isTeam ? "Stammgruppe" : "Meine Kinder"}
       </h2>
 
       {isTeam && (
         <div className="space-y-3">
-          <p className="text-xs text-stone-500 uppercase font-bold">Stammgruppe</p>
+          <p className="text-xs text-stone-500 dark:text-stone-400 uppercase font-bold">Stammgruppe</p>
           <select
             value={primaryGroup || ""}
             onChange={(e) => setPrimaryGroup(e.target.value)}
-            className="w-full p-3 rounded-xl bg-stone-50 border border-stone-300 text-sm"
+            className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 text-sm text-stone-900 dark:text-stone-100"
           >
             <option value="">Keine</option>
             {displayGroups.map((g) => (
@@ -220,7 +220,7 @@ export default function ProfileChildren({
       {isParent && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <p className="text-xs text-stone-500 uppercase font-bold">
+            <p className="text-xs text-stone-500 dark:text-stone-400 uppercase font-bold">
               {children.length === 1 ? "Kind" : "Kinder"}
             </p>
             <button
@@ -234,7 +234,7 @@ export default function ProfileChildren({
           </div>
 
           {children.length === 0 && (
-            <p className="text-sm text-stone-500">Noch keine Kinder hinterlegt.</p>
+            <p className="text-sm text-stone-500 dark:text-stone-400">Noch keine Kinder hinterlegt.</p>
           )}
 
           <div className="space-y-3">
@@ -243,17 +243,17 @@ export default function ProfileChildren({
               const styles = getGroupStyles(groupData);
 
               return (
-                <div key={c.id} className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden flex">
+                <div key={c.id} className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-sm overflow-hidden flex">
                   <div className={`w-2 ${styles.chipClass.replace("text-white", "")}`} />
                   <div className="flex-1 p-4 flex justify-between items-center">
                     <div>
-                      <p className="font-semibold text-stone-800 text-sm">{c.name}</p>
-                      <p className="text-xs text-stone-500 mt-1 flex items-center gap-1">
+                      <p className="font-semibold text-stone-800 dark:text-stone-100 text-sm">{c.name}</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 flex items-center gap-1">
                         <styles.Icon size={14} />
                         <span>{styles.name}</span>
                       </p>
                       {(c.birthday || c.notes) && (
-                        <p className="text-[11px] text-stone-400 mt-1">
+                        <p className="text-[11px] text-stone-400 dark:text-stone-500 mt-1">
                           {c.birthday && `Geburtstag: ${formatBirthday(c.birthday)}`}
                           {c.birthday && c.notes && " • "}
                           {c.notes && "Hinweise hinterlegt"}
@@ -264,7 +264,7 @@ export default function ProfileChildren({
                       <button
                         type="button"
                         onClick={() => openEditModal(c)}
-                        className="p-2 rounded-lg bg-stone-100 text-stone-600 hover:bg-stone-200"
+                        className="p-2 rounded-lg bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600"
                       >
                         <Pencil size={14} />
                       </button>
@@ -296,16 +296,16 @@ export default function ProfileChildren({
 
       {childToDelete && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-xl border border-stone-200 space-y-4">
-            <h3 className="text-sm font-bold text-stone-800 mb-1">Kind löschen?</h3>
-            <p className="text-sm text-stone-600">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-sm shadow-xl border border-stone-200 dark:border-stone-700 space-y-4">
+            <h3 className="text-sm font-bold text-stone-800 dark:text-stone-100 mb-1">Kind löschen?</h3>
+            <p className="text-sm text-stone-600 dark:text-stone-300">
               Möchtest du <strong>{childToDelete.name}</strong> wirklich entfernen?
             </p>
             <div className="flex gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setChildToDelete(null)}
-                className="flex-1 py-2 rounded-xl bg-stone-200 text-stone-700 text-sm font-semibold hover:bg-stone-300"
+                className="flex-1 py-2 rounded-xl bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 text-sm font-semibold hover:bg-stone-300 dark:hover:bg-stone-600"
               >
                 Abbrechen
               </button>

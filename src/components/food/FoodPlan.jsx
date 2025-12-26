@@ -401,7 +401,7 @@ export default function FoodPlan({ isAdmin }) {
   // ------------------------------------------------
   if (loading) {
     return (
-      <div className="bg-white rounded-3xl shadow-sm border border-[#f2eee4] px-5 py-8 flex justify-center">
+      <div className="bg-white dark:bg-stone-800 rounded-3xl shadow-sm border border-[#f2eee4] dark:border-stone-700 px-5 py-8 flex justify-center">
         <Loader2 className="animate-spin text-amber-500" size={24} />
       </div>
     );
@@ -411,16 +411,15 @@ export default function FoodPlan({ isAdmin }) {
     <>
       {/* === HEADER - UI Review Update === */}
       <div
-        className="p-5 rounded-3xl shadow-sm border border-stone-200 mb-4"
-        style={{ backgroundColor: "#f8f9fa" }}
+        className="p-5 rounded-3xl shadow-sm border border-stone-200 dark:border-stone-700 mb-4 bg-[#f8f9fa] dark:bg-stone-800"
       >
         <div className="flex items-center gap-3">
           <div className="bg-stone-400 p-2 rounded-2xl text-white shadow">
             <UtensilsCrossed size={18} />
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-bold text-stone-800">Speiseplan</h2>
-            <p className="text-xs text-stone-600">Woche: {weekRange}</p>
+            <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Speiseplan</h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300">Woche: {weekRange}</p>
           </div>
 
           {/* RIGHT SIDE BUTTONS */}
@@ -465,7 +464,7 @@ export default function FoodPlan({ isAdmin }) {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-3 py-2 flex items-center justify-center gap-1 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-200 text-sm font-medium"
+                  className="px-3 py-2 flex items-center justify-center gap-1 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600 text-sm font-medium"
                 >
                   <X size={14} />
                   <span>Abbrechen</span>
@@ -478,7 +477,7 @@ export default function FoodPlan({ isAdmin }) {
                   setEditMode(true);
                   setSaveState("idle");
                 }}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-white text-stone-500 hover:bg-stone-200"
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-stone-700 text-stone-500 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-600"
               >
                 <Pencil size={16} />
               </button>

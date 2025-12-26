@@ -384,40 +384,40 @@ export default function NewsCreate({
       </div>
 
       {/* TITEL INPUT */}
-      <div className="rounded-2xl border border-stone-300 bg-white overflow-hidden shadow-sm">
+      <div className="rounded-2xl border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 overflow-hidden shadow-sm">
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Betreff / Headline (optional)"
-          className="w-full px-4 py-3 text-sm font-semibold border-b border-stone-200 focus:outline-none focus:bg-amber-50 transition-colors"
+          className="w-full px-4 py-3 text-sm font-semibold border-b border-stone-200 dark:border-stone-700 focus:outline-none focus:bg-amber-50 dark:focus:bg-amber-900/20 transition-colors bg-transparent text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500"
         />
 
         {/* Toolbar */}
         {editor && (
-          <div className="flex items-center gap-1 px-3 py-2 border-b bg-stone-50">
-            <button onClick={() => applyFormat("bold")} className={`p-1.5 rounded-md hover:bg-stone-200 ${isActive("bold") ? "bg-stone-300" : ""}`}><Bold size={16} /></button>
-            <button onClick={() => applyFormat("italic")} className={`p-1.5 rounded-md hover:bg-stone-200 ${isActive("italic") ? "bg-stone-300" : ""}`}><Italic size={16} /></button>
-            <button onClick={() => applyFormat("underline")} className={`p-1.5 rounded-md hover:bg-stone-200 ${isActive("customUnderline") ? "bg-stone-300" : ""}`}><UnderlineIcon size={16} /></button>
-            <span className="w-px h-5 bg-stone-300 mx-1" />
-            <button onClick={() => applyFormat("bulletList")} className={`p-1.5 rounded-md hover:bg-stone-200 ${isActive("bulletList") ? "bg-stone-300" : ""}`}><ListIcon size={16} /></button>
-            <button onClick={() => applyFormat("orderedList")} className={`p-1.5 rounded-md hover:bg-stone-200 ${isActive("orderedList") ? "bg-stone-300" : ""}`}><ListOrdered size={16} /></button>
-            <button onClick={() => applyFormat("heading")} className={`p-1.5 rounded-md hover:bg-stone-200 ${isActive("heading", { level: 2 }) ? "bg-stone-300" : ""}`}><TypeIcon size={16} /></button>
+          <div className="flex items-center gap-1 px-3 py-2 border-b border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900">
+            <button onClick={() => applyFormat("bold")} className={`p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 ${isActive("bold") ? "bg-stone-300 dark:bg-stone-600" : ""}`}><Bold size={16} /></button>
+            <button onClick={() => applyFormat("italic")} className={`p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 ${isActive("italic") ? "bg-stone-300 dark:bg-stone-600" : ""}`}><Italic size={16} /></button>
+            <button onClick={() => applyFormat("underline")} className={`p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 ${isActive("customUnderline") ? "bg-stone-300 dark:bg-stone-600" : ""}`}><UnderlineIcon size={16} /></button>
+            <span className="w-px h-5 bg-stone-300 dark:bg-stone-600 mx-1" />
+            <button onClick={() => applyFormat("bulletList")} className={`p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 ${isActive("bulletList") ? "bg-stone-300 dark:bg-stone-600" : ""}`}><ListIcon size={16} /></button>
+            <button onClick={() => applyFormat("orderedList")} className={`p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 ${isActive("orderedList") ? "bg-stone-300 dark:bg-stone-600" : ""}`}><ListOrdered size={16} /></button>
+            <button onClick={() => applyFormat("heading")} className={`p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 ${isActive("heading", { level: 2 }) ? "bg-stone-300 dark:bg-stone-600" : ""}`}><TypeIcon size={16} /></button>
 
-            <button onClick={() => applyFormat("hr")} className="p-1.5 rounded-md hover:bg-stone-200">
+            <button onClick={() => applyFormat("hr")} className="p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300">
               <MinusIcon size={16} />
             </button>
 
             <div className="flex-1" />
 
             {/* Bilder/Videos für Galerie */}
-            <label className="p-1.5 rounded-md hover:bg-stone-200 cursor-pointer" title="Bilder/Videos hinzufügen">
+            <label className="p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 cursor-pointer text-stone-700 dark:text-stone-300" title="Bilder/Videos hinzufügen">
               <Film size={16} />
               <input type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleGalleryImagesChange} />
             </label>
 
             {/* Andere Dateien */}
-            <label className="p-1.5 rounded-md hover:bg-stone-200 cursor-pointer" title="Dateien anhängen">
+            <label className="p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 cursor-pointer text-stone-700 dark:text-stone-300" title="Dateien anhängen">
               <Paperclip size={16} />
               <input type="file" multiple className="hidden" onChange={handleFileChange} />
             </label>
@@ -427,14 +427,14 @@ export default function NewsCreate({
         {/* EDITOR AREA */}
         <EditorContent
           editor={editor}
-          className="ProseMirror min-h-[140px] px-3 py-2 focus:outline-none text-sm"
+          className="ProseMirror min-h-[140px] px-3 py-2 focus:outline-none text-sm text-stone-900 dark:text-stone-100"
         />
       </div>
 
       {/* MEDIEN-GALERIE VORSCHAU (Bilder + Videos) */}
       {galleryImages.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs font-semibold text-stone-500 flex items-center gap-1">
+          <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 flex items-center gap-1">
             <Film size={14} />
             {galleryImages.length} {galleryImages.length === 1 ? "Medium" : "Medien"}
             {galleryImages.some(m => m.isVideo) && (
@@ -451,7 +451,7 @@ export default function NewsCreate({
             {galleryImages.map((media) => (
               <div
                 key={media.id}
-                className="relative group aspect-square rounded-xl overflow-hidden bg-stone-100 border border-stone-200"
+                className="relative group aspect-square rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-700 border border-stone-200 dark:border-stone-600"
               >
                 {media.isVideo ? (
                   <>
@@ -484,8 +484,8 @@ export default function NewsCreate({
               </div>
             ))}
             {/* Button zum Hinzufügen weiterer Medien */}
-            <label className="aspect-square rounded-xl border-2 border-dashed border-stone-300 flex items-center justify-center cursor-pointer hover:bg-stone-50 hover:border-amber-400 transition-colors">
-              <div className="text-center text-stone-400">
+            <label className="aspect-square rounded-xl border-2 border-dashed border-stone-300 dark:border-stone-600 flex items-center justify-center cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-700 hover:border-amber-400 dark:hover:border-amber-500 transition-colors">
+              <div className="text-center text-stone-400 dark:text-stone-500">
                 <Film size={24} className="mx-auto mb-1" />
                 <span className="text-xs">Weitere</span>
               </div>
@@ -501,9 +501,9 @@ export default function NewsCreate({
           {attachments.map((att, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between bg-stone-50 border border-stone-200 rounded-xl p-2"
+              className="flex items-center justify-between bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl p-2"
             >
-              <span className="truncate">{att.name}</span>
+              <span className="truncate text-stone-700 dark:text-stone-200">{att.name}</span>
               <button
                 onClick={() => removeAttachment(idx)}
                 className="p-1 text-red-500 hover:text-red-700"

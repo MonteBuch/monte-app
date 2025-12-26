@@ -20,14 +20,14 @@ export function LoadingOverlay({ message = "Wird geladen..." }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 gap-3">
       <LoadingSpinner size="lg" />
-      <p className="text-sm text-stone-500">{message}</p>
+      <p className="text-sm text-stone-500 dark:text-stone-400">{message}</p>
     </div>
   );
 }
 
 export function LoadingInline({ message }) {
   return (
-    <div className="flex items-center gap-2 text-stone-500">
+    <div className="flex items-center gap-2 text-stone-500 dark:text-stone-400">
       <LoadingSpinner size="sm" />
       {message && <span className="text-sm">{message}</span>}
     </div>
@@ -36,18 +36,18 @@ export function LoadingInline({ message }) {
 
 export function SkeletonCard() {
   return (
-    <div className="animate-pulse bg-white rounded-2xl p-4 space-y-3">
+    <div className="animate-pulse bg-white dark:bg-stone-800 rounded-2xl p-4 space-y-3">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-stone-200 rounded-full" />
+        <div className="w-10 h-10 bg-stone-200 dark:bg-stone-700 rounded-full" />
         <div className="flex-1 space-y-2">
-          <div className="h-4 bg-stone-200 rounded w-1/3" />
-          <div className="h-3 bg-stone-200 rounded w-1/4" />
+          <div className="h-4 bg-stone-200 dark:bg-stone-700 rounded w-1/3" />
+          <div className="h-3 bg-stone-200 dark:bg-stone-700 rounded w-1/4" />
         </div>
       </div>
       <div className="space-y-2">
-        <div className="h-3 bg-stone-200 rounded w-full" />
-        <div className="h-3 bg-stone-200 rounded w-5/6" />
-        <div className="h-3 bg-stone-200 rounded w-4/6" />
+        <div className="h-3 bg-stone-200 dark:bg-stone-700 rounded w-full" />
+        <div className="h-3 bg-stone-200 dark:bg-stone-700 rounded w-5/6" />
+        <div className="h-3 bg-stone-200 dark:bg-stone-700 rounded w-4/6" />
       </div>
     </div>
   );

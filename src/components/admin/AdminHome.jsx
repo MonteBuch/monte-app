@@ -15,7 +15,7 @@ import ProfileSection from "../profile/ProfileSection";
 export default function AdminHome({ onNavigate }) {
   return (
     <div className="space-y-5">
-      <h2 className="text-lg font-bold text-stone-800">
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">
         Admin-Bereich
       </h2>
 

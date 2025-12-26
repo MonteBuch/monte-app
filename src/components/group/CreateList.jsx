@@ -11,7 +11,7 @@ export default function CreateList({ activeGroup, groupName, reload }) {
       {/* Button zum Öffnen des Modals */}
       <button
         onClick={() => setShowModal(true)}
-        className="w-full bg-white p-4 rounded-2xl shadow-sm border border-stone-100 hover:border-amber-300 hover:shadow-md transition flex items-center justify-center gap-2 text-stone-600 hover:text-amber-600"
+        className="w-full bg-white dark:bg-stone-800 p-4 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 hover:border-amber-300 dark:hover:border-amber-500 hover:shadow-md transition flex items-center justify-center gap-2 text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400"
       >
         <Plus size={20} />
         <span className="font-medium">Neue Liste anlegen</span>

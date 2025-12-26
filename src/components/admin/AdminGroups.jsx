@@ -207,7 +207,7 @@ export default function AdminGroups() {
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex justify-center">
+      <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 flex justify-center">
         <Loader2 className="animate-spin text-amber-500" size={24} />
       </div>
     );
@@ -215,9 +215,9 @@ export default function AdminGroups() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold text-stone-800">Gruppenverwaltung</h2>
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Gruppenverwaltung</h2>
 
-      <p className="text-sm text-stone-500">
+      <p className="text-sm text-stone-500 dark:text-stone-400">
         Gruppen hinzufügen, bearbeiten, sortieren oder löschen.
       </p>
 
@@ -243,13 +243,13 @@ export default function AdminGroups() {
                     <div
                       ref={drag.innerRef}
                       {...drag.draggableProps}
-                      className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between"
+                      className="bg-white dark:bg-stone-800 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm flex items-center justify-between"
                     >
                       {/* Links: Handle, Farbbalken, Icon, Name */}
                       <div className="flex items-center gap-3">
                         <div
                           {...drag.dragHandleProps}
-                          className="cursor-grab text-stone-400 hover:text-stone-600"
+                          className="cursor-grab text-stone-400 hover:text-stone-600 dark:hover:text-stone-200"
                         >
                           <GripVertical size={18} />
                         </div>
@@ -258,12 +258,12 @@ export default function AdminGroups() {
                           className={`w-2 h-10 rounded-full ${g.color}`}
                         />
 
-                        <div className="text-stone-700">
+                        <div className="text-stone-700 dark:text-stone-200">
                           {iconFor(g.icon)}
                         </div>
 
                         <div>
-                          <p className="font-semibold text-sm text-stone-800">
+                          <p className="font-semibold text-sm text-stone-800 dark:text-stone-100">
                             {g.name}
                           </p>
                         </div>
@@ -274,7 +274,7 @@ export default function AdminGroups() {
                         {!g.is_event_group && (
                           <button
                             onClick={() => setEditing(g)}
-                            className="p-2 bg-stone-100 border border-stone-200 rounded-lg text-stone-600 hover:bg-stone-200"
+                            className="p-2 bg-stone-100 dark:bg-stone-700 border border-stone-200 dark:border-stone-600 rounded-lg text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600"
                           >
                             <Edit size={14} />
                           </button>
@@ -286,7 +286,7 @@ export default function AdminGroups() {
                             disabled={groups.length <= 1}
                             className={`p-2 rounded-lg border ${
                               groups.length <= 1
-                                ? "bg-stone-100 border-stone-200 text-stone-300 cursor-not-allowed"
+                                ? "bg-stone-100 dark:bg-stone-700 border-stone-200 dark:border-stone-600 text-stone-300 dark:text-stone-500 cursor-not-allowed"
                                 : "bg-red-50 border-red-200 text-red-600 hover:bg-red-100"
                             }`}
                           >
@@ -326,23 +326,23 @@ export default function AdminGroups() {
 
       {migrateModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-6 rounded-2xl max-w-md w-full border border-stone-200 shadow-xl space-y-5">
-            <h3 className="font-bold text-stone-800 text-lg">
+          <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl max-w-md w-full border border-stone-200 dark:border-stone-700 shadow-xl space-y-5">
+            <h3 className="font-bold text-stone-800 dark:text-stone-100 text-lg">
               Gruppe löschen – Wohin verschieben?
             </h3>
 
-            <p className="text-sm text-stone-600">
+            <p className="text-sm text-stone-600 dark:text-stone-300">
               Gruppe <strong>{migrateModal.name}</strong> wird noch verwendet.
             </p>
 
             {migrateModal.childCount > 0 && (
-              <p className="text-sm text-stone-700">
+              <p className="text-sm text-stone-700 dark:text-stone-200">
                 • {migrateModal.childCount} Kind(er)
               </p>
             )}
 
             {migrateModal.teamCount > 0 && (
-              <p className="text-sm text-stone-700">
+              <p className="text-sm text-stone-700 dark:text-stone-200">
                 • {migrateModal.teamCount} Teammitglied(er)
               </p>
             )}
@@ -350,7 +350,7 @@ export default function AdminGroups() {
             <select
               value={migrationTarget}
               onChange={(e) => setMigrationTarget(e.target.value)}
-              className="w-full p-3 rounded-xl bg-stone-50 border border-stone-300 text-sm"
+              className="w-full p-3 rounded-xl bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 text-sm dark:text-stone-100"
             >
               <option value="">Zielgruppe wählen…</option>
               {groups
@@ -368,7 +368,7 @@ export default function AdminGroups() {
                   setMigrateModal(null);
                   setMigrationTarget("");
                 }}
-                className="flex-1 py-2 rounded-xl bg-stone-200 text-stone-700 font-semibold"
+                className="flex-1 py-2 rounded-xl bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold"
               >
                 Abbrechen
               </button>
@@ -379,7 +379,7 @@ export default function AdminGroups() {
                 className={`flex-1 py-2 rounded-xl font-bold ${
                   migrationTarget
                     ? "bg-amber-600 text-white hover:bg-amber-700"
-                    : "bg-stone-300 text-stone-500"
+                    : "bg-stone-300 dark:bg-stone-600 text-stone-500 dark:text-stone-400"
                 }`}
               >
                 Verschieben & Löschen

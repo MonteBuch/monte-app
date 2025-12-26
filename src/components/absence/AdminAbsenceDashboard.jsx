@@ -284,16 +284,16 @@ export default function AdminAbsenceDashboard({ user }) {
         key={e.id}
         className={`p-4 rounded-2xl border shadow-sm ${
           faded
-            ? "bg-stone-50 border-stone-200 opacity-70"
-            : "bg-white border-stone-200"
+            ? "bg-stone-50 dark:bg-stone-900 border-stone-200 dark:border-stone-700 opacity-70"
+            : "bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700"
         }`}
       >
         <div className="flex justify-between items-start gap-4">
           <div className="flex-1 space-y-1">
-            <p className="font-bold text-sm text-stone-800">{e.childName}</p>
+            <p className="font-bold text-sm text-stone-800 dark:text-stone-100">{e.childName}</p>
 
-            <p className="text-xs text-stone-600 flex items-center gap-1">
-              <CalendarDays size={12} className="text-stone-400" />
+            <p className="text-xs text-stone-600 dark:text-stone-300 flex items-center gap-1">
+              <CalendarDays size={12} className="text-stone-400 dark:text-stone-500" />
               {dateLabel(e)}
             </p>
 
@@ -305,24 +305,24 @@ export default function AdminAbsenceDashboard({ user }) {
 
             {/* Hinweis der Eltern anzeigen */}
             {e.otherText && (
-              <p className="text-xs text-stone-600 bg-stone-50 p-2 rounded-lg mt-1">
+              <p className="text-xs text-stone-600 dark:text-stone-300 bg-stone-50 dark:bg-stone-900 p-2 rounded-lg mt-1">
                 <span className="font-medium">Hinweis:</span> {e.otherText}
               </p>
             )}
 
-            <p className="text-[10px] text-stone-400 mt-1">
+            <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-1">
               Eingereicht am{" "}
               {new Date(e.createdAt).toLocaleString("de-DE")}
             </p>
 
             {/* Team-Antwort anzeigen wenn vorhanden */}
             {e.staffResponse && (
-              <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg">
-                <p className="text-[10px] font-semibold text-amber-800 mb-1">
+              <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg">
+                <p className="text-[10px] font-semibold text-amber-800 dark:text-amber-300 mb-1">
                   Eure Antwort{e.responseAcknowledged ? " (gelesen)" : ""}:
                 </p>
-                <p className="text-xs text-amber-900">{e.staffResponse}</p>
-                <p className="text-[10px] text-amber-600 mt-1">
+                <p className="text-xs text-amber-900 dark:text-amber-100">{e.staffResponse}</p>
+                <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-1">
                   {new Date(e.staffResponseAt).toLocaleString("de-DE")}
                 </p>
               </div>
@@ -347,14 +347,14 @@ export default function AdminAbsenceDashboard({ user }) {
               {e.status === "new" ? (
                 <button
                   onClick={() => markRead(e.id)}
-                  className="p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100"
+                  className="p-2 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/50"
                 >
                   <CheckCircle size={16} />
                 </button>
               ) : (
                 <button
                   onClick={() => markUnread(e.id)}
-                  className="p-2 bg-stone-200 text-stone-700 rounded-lg hover:bg-stone-300"
+                  className="p-2 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 rounded-lg hover:bg-stone-300 dark:hover:bg-stone-600"
                 >
                   <Undo2 size={16} />
                 </button>
@@ -383,7 +383,7 @@ export default function AdminAbsenceDashboard({ user }) {
 
   if (loading && groups.length === 0) {
     return (
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex justify-center">
+      <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 flex justify-center">
         <Loader2 className="animate-spin text-amber-500" size={24} />
       </div>
     );
@@ -391,10 +391,10 @@ export default function AdminAbsenceDashboard({ user }) {
 
   return (
     <div className="space-y-6">
-      {/* ✅ NUR DER HEADER (KEIN EXTRA „ABWESENHEITEN") */}
+      {/* NUR DER HEADER (KEIN EXTRA „ABWESENHEITEN") */}
       <div
-        className="p-6 rounded-3xl shadow-sm border border-stone-200 flex flex-col gap-3"
-        style={{ backgroundColor: groupId === "all" ? "#f8f9fa" : currentGroup?.headerColor }}
+        className="p-6 rounded-3xl shadow-sm border border-stone-200 dark:border-stone-700 flex flex-col gap-3 bg-[#f8f9fa] dark:bg-stone-800"
+        style={{ backgroundColor: groupId === "all" ? undefined : currentGroup?.headerColor }}
       >
         <div className="flex items-center gap-3">
           {groupId === "all" ? (
@@ -410,8 +410,8 @@ export default function AdminAbsenceDashboard({ user }) {
           )}
 
           <div>
-            <h2 className="text-lg font-bold text-stone-800">Meldungen</h2>
-            <p className="text-xs text-stone-600">
+            <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Meldungen</h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300">
               {groupId === "all"
                 ? "Alle Abwesenheiten aller Gruppen"
                 : `Abwesenheiten der Gruppe ${currentGroup?.name}`}
@@ -427,7 +427,7 @@ export default function AdminAbsenceDashboard({ user }) {
             className={`flex items-center gap-2 px-3 py-2 rounded-full border text-xs font-bold transition ${
               groupId === "all"
                 ? "bg-stone-600 border-transparent text-white"
-                : "bg-stone-50 text-stone-600 border-stone-300 hover:bg-stone-100"
+                : "bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-700"
             }`}
           >
             <CalendarDays size={14} />
@@ -452,7 +452,7 @@ export default function AdminAbsenceDashboard({ user }) {
                 className={`flex items-center gap-2 px-3 py-2 rounded-full border text-xs font-bold transition ${
                   active
                     ? `${styles.chipClass} border-transparent text-white`
-                    : "bg-stone-50 text-stone-600 border-stone-300 hover:bg-stone-100"
+                    : "bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-700"
                 }`}
               >
                 <styles.Icon size={14} />
@@ -475,7 +475,7 @@ export default function AdminAbsenceDashboard({ user }) {
           className={`flex-1 py-2 rounded-xl text-sm font-bold border transition ${
             activeTab === "new"
               ? "bg-amber-500 text-white border-transparent"
-              : "bg-white border-stone-300 text-stone-600 hover:bg-stone-100"
+              : "bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-600 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700"
           }`}
           onClick={() => setActiveTab("new")}
         >
@@ -486,7 +486,7 @@ export default function AdminAbsenceDashboard({ user }) {
           className={`flex-1 py-2 rounded-xl text-sm font-bold border transition ${
             activeTab === "read"
               ? "bg-amber-500 text-white border-transparent"
-              : "bg-white border-stone-300 text-stone-600 hover:bg-stone-100"
+              : "bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-600 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700"
           }`}
           onClick={() => setActiveTab("read")}
         >
@@ -498,7 +498,7 @@ export default function AdminAbsenceDashboard({ user }) {
       {activeTab === "new" && (
         <div className="space-y-3">
           {newEntries.length === 0 ? (
-            <div className="bg-white p-6 rounded-xl border text-center text-stone-500">
+            <div className="bg-white dark:bg-stone-800 p-6 rounded-xl border border-stone-200 dark:border-stone-700 text-center text-stone-500 dark:text-stone-400">
               Keine neuen Meldungen.
             </div>
           ) : (
@@ -510,7 +510,7 @@ export default function AdminAbsenceDashboard({ user }) {
       {activeTab === "read" && (
         <div className="space-y-3">
           {readEntries.length === 0 ? (
-            <div className="bg-white p-6 rounded-xl border text-center text-stone-500">
+            <div className="bg-white dark:bg-stone-800 p-6 rounded-xl border border-stone-200 dark:border-stone-700 text-center text-stone-500 dark:text-stone-400">
               Keine gelesenen Meldungen.
             </div>
           ) : (
@@ -522,13 +522,13 @@ export default function AdminAbsenceDashboard({ user }) {
       {/* Antwort-Modal */}
       {respondingTo && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-6 rounded-2xl max-w-md w-full border border-stone-200 shadow-xl space-y-4">
+          <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl max-w-md w-full border border-stone-200 dark:border-stone-700 shadow-xl space-y-4">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-bold text-stone-800 text-lg">
+                <h3 className="font-bold text-stone-800 dark:text-stone-100 text-lg">
                   Antwort an Eltern
                 </h3>
-                <p className="text-sm text-stone-500">
+                <p className="text-sm text-stone-500 dark:text-stone-400">
                   Für {respondingTo.childName}
                 </p>
               </div>
@@ -537,29 +537,29 @@ export default function AdminAbsenceDashboard({ user }) {
                   setRespondingTo(null);
                   setResponseText("");
                 }}
-                className="p-1 text-stone-400 hover:text-stone-600"
+                className="p-1 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="bg-stone-50 p-3 rounded-xl text-sm text-stone-600">
-              <p className="font-medium text-stone-700 mb-1">Meldung:</p>
+            <div className="bg-stone-50 dark:bg-stone-900 p-3 rounded-xl text-sm text-stone-600 dark:text-stone-300">
+              <p className="font-medium text-stone-700 dark:text-stone-200 mb-1">Meldung:</p>
               <p>{dateLabel(respondingTo)} – {respondingTo.reason.charAt(0).toUpperCase() + respondingTo.reason.slice(1)}</p>
               {respondingTo.otherText && (
-                <p className="mt-1 text-stone-500">Hinweis: {respondingTo.otherText}</p>
+                <p className="mt-1 text-stone-500 dark:text-stone-400">Hinweis: {respondingTo.otherText}</p>
               )}
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-700 block mb-2">
+              <label className="text-sm font-medium text-stone-700 dark:text-stone-200 block mb-2">
                 Eure Nachricht an die Eltern:
               </label>
               <textarea
                 rows={4}
                 value={responseText}
                 onChange={(e) => setResponseText(e.target.value)}
-                className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-sm resize-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-xl text-sm text-stone-900 dark:text-stone-100 resize-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 placeholder="z.B. Gute Besserung! Bitte informiert uns über den weiteren Verlauf..."
               />
             </div>
@@ -570,7 +570,7 @@ export default function AdminAbsenceDashboard({ user }) {
                   setRespondingTo(null);
                   setResponseText("");
                 }}
-                className="flex-1 py-2 rounded-xl bg-stone-200 text-stone-700 font-semibold hover:bg-stone-300"
+                className="flex-1 py-2 rounded-xl bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold hover:bg-stone-300 dark:hover:bg-stone-600"
               >
                 Abbrechen
               </button>

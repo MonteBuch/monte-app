@@ -659,15 +659,15 @@ export default function AdminSystemTools() {
      ============================================================= */
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold text-stone-800">System-Tools</h2>
+      <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">System-Tools</h2>
 
       {/* DATENEXPORT */}
-      <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-        <h3 className="font-semibold text-stone-700 flex items-center gap-2">
+      <div className="bg-white dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm space-y-4">
+        <h3 className="font-semibold text-stone-700 dark:text-stone-200 flex items-center gap-2">
           <Download size={18} />
           Datenexport
         </h3>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-stone-500 dark:text-stone-400">
           Exportiere Benutzer- und Email-Listen als CSV-Datei.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -689,22 +689,22 @@ export default function AdminSystemTools() {
       </div>
 
       {/* TERMIN EXPORT/IMPORT */}
-      <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-        <h3 className="font-semibold text-stone-700 flex items-center gap-2">
+      <div className="bg-white dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm space-y-4">
+        <h3 className="font-semibold text-stone-700 dark:text-stone-200 flex items-center gap-2">
           <Calendar size={18} />
           Termine Export / Import
         </h3>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-stone-500 dark:text-stone-400">
           Exportiere Termine als CSV oder importiere aus einer CSV-Datei. Das Startdatum bestimmt die Jahreszuordnung.
         </p>
 
         {/* Jahresauswahl */}
         <div className="flex items-center gap-3">
-          <span className="text-sm text-stone-600">Jahr:</span>
+          <span className="text-sm text-stone-600 dark:text-stone-300">Jahr:</span>
           <select
             value={calendarYear}
             onChange={(e) => setCalendarYear(parseInt(e.target.value))}
-            className="px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="px-3 py-2 border border-stone-200 dark:border-stone-700 rounded-xl text-sm dark:bg-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
           >
             {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map((year) => (
               <option key={year} value={year}>{year}</option>
@@ -735,18 +735,18 @@ export default function AdminSystemTools() {
             {calendarImporting ? <Loader2 className="animate-spin" size={18} /> : <><Upload size={18} /> Import</>}
           </button>
         </div>
-        <p className="text-xs text-stone-400">
+        <p className="text-xs text-stone-400 dark:text-stone-500">
           CSV-Format: Titel; Startdatum (YYYY-MM-DD); Enddatum; Uhrzeit; Kategorie (closed/parent_event/celebration/other); Notizen
         </p>
       </div>
 
       {/* APP NAME */}
-      <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-        <h3 className="font-semibold text-stone-700 flex items-center gap-2">
+      <div className="bg-white dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm space-y-4">
+        <h3 className="font-semibold text-stone-700 dark:text-stone-200 flex items-center gap-2">
           <Type size={18} />
           App-Name
         </h3>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-stone-500 dark:text-stone-400">
           Dieser Name erscheint im Header, Login und in Emails.
         </p>
         <div className="flex gap-3">
@@ -755,7 +755,7 @@ export default function AdminSystemTools() {
             value={appName}
             onChange={(e) => setAppName(e.target.value)}
             placeholder="z. B. Montessori Kinderhaus"
-            className="flex-1 p-3 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="flex-1 p-3 border border-stone-200 dark:border-stone-700 rounded-xl text-sm dark:bg-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
           />
           <button
             onClick={handleSaveAppName}
@@ -769,17 +769,17 @@ export default function AdminSystemTools() {
       </div>
 
       {/* LOGO UPLOAD */}
-      <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-        <h3 className="font-semibold text-stone-700 flex items-center gap-2">
+      <div className="bg-white dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm space-y-4">
+        <h3 className="font-semibold text-stone-700 dark:text-stone-200 flex items-center gap-2">
           <Image size={18} />
           Logo
         </h3>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-stone-500 dark:text-stone-400">
           Das Logo erscheint im Header und Login. Du kannst den Bildausschnitt anpassen.
         </p>
 
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center overflow-hidden border-2 border-stone-200">
+          <div className="w-16 h-16 rounded-full bg-stone-100 dark:bg-stone-700 flex items-center justify-center overflow-hidden border-2 border-stone-200 dark:border-stone-600">
             {facility.logo_url ? (
               <img src={facility.logo_url} alt="Logo" className="w-full h-full object-cover" />
             ) : (
@@ -806,7 +806,7 @@ export default function AdminSystemTools() {
               <button
                 onClick={handleLogoRemove}
                 disabled={uploadingLogo}
-                className="flex items-center justify-center gap-2 py-2 px-4 bg-stone-200 text-stone-700 font-semibold rounded-xl hover:bg-stone-300 transition-colors disabled:opacity-50"
+                className="flex items-center justify-center gap-2 py-2 px-4 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold rounded-xl hover:bg-stone-300 dark:hover:bg-stone-600 transition-colors disabled:opacity-50"
               >
                 <X size={16} /> Entfernen
               </button>
@@ -818,8 +818,8 @@ export default function AdminSystemTools() {
       {/* CROPPER MODAL */}
       {cropperOpen && originalImage && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h3 className="font-bold text-stone-800 flex items-center gap-2">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-6 max-w-md w-full space-y-4">
+            <h3 className="font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
               <Move size={18} />
               Bildausschnitt anpassen
             </h3>
@@ -838,7 +838,7 @@ export default function AdminSystemTools() {
             {/* Controls */}
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <ZoomOut size={16} className="text-stone-500" />
+                <ZoomOut size={16} className="text-stone-500 dark:text-stone-400" />
                 <input
                   type="range"
                   min="0.5"
@@ -848,11 +848,11 @@ export default function AdminSystemTools() {
                   onChange={(e) => setCropSettings(prev => ({ ...prev, scale: parseFloat(e.target.value) }))}
                   className="flex-1"
                 />
-                <ZoomIn size={16} className="text-stone-500" />
+                <ZoomIn size={16} className="text-stone-500 dark:text-stone-400" />
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-xs text-stone-500 w-20">Horizontal</span>
+                <span className="text-xs text-stone-500 dark:text-stone-400 w-20">Horizontal</span>
                 <input
                   type="range"
                   min="-100"
@@ -864,7 +864,7 @@ export default function AdminSystemTools() {
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-xs text-stone-500 w-20">Vertikal</span>
+                <span className="text-xs text-stone-500 dark:text-stone-400 w-20">Vertikal</span>
                 <input
                   type="range"
                   min="-100"
@@ -876,14 +876,14 @@ export default function AdminSystemTools() {
               </div>
             </div>
 
-            <p className="text-xs text-stone-400 text-center">
-              Transparente Bereiche werden weiß gefüllt.
+            <p className="text-xs text-stone-400 dark:text-stone-500 text-center">
+              Transparente Bereiche werden weiss gefüllt.
             </p>
 
             <div className="flex gap-3">
               <button
                 onClick={() => { setCropperOpen(false); setOriginalImage(null); }}
-                className="flex-1 py-2 bg-stone-200 text-stone-700 font-semibold rounded-xl hover:bg-stone-300"
+                className="flex-1 py-2 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold rounded-xl hover:bg-stone-300 dark:hover:bg-stone-600"
               >
                 Abbrechen
               </button>
@@ -899,15 +899,15 @@ export default function AdminSystemTools() {
       )}
 
       {/* SYSTEM RESET */}
-      <div className="bg-white p-5 rounded-2xl border border-red-200 shadow-sm space-y-4">
+      <div className="bg-white dark:bg-stone-800 p-5 rounded-2xl border border-red-200 dark:border-red-900 shadow-sm space-y-4">
         <h3 className="font-semibold text-red-700 flex items-center gap-2">
           <AlertTriangle size={18} />
           Kompletter System-Reset
         </h3>
-        <p className="text-sm text-stone-600">
+        <p className="text-sm text-stone-600 dark:text-stone-300">
           <strong className="text-red-600">ACHTUNG:</strong> Löscht ALLE Daten unwiderruflich.
         </p>
-        <ul className="text-sm text-stone-600 list-disc list-inside ml-2 space-y-1">
+        <ul className="text-sm text-stone-600 dark:text-stone-300 list-disc list-inside ml-2 space-y-1">
           <li>Alle Benutzerkonten (inkl. deines eigenen!)</li>
           <li>Alle Gruppen, News, Kinder, Speisepläne</li>
           <li>Einrichtungsdaten werden zurückgesetzt</li>
@@ -919,19 +919,19 @@ export default function AdminSystemTools() {
         {resetStep === 0 && (
           <button
             onClick={() => setResetStep(1)}
-            className="w-full py-3 bg-red-100 text-red-700 font-semibold rounded-xl hover:bg-red-200 flex items-center justify-center gap-2"
+            className="w-full py-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 font-semibold rounded-xl hover:bg-red-200 dark:hover:bg-red-900/50 flex items-center justify-center gap-2"
           >
             <Trash2 size={18} /> System zurücksetzen...
           </button>
         )}
 
         {resetStep === 1 && (
-          <div className="space-y-3 p-4 bg-red-50 rounded-xl border border-red-200">
-            <p className="text-sm font-semibold text-red-800">
-              ⚠️ Bist du ABSOLUT sicher?
+          <div className="space-y-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-900">
+            <p className="text-sm font-semibold text-red-800 dark:text-red-400">
+              Bist du ABSOLUT sicher?
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setResetStep(0)} className="flex-1 py-2 bg-stone-200 text-stone-700 font-semibold rounded-lg">
+              <button onClick={() => setResetStep(0)} className="flex-1 py-2 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold rounded-lg">
                 Abbrechen
               </button>
               <button onClick={() => { setResetStep(2); setConfirmText(""); }} className="flex-1 py-2 bg-red-500 text-white font-semibold rounded-lg">
@@ -942,20 +942,20 @@ export default function AdminSystemTools() {
         )}
 
         {resetStep === 2 && (
-          <div className="space-y-3 p-4 bg-red-50 rounded-xl border border-red-200">
-            <p className="text-sm font-semibold text-red-800">
-              🔒 Gib <code className="bg-red-100 px-1 rounded">Bestätigung</code> ein:
+          <div className="space-y-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-900">
+            <p className="text-sm font-semibold text-red-800 dark:text-red-400">
+              Gib <code className="bg-red-100 dark:bg-red-900/40 px-1 rounded">Bestätigung</code> ein:
             </p>
             <input
               type="text"
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder='Tippe "Bestätigung"'
-              className="w-full p-3 border border-red-300 rounded-xl text-sm"
+              className="w-full p-3 border border-red-300 dark:border-red-900 rounded-xl text-sm dark:bg-stone-900 dark:text-stone-100"
               autoFocus
             />
             <div className="flex gap-3">
-              <button onClick={() => setResetStep(0)} className="flex-1 py-2 bg-stone-200 text-stone-700 font-semibold rounded-lg">
+              <button onClick={() => setResetStep(0)} className="flex-1 py-2 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold rounded-lg">
                 Abbrechen
               </button>
               <button
@@ -971,29 +971,29 @@ export default function AdminSystemTools() {
         )}
 
         {resetStep === 3 && resetCredentials && (
-          <div className="space-y-4 p-4 bg-green-50 rounded-xl border border-green-200">
-            <p className="text-sm font-semibold text-green-800">
+          <div className="space-y-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-900">
+            <p className="text-sm font-semibold text-green-800 dark:text-green-400">
               ✓ Reset abgeschlossen! Neuer Admin-Account:
             </p>
 
             <div className="space-y-2">
-              <div className="flex items-center gap-2 bg-white p-3 rounded-lg border">
-                <span className="text-xs text-stone-500 w-16">Email:</span>
-                <code className="flex-1 text-sm font-mono">{resetCredentials.email}</code>
-                <button onClick={() => copyToClipboard(resetCredentials.email)} className="p-1 hover:bg-stone-100 rounded">
+              <div className="flex items-center gap-2 bg-white dark:bg-stone-900 p-3 rounded-lg border dark:border-stone-700">
+                <span className="text-xs text-stone-500 dark:text-stone-400 w-16">Email:</span>
+                <code className="flex-1 text-sm font-mono dark:text-stone-100">{resetCredentials.email}</code>
+                <button onClick={() => copyToClipboard(resetCredentials.email)} className="p-1 hover:bg-stone-100 dark:hover:bg-stone-700 rounded">
                   <Copy size={14} />
                 </button>
               </div>
-              <div className="flex items-center gap-2 bg-white p-3 rounded-lg border">
-                <span className="text-xs text-stone-500 w-16">Passwort:</span>
-                <code className="flex-1 text-sm font-mono">{resetCredentials.password}</code>
-                <button onClick={() => copyToClipboard(resetCredentials.password)} className="p-1 hover:bg-stone-100 rounded">
+              <div className="flex items-center gap-2 bg-white dark:bg-stone-900 p-3 rounded-lg border dark:border-stone-700">
+                <span className="text-xs text-stone-500 dark:text-stone-400 w-16">Passwort:</span>
+                <code className="flex-1 text-sm font-mono dark:text-stone-100">{resetCredentials.password}</code>
+                <button onClick={() => copyToClipboard(resetCredentials.password)} className="p-1 hover:bg-stone-100 dark:hover:bg-stone-700 rounded">
                   <Copy size={14} />
                 </button>
               </div>
             </div>
 
-            <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded">
+            <p className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-2 rounded">
               ⚠️ Diese Zugangsdaten jetzt notieren! Nach dem Abmelden sind sie nicht mehr sichtbar.
               {resetCredentials.error && " (Admin konnte nicht automatisch erstellt werden - bitte manuell anlegen)"}
             </p>

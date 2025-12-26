@@ -196,13 +196,13 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="relative bg-white dark:bg-stone-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-stone-100">
-          <h2 className="text-lg font-bold text-stone-800">Neue Liste anlegen</h2>
+        <div className="flex items-center justify-between p-4 border-b border-stone-100 dark:border-stone-700">
+          <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Neue Liste anlegen</h2>
           <button
             onClick={onClose}
-            className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-full transition"
+            className="p-2 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-full transition"
           >
             <X size={20} />
           </button>
@@ -212,11 +212,11 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Titel */}
           <div>
-            <label className="text-xs font-medium text-stone-500 block mb-1">
+            <label className="text-xs font-medium text-stone-500 dark:text-stone-400 block mb-1">
               Titel
             </label>
             <input
-              className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+              className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl text-sm text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
               placeholder="z.B. Weihnachtsfeier Mitbringsel"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -226,7 +226,7 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
 
           {/* Listentyp */}
           <div>
-            <label className="text-xs font-medium text-stone-500 block mb-2">
+            <label className="text-xs font-medium text-stone-500 dark:text-stone-400 block mb-2">
               Art der Liste
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -239,8 +239,8 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
                     onClick={() => setType(lt.value)}
                     className={`p-3 rounded-xl border-2 transition flex flex-col items-center gap-1 ${
                       isSelected
-                        ? "border-amber-500 bg-amber-50 text-amber-700"
-                        : "border-stone-200 bg-white text-stone-600 hover:border-stone-300"
+                        ? "border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                        : "border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:border-stone-300 dark:hover:border-stone-600"
                     }`}
                   >
                     <Icon size={20} />
@@ -249,15 +249,15 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
                 );
               })}
             </div>
-            <p className="text-xs text-stone-400 mt-2">
+            <p className="text-xs text-stone-400 dark:text-stone-500 mt-2">
               {LIST_TYPES.find((lt) => lt.value === type)?.description}
             </p>
           </div>
 
           {/* Duty-Konfiguration */}
           {type === "duty" && (
-            <div className="bg-amber-50 p-4 rounded-xl space-y-4 border border-amber-200">
-              <div className="flex items-center gap-2 text-amber-700 text-sm font-medium">
+            <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl space-y-4 border border-amber-200 dark:border-amber-800">
+              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 text-sm font-medium">
                 <Calendar size={16} />
                 <span>Wiederkehrende Termine</span>
               </div>
@@ -265,11 +265,11 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
               {/* Wochentag & Intervall */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-stone-500 block mb-1">
+                  <label className="text-xs text-stone-500 dark:text-stone-400 block mb-1">
                     Wochentag
                   </label>
                   <select
-                    className="w-full p-2.5 bg-white border border-stone-200 rounded-lg text-sm"
+                    className="w-full p-2.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg text-sm text-stone-900 dark:text-stone-100"
                     value={dutyConfig.weekday}
                     onChange={(e) =>
                       updateDutyConfig("weekday", parseInt(e.target.value))
@@ -284,11 +284,11 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
                 </div>
 
                 <div>
-                  <label className="text-xs text-stone-500 block mb-1">
+                  <label className="text-xs text-stone-500 dark:text-stone-400 block mb-1">
                     Intervall
                   </label>
                   <select
-                    className="w-full p-2.5 bg-white border border-stone-200 rounded-lg text-sm"
+                    className="w-full p-2.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg text-sm text-stone-900 dark:text-stone-100"
                     value={dutyConfig.interval}
                     onChange={(e) =>
                       updateDutyConfig("interval", parseInt(e.target.value))
@@ -304,12 +304,12 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
 
               {/* Startdatum */}
               <div>
-                <label className="text-xs text-stone-500 block mb-1">
+                <label className="text-xs text-stone-500 dark:text-stone-400 block mb-1">
                   Startdatum
                 </label>
                 <input
                   type="date"
-                  className="w-full p-2.5 bg-white border border-stone-200 rounded-lg text-sm"
+                  className="w-full p-2.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg text-sm text-stone-900 dark:text-stone-100"
                   value={dutyConfig.startDate}
                   onChange={(e) => updateDutyConfig("startDate", e.target.value)}
                 />
@@ -317,12 +317,12 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
 
               {/* Ende */}
               <div>
-                <label className="text-xs text-stone-500 block mb-1">
+                <label className="text-xs text-stone-500 dark:text-stone-400 block mb-1">
                   Ende
                 </label>
                 <div className="flex gap-2">
                   <select
-                    className="p-2.5 bg-white border border-stone-200 rounded-lg text-sm"
+                    className="p-2.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg text-sm text-stone-900 dark:text-stone-100"
                     value={dutyConfig.endType}
                     onChange={(e) => {
                       updateDutyConfig("endType", e.target.value);
@@ -345,7 +345,7 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
                       type="number"
                       min="1"
                       max="52"
-                      className="flex-1 p-2.5 bg-white border border-stone-200 rounded-lg text-sm"
+                      className="flex-1 p-2.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg text-sm text-stone-900 dark:text-stone-100"
                       value={dutyConfig.endValue}
                       onChange={(e) =>
                         updateDutyConfig(
@@ -357,7 +357,7 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
                   ) : (
                     <input
                       type="date"
-                      className="flex-1 p-2.5 bg-white border border-stone-200 rounded-lg text-sm"
+                      className="flex-1 p-2.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg text-sm text-stone-900 dark:text-stone-100"
                       value={dutyConfig.endValue}
                       onChange={(e) =>
                         updateDutyConfig("endValue", e.target.value)
@@ -369,11 +369,11 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
 
               {/* Anzeige-Limit */}
               <div>
-                <label className="text-xs text-stone-500 block mb-1">
+                <label className="text-xs text-stone-500 dark:text-stone-400 block mb-1">
                   Anzeige in der Liste
                 </label>
                 <select
-                  className="w-full p-2.5 bg-white border border-stone-200 rounded-lg text-sm"
+                  className="w-full p-2.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg text-sm text-stone-900 dark:text-stone-100"
                   value={dutyConfig.showNext}
                   onChange={(e) =>
                     updateDutyConfig("showNext", parseInt(e.target.value))
@@ -388,11 +388,11 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
 
               {/* Vorschau */}
               {previewDates.length > 0 && (
-                <div className="p-3 bg-white rounded-lg border border-stone-200">
-                  <div className="text-xs font-medium text-stone-500 mb-2">
+                <div className="p-3 bg-white dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700">
+                  <div className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">
                     Vorschau ({previewDates.length} Termine)
                   </div>
-                  <div className="text-sm text-stone-700 space-y-1 max-h-32 overflow-y-auto">
+                  <div className="text-sm text-stone-700 dark:text-stone-200 space-y-1 max-h-32 overflow-y-auto">
                     {previewDates.slice(0, 6).map((d, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-amber-400" />
@@ -400,7 +400,7 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
                       </div>
                     ))}
                     {previewDates.length > 6 && (
-                      <div className="text-stone-400 text-xs pt-1">
+                      <div className="text-stone-400 dark:text-stone-500 text-xs pt-1">
                         + {previewDates.length - 6} weitere Termine
                       </div>
                     )}
@@ -414,11 +414,11 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
           {type !== "duty" && (
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-stone-500 block mb-1">
+                <label className="text-xs font-medium text-stone-500 dark:text-stone-400 block mb-1">
                   {type === "poll" ? "Antwortoptionen" : "Einträge (optional)"}
                 </label>
                 <textarea
-                  className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-sm min-h-[120px] focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                  className="w-full p-3 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl text-sm text-stone-900 dark:text-stone-100 min-h-[120px] focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
                   placeholder={
                     type === "poll"
                       ? "Eine Option pro Zeile eingeben…\n\nBeispiel:\nOption A\nOption B\nOption C"
@@ -427,7 +427,7 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
                   value={itemsText}
                   onChange={(e) => setItemsText(e.target.value)}
                 />
-                <p className="text-xs text-stone-400 mt-1">
+                <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
                   {itemsText.split("\n").filter((l) => l.trim()).length} Einträge
                   {type === "bring" && itemsText.split("\n").filter((l) => l.trim()).length === 0 && (
                     <span className="text-amber-600 ml-2">— Eltern können eigene Einträge hinzufügen</span>
@@ -439,19 +439,19 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
               {type === "poll" && (
                 <div className="space-y-3">
                   {/* Anonymität */}
-                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={!isAnonymous}
                         onChange={(e) => setIsAnonymous(!e.target.checked)}
-                        className="mt-0.5 w-4 h-4 text-blue-600 border-stone-300 rounded focus:ring-blue-500"
+                        className="mt-0.5 w-4 h-4 text-blue-600 border-stone-300 dark:border-stone-600 rounded focus:ring-blue-500"
                       />
                       <div>
-                        <span className="text-sm font-medium text-stone-700">
+                        <span className="text-sm font-medium text-stone-700 dark:text-stone-200">
                           Namen anzeigen
                         </span>
-                        <p className="text-xs text-stone-500 mt-0.5">
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                           {isAnonymous
                             ? "Abstimmung ist anonym"
                             : "Kitateam sieht, wer für welche Option gestimmt hat"
@@ -462,19 +462,19 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
                   </div>
 
                   {/* Statistik für Eltern sichtbar */}
-                  <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                  <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-200 dark:border-amber-800">
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={showStatsToParents}
                         onChange={(e) => setShowStatsToParents(e.target.checked)}
-                        className="mt-0.5 w-4 h-4 text-amber-600 border-stone-300 rounded focus:ring-amber-500"
+                        className="mt-0.5 w-4 h-4 text-amber-600 border-stone-300 dark:border-stone-600 rounded focus:ring-amber-500"
                       />
                       <div>
-                        <span className="text-sm font-medium text-stone-700">
+                        <span className="text-sm font-medium text-stone-700 dark:text-stone-200">
                           Beteiligung für Eltern sichtbar
                         </span>
-                        <p className="text-xs text-stone-500 mt-0.5">
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                           {showStatsToParents
                             ? "Eltern sehen, wie viele bereits abgestimmt haben"
                             : "Nur Kitateam sieht die Anzahl der Abstimmenden"
@@ -490,11 +490,11 @@ export default function CreateListModal({ isOpen, onClose, activeGroup, groupNam
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-stone-100 bg-stone-50">
+        <div className="p-4 border-t border-stone-100 dark:border-stone-700 bg-stone-50 dark:bg-stone-900">
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 py-3 px-4 bg-white border border-stone-200 text-stone-600 rounded-xl font-medium hover:bg-stone-50 transition"
+              className="flex-1 py-3 px-4 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 rounded-xl font-medium hover:bg-stone-50 dark:hover:bg-stone-700 transition"
             >
               Abbrechen
             </button>

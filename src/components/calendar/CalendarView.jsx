@@ -226,13 +226,13 @@ export default function CalendarView() {
   if (availableYears.length === 0) {
     return (
       <div className="space-y-6">
-        <h2 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+        <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
           <CalendarIcon size={20} className="text-amber-500" />
           Terminübersicht
         </h2>
-        <div className="bg-white rounded-2xl border border-stone-200 p-8 text-center">
-          <CalendarIcon size={48} className="mx-auto text-stone-300 mb-4" />
-          <p className="text-stone-500">Noch keine Termine vorhanden.</p>
+        <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-8 text-center">
+          <CalendarIcon size={48} className="mx-auto text-stone-300 dark:text-stone-600 mb-4" />
+          <p className="text-stone-500 dark:text-stone-400">Noch keine Termine vorhanden.</p>
         </div>
       </div>
     );
@@ -247,7 +247,7 @@ export default function CalendarView() {
     <div className="space-y-6">
       {/* Header mit Jahresauswahl */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+        <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
           <CalendarIcon size={20} className="text-amber-500" />
           Terminübersicht
         </h2>
@@ -255,17 +255,17 @@ export default function CalendarView() {
           <button
             onClick={() => canGoBack && setSelectedYear(availableYears[currentYearIndex - 1])}
             disabled={!canGoBack}
-            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronLeft size={20} />
           </button>
-          <span className="text-lg font-bold text-stone-800 min-w-[60px] text-center">
+          <span className="text-lg font-bold text-stone-800 dark:text-stone-100 min-w-[60px] text-center">
             {selectedYear}
           </span>
           <button
             onClick={() => canGoForward && setSelectedYear(availableYears[currentYearIndex + 1])}
             disabled={!canGoForward}
-            className="p-2 rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronRight size={20} />
           </button>
@@ -273,8 +273,8 @@ export default function CalendarView() {
       </div>
 
       {/* Legende */}
-      <div className="bg-white rounded-2xl border border-stone-200 p-4 shadow-sm">
-        <p className="text-xs font-semibold text-stone-500 uppercase mb-3">Legende</p>
+      <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-4 shadow-sm">
+        <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase mb-3">Legende</p>
         <div className="flex flex-wrap gap-2">
           {Object.entries(CATEGORIES).map(([key, cat]) => (
             <span
@@ -302,26 +302,26 @@ export default function CalendarView() {
           return (
             <div
               key={monthIdx}
-              className={`bg-white rounded-2xl border shadow-sm overflow-hidden ${
-                isCurrentMonth ? "border-amber-300 ring-2 ring-amber-100" : "border-stone-200"
+              className={`bg-white dark:bg-stone-800 rounded-2xl border shadow-sm overflow-hidden ${
+                isCurrentMonth ? "border-amber-300 ring-2 ring-amber-100 dark:border-amber-600 dark:ring-amber-900/30" : "border-stone-200 dark:border-stone-700"
               }`}
             >
               {/* Monats-Header */}
               <div
                 className={`px-4 py-3 border-b ${
                   isCurrentMonth
-                    ? "bg-amber-50 border-amber-200"
-                    : "bg-stone-50 border-stone-100"
+                    ? "bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700"
+                    : "bg-stone-50 dark:bg-stone-900 border-stone-100 dark:border-stone-700"
                 }`}
               >
                 <h3
                   className={`font-bold ${
-                    isCurrentMonth ? "text-amber-700" : "text-stone-700"
+                    isCurrentMonth ? "text-amber-700 dark:text-amber-300" : "text-stone-700 dark:text-stone-200"
                   }`}
                 >
                   {monthName}
                   {isCurrentMonth && (
-                    <span className="ml-2 text-xs font-normal text-amber-600">
+                    <span className="ml-2 text-xs font-normal text-amber-600 dark:text-amber-400">
                       (aktuell)
                     </span>
                   )}
@@ -345,8 +345,8 @@ export default function CalendarView() {
                             today
                               ? `${cat.lightColor} ${cat.borderColor} border-2`
                               : past
-                              ? "bg-stone-50 border-stone-100 opacity-60"
-                              : `bg-white border-stone-200 hover:${cat.lightColor}`
+                              ? "bg-stone-50 dark:bg-stone-900 border-stone-100 dark:border-stone-700 opacity-60"
+                              : `bg-white dark:bg-stone-700 border-stone-200 dark:border-stone-600 hover:${cat.lightColor}`
                           }`}
                         >
                           <div className="flex items-start justify-between gap-2">
@@ -355,7 +355,7 @@ export default function CalendarView() {
                                 <span
                                   className={`w-2 h-2 rounded-full flex-shrink-0 ${cat.color}`}
                                 />
-                                <span className="text-sm font-semibold text-stone-800 truncate">
+                                <span className="text-sm font-semibold text-stone-800 dark:text-stone-100 truncate">
                                   {event.title}
                                 </span>
                                 {today && (
@@ -365,17 +365,17 @@ export default function CalendarView() {
                                 )}
                               </div>
                               {event.notes && (
-                                <p className="text-xs text-stone-500 truncate pl-4">
+                                <p className="text-xs text-stone-500 dark:text-stone-400 truncate pl-4">
                                   {event.notes}
                                 </p>
                               )}
                             </div>
                             <div className="text-right flex-shrink-0">
-                              <p className="text-sm font-medium text-stone-700">
+                              <p className="text-sm font-medium text-stone-700 dark:text-stone-200">
                                 {formatDate(event.date_start, event.date_end)}
                               </p>
                               {event.time_info && (
-                                <p className="text-xs text-stone-500">
+                                <p className="text-xs text-stone-500 dark:text-stone-400">
                                   {event.time_info}
                                 </p>
                               )}
@@ -386,7 +386,7 @@ export default function CalendarView() {
                     })}
                   </div>
                 ) : (
-                  <p className="text-sm text-stone-400 text-center py-4">
+                  <p className="text-sm text-stone-400 dark:text-stone-500 text-center py-4">
                     Keine Termine
                   </p>
                 )}
@@ -399,7 +399,7 @@ export default function CalendarView() {
       {/* Event Detail Modal */}
       {selectedEvent && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 space-y-4">
+          <div className="bg-white dark:bg-stone-800 rounded-2xl p-5 w-full max-w-md shadow-xl border border-stone-200 dark:border-stone-700 space-y-4">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
@@ -416,27 +416,27 @@ export default function CalendarView() {
                     {CATEGORIES[selectedEvent.category]?.label || "Termin"}
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-stone-800">
+                <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100">
                   {selectedEvent.title}
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="p-1 rounded-lg hover:bg-stone-100"
+                className="p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700"
               >
-                <X size={20} className="text-stone-400" />
+                <X size={20} className="text-stone-400 dark:text-stone-500" />
               </button>
             </div>
 
             <div className="space-y-3">
               {/* Datum */}
-              <div className="flex items-center gap-3 p-3 bg-stone-50 rounded-xl">
-                <CalendarIcon size={18} className="text-stone-500" />
+              <div className="flex items-center gap-3 p-3 bg-stone-50 dark:bg-stone-900 rounded-xl">
+                <CalendarIcon size={18} className="text-stone-500 dark:text-stone-400" />
                 <div>
-                  <p className="text-sm font-medium text-stone-800">
+                  <p className="text-sm font-medium text-stone-800 dark:text-stone-100">
                     {formatDate(selectedEvent.date_start, selectedEvent.date_end)}
                     {selectedEvent.date_end && (
-                      <span className="text-stone-500">
+                      <span className="text-stone-500 dark:text-stone-400">
                         {" "}({Math.ceil(
                           (new Date(selectedEvent.date_end) - new Date(selectedEvent.date_start)) /
                             (1000 * 60 * 60 * 24)
@@ -449,9 +449,9 @@ export default function CalendarView() {
 
               {/* Uhrzeit */}
               {selectedEvent.time_info && (
-                <div className="flex items-center gap-3 p-3 bg-stone-50 rounded-xl">
-                  <Clock size={18} className="text-stone-500" />
-                  <p className="text-sm font-medium text-stone-800">
+                <div className="flex items-center gap-3 p-3 bg-stone-50 dark:bg-stone-900 rounded-xl">
+                  <Clock size={18} className="text-stone-500 dark:text-stone-400" />
+                  <p className="text-sm font-medium text-stone-800 dark:text-stone-100">
                     {selectedEvent.time_info}
                   </p>
                 </div>
@@ -459,16 +459,16 @@ export default function CalendarView() {
 
               {/* Notizen */}
               {selectedEvent.notes && (
-                <div className="flex items-start gap-3 p-3 bg-stone-50 rounded-xl">
-                  <Info size={18} className="text-stone-500 mt-0.5" />
-                  <p className="text-sm text-stone-700">{selectedEvent.notes}</p>
+                <div className="flex items-start gap-3 p-3 bg-stone-50 dark:bg-stone-900 rounded-xl">
+                  <Info size={18} className="text-stone-500 dark:text-stone-400 mt-0.5" />
+                  <p className="text-sm text-stone-700 dark:text-stone-200">{selectedEvent.notes}</p>
                 </div>
               )}
             </div>
 
             <button
               onClick={() => setSelectedEvent(null)}
-              className="w-full py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200 transition-colors"
+              className="w-full py-3 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors"
             >
               Schließen
             </button>

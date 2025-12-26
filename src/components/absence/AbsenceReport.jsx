@@ -240,7 +240,7 @@ export default function AbsenceReport({ user }) {
 
   if (!child) {
     return (
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 text-sm text-stone-600">
+      <div className="bg-white dark:bg-stone-800 p-4 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 text-sm text-stone-600 dark:text-stone-300">
         Für dieses Profil sind aktuell keine Kinder hinterlegt.
       </div>
     );
@@ -258,7 +258,7 @@ export default function AbsenceReport({ user }) {
     <div className="space-y-5">
       {/* === HEADER - UI Review Update === */}
       <div
-        className="p-6 rounded-3xl shadow-sm border border-stone-200 flex flex-col gap-3"
+        className="p-6 rounded-3xl shadow-sm border border-stone-200 dark:border-stone-700 flex flex-col gap-3"
         style={{
           backgroundColor: activeGroupStyles?.headerColor || "#f8f9fa",
         }}
@@ -277,8 +277,8 @@ export default function AbsenceReport({ user }) {
             )}
           </div>
           <div>
-            <h2 className="text-lg font-bold text-stone-800">Meldungen</h2>
-            <p className="text-xs text-stone-600">
+            <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Meldungen</h2>
+            <p className="text-xs text-stone-600 dark:text-stone-300">
               {children.length === 1
                 ? `Abwesenheiten für ${child.name}`
                 : "Abwesenheiten melden und verwalten"}
@@ -305,7 +305,7 @@ export default function AbsenceReport({ user }) {
                   className={`flex items-center gap-2 px-3 py-2 rounded-full border text-xs font-bold transition ${
                     active
                       ? `${groupStyles.chipClass} border-transparent text-white`
-                      : "bg-stone-50 text-stone-600 border-stone-300 hover:bg-stone-100"
+                      : "bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-700"
                   }`}
                 >
                   <groupStyles.Icon size={14} />
@@ -344,11 +344,11 @@ export default function AbsenceReport({ user }) {
       {/* Liste */}
       <div className="space-y-3">
         {loading ? (
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex justify-center">
+          <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 flex justify-center">
             <Loader2 className="animate-spin text-amber-500" size={24} />
           </div>
         ) : entries.length === 0 ? (
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 text-center text-stone-500 text-sm">
+          <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700 text-center text-stone-500 dark:text-stone-400 text-sm">
             Keine bisherigen Meldungen.
           </div>
         ) : (
@@ -364,20 +364,20 @@ export default function AbsenceReport({ user }) {
             return (
               <div
                 key={e.id}
-                className={`bg-white p-4 rounded-2xl shadow-sm border ${
+                className={`bg-white dark:bg-stone-800 p-4 rounded-2xl shadow-sm border ${
                   hasUnacknowledgedResponse
-                    ? "border-amber-300 ring-2 ring-amber-100"
-                    : "border-stone-100"
+                    ? "border-amber-300 ring-2 ring-amber-100 dark:border-amber-600 dark:ring-amber-900/30"
+                    : "border-stone-100 dark:border-stone-700"
                 }`}
               >
                 <div className="flex justify-between items-start gap-3">
                   <div className="space-y-2 flex-1">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-sm font-semibold text-stone-900">
+                        <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
                           {e.childName || child.name}
                         </p>
-                        <p className="text-xs text-stone-600 mt-0.5">
+                        <p className="text-xs text-stone-600 dark:text-stone-300 mt-0.5">
                           {dateLabel(e)}
                         </p>
                       </div>
@@ -400,7 +400,7 @@ export default function AbsenceReport({ user }) {
 
                     {/* Hinweis anzeigen (immer, nicht nur bei sonstiges) */}
                     {e.otherText && (
-                      <p className="text-xs text-stone-600 bg-stone-50 p-2 rounded-lg">
+                      <p className="text-xs text-stone-600 dark:text-stone-300 bg-stone-50 dark:bg-stone-900 p-2 rounded-lg">
                         <span className="font-medium">Hinweis:</span> {e.otherText}
                       </p>
                     )}
@@ -409,23 +409,23 @@ export default function AbsenceReport({ user }) {
                     {e.staffResponse && (
                       <div className={`mt-2 p-3 rounded-xl ${
                         e.responseAcknowledged
-                          ? "bg-stone-50 border border-stone-200"
-                          : "bg-amber-50 border border-amber-200"
+                          ? "bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700"
+                          : "bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700"
                       }`}>
                         <div className="flex items-start gap-2">
-                          <MessageSquare size={14} className={e.responseAcknowledged ? "text-stone-500" : "text-amber-600"} />
+                          <MessageSquare size={14} className={e.responseAcknowledged ? "text-stone-500 dark:text-stone-400" : "text-amber-600 dark:text-amber-400"} />
                           <div className="flex-1">
                             <p className={`text-[10px] font-semibold mb-1 ${
-                              e.responseAcknowledged ? "text-stone-600" : "text-amber-800"
+                              e.responseAcknowledged ? "text-stone-600 dark:text-stone-400" : "text-amber-800 dark:text-amber-300"
                             }`}>
                               Rückmeldung der Kita:
                             </p>
                             <p className={`text-sm ${
-                              e.responseAcknowledged ? "text-stone-700" : "text-amber-900"
+                              e.responseAcknowledged ? "text-stone-700 dark:text-stone-200" : "text-amber-900 dark:text-amber-100"
                             }`}>
                               {e.staffResponse}
                             </p>
-                            <p className="text-[10px] text-stone-400 mt-1">
+                            <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-1">
                               {new Date(e.staffResponseAt).toLocaleString("de-DE")}
                             </p>
 
@@ -459,7 +459,7 @@ export default function AbsenceReport({ user }) {
                       <button
                         type="button"
                         onClick={() => setEditing(e)}
-                        className="p-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200"
+                        className="p-2 bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 rounded-lg hover:bg-stone-200 dark:hover:bg-stone-600"
                       >
                         <Pencil size={14} />
                       </button>
@@ -474,7 +474,7 @@ export default function AbsenceReport({ user }) {
                   </div>
                 </div>
 
-                <p className="text-[10px] text-stone-400 mt-2">
+                <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-2">
                   Eingereicht am {submittedAt}
                 </p>
               </div>

@@ -239,7 +239,7 @@ export default function WelcomeScreen({ user, onComplete }) {
       }`}
     >
       <div
-        className={`bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden transform transition-all duration-300 ${
+        className={`bg-white dark:bg-stone-800 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden transform transition-all duration-300 ${
           isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
         }`}
       >
@@ -247,7 +247,7 @@ export default function WelcomeScreen({ user, onComplete }) {
         <div className="flex justify-end p-4">
           <button
             onClick={handleSkip}
-            className="text-stone-400 hover:text-stone-600 text-sm font-medium flex items-center gap-1"
+            className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 text-sm font-medium flex items-center gap-1"
           >
             Überspringen
             <X size={16} />
@@ -264,15 +264,15 @@ export default function WelcomeScreen({ user, onComplete }) {
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-bold text-stone-800 mb-2">
+          <h2 className="text-2xl font-bold text-stone-800 dark:text-stone-100 mb-2">
             {slide.title}
           </h2>
-          <p className="text-amber-600 font-semibold text-sm mb-4">
+          <p className="text-amber-600 dark:text-amber-500 font-semibold text-sm mb-4">
             {slide.subtitle}
           </p>
 
           {/* Description */}
-          <p className="text-stone-600 text-sm leading-relaxed mb-8">
+          <p className="text-stone-600 dark:text-stone-300 text-sm leading-relaxed mb-8">
             {slide.description}
           </p>
 
@@ -285,7 +285,7 @@ export default function WelcomeScreen({ user, onComplete }) {
                 className={`w-2 h-2 rounded-full transition-all ${
                   index === currentSlide
                     ? "w-6 bg-amber-500"
-                    : "bg-stone-300 hover:bg-stone-400"
+                    : "bg-stone-300 dark:bg-stone-600 hover:bg-stone-400 dark:hover:bg-stone-500"
                 }`}
               />
             ))}
@@ -296,7 +296,7 @@ export default function WelcomeScreen({ user, onComplete }) {
             {currentSlide > 0 && (
               <button
                 onClick={handlePrev}
-                className="flex-1 py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold text-sm hover:bg-stone-200 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-xl bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 font-semibold text-sm hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors flex items-center justify-center gap-2"
               >
                 <ChevronLeft size={18} />
                 Zurück
