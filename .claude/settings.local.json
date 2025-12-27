@@ -41,7 +41,8 @@
       "Bash(git commit:*)",
       "WebFetch(domain:github.com)",
       "Bash(npx supabase:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(dir \"C:\\\\Users\\\\abcep\\\\Desktop\\\\Monte\\\\Intro\"\" 2>nul || echo \"Intro folder not found \")"
     ]
   }
 }

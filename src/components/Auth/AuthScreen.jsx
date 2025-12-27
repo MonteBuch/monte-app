@@ -91,6 +91,7 @@ export default function AuthScreen({ onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [showInvitePopup, setShowInvitePopup] = useState(false);
 
   // Biometrie States
   const [biometricAvailable, setBiometricAvailable] = useState(false);
@@ -609,16 +610,26 @@ export default function AuthScreen({ onLogin }) {
                 <h2 className="text-xl font-bold text-stone-700">
                   {isRegistering ? "Registrieren" : "Anmelden"}
                 </h2>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsRegistering((v) => !v);
-                    setError("");
-                  }}
-                  className="text-xs text-amber-600 font-bold hover:underline"
-                >
-                  {isRegistering ? "Zum Login" : "Konto erstellen"}
-                </button>
+                {isRegistering ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRegistering(false);
+                      setError("");
+                    }}
+                    className="text-xs text-amber-600 font-bold hover:underline"
+                  >
+                    Zum Login
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowInvitePopup(true)}
+                    className="text-xs text-amber-600 font-bold hover:underline"
+                  >
+                    Konto erstellen
+                  </button>
+                )}
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -628,7 +639,7 @@ export default function AuthScreen({ onLogin }) {
                 {/* Name */}
                 <div>
                   <label className="block text-xs font-bold text-stone-400 uppercase mb-1">
-                    Vollständiger Name
+                    Anzeigename
                   </label>
                   <input
                     required
@@ -636,47 +647,8 @@ export default function AuthScreen({ onLogin }) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200"
+                    placeholder="So wirst du in der App angezeigt"
                   />
-                </div>
-
-                {/* Rollen (deaktiviert wenn Einladungslink gültig) */}
-                <div className={`flex items-center gap-2 bg-stone-50 p-3 rounded-xl border border-stone-200 ${inviteValid ? "opacity-60" : ""}`}>
-                  <button
-                    type="button"
-                    onClick={() => !inviteValid && setRole("parent")}
-                    disabled={inviteValid}
-                    className={`flex-1 py-2 rounded-lg text-sm font-bold ${
-                      role === "parent"
-                        ? "bg-white shadow text-stone-800"
-                        : "text-stone-400"
-                    } ${inviteValid ? "cursor-not-allowed" : ""}`}
-                  >
-                    Elternteil
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => !inviteValid && setRole("team")}
-                    disabled={inviteValid}
-                    className={`flex-1 py-2 rounded-lg text-sm font-bold ${
-                      role === "team"
-                        ? "bg-white shadow text-stone-800"
-                        : "text-stone-400"
-                    } ${inviteValid ? "cursor-not-allowed" : ""}`}
-                  >
-                    Kita-Team
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => !inviteValid && setRole("admin")}
-                    disabled={inviteValid}
-                    className={`flex-1 py-2 rounded-lg text-sm font-bold ${
-                      role === "admin"
-                        ? "bg-white shadow text-stone-800"
-                        : "text-stone-400"
-                    } ${inviteValid ? "cursor-not-allowed" : ""}`}
-                  >
-                    Admin
-                  </button>
                 </div>
 
                 {/* Einladungslink-Anzeige */}
@@ -966,6 +938,32 @@ export default function AuthScreen({ onLogin }) {
           )}
         </div>
       </div>
+
+      {/* Einladungslink-Popup */}
+      {showInvitePopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl">
+            <div className="flex justify-center mb-4">
+              <div className="bg-amber-100 p-3 rounded-full">
+                <Link2 className="text-amber-600" size={28} />
+              </div>
+            </div>
+            <h3 className="text-lg font-bold text-stone-800 text-center mb-2">
+              Einladungslink erforderlich
+            </h3>
+            <p className="text-sm text-stone-600 text-center mb-6">
+              Bitte fordern Sie einen Einladungslink von der Einrichtung an, um ein Konto zu erstellen.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowInvitePopup(false)}
+              className="w-full bg-stone-800 text-white font-bold py-3 rounded-xl hover:bg-stone-900"
+            >
+              Verstanden
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
