@@ -29,7 +29,8 @@ export async function getEmailRecipientsForNews(groupIds) {
         ),
         notification_preferences (
           category,
-          preference
+          preference,
+          email_enabled
         )
       `)
       .eq("facility_id", FACILITY_ID)
@@ -49,12 +50,21 @@ export async function getEmailRecipientsForNews(groupIds) {
       .filter(p => {
         // Prüfen ob Email-Benachrichtigung für News aktiviert ist
         const newsPrefs = p.notification_preferences?.find(np => np.category === 'news');
-        // WICHTIG: Standard ist jetzt 'both' (Email + App) statt nur 'app'
-        // Nutzer können in Profil → Benachrichtigungen auf 'app' oder 'off' ändern
-        const preference = newsPrefs?.preference || 'both';
-        const emailEnabled = preference === 'email' || preference === 'both';
 
-        console.log(`Profil ${p.full_name}: news preference = "${preference}" (explizit: ${!!newsPrefs}), emailEnabled = ${emailEnabled}`);
+        // Nutze neues Boolean-Feld mit Fallback auf Legacy-Feld
+        let emailEnabled;
+        if (newsPrefs?.email_enabled !== null && newsPrefs?.email_enabled !== undefined) {
+          // Neues Boolean-Feld vorhanden
+          emailEnabled = newsPrefs.email_enabled;
+        } else if (newsPrefs?.preference) {
+          // Fallback auf Legacy-Feld
+          emailEnabled = newsPrefs.preference === 'email' || newsPrefs.preference === 'both';
+        } else {
+          // Kein Eintrag = Standard ist aktiviert
+          emailEnabled = true;
+        }
+
+        console.log(`Profil ${p.full_name}: email_enabled = ${emailEnabled} (explizit: ${!!newsPrefs})`);
 
         if (!emailEnabled) return false;
 

@@ -952,7 +952,7 @@ export default function AuthScreen({ onLogin }) {
               Einladungslink erforderlich
             </h3>
             <p className="text-sm text-stone-600 text-center mb-6">
-              Bitte fordern Sie einen Einladungslink von der Einrichtung an, um ein Konto zu erstellen.
+              Bitte fordere einen Einladungslink von der Einrichtung an, um ein Konto zu erstellen.
             </p>
             <button
               type="button"

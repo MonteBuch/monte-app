@@ -14,6 +14,8 @@ import {
   Sprout,
   MessageCircle,
   Menu,
+  Mail,
+  X,
 } from "lucide-react";
 
 import { supabase } from "./api/supabaseClient";
@@ -277,8 +279,12 @@ function AppContent() {
   const [unreadChatCount, setUnreadChatCount] = useState(0);
   // Ungelesene Likes Count für Team/Admin (Badge in Navigation)
   const [unreadLikesCount, setUnreadLikesCount] = useState(0);
+  // Badge-Präferenzen für verschiedene Kategorien
+  const [badgePrefs, setBadgePrefs] = useState({});
   // Email-Bestätigung erfolgreich (zeigt Meldung statt Auto-Login)
   const [emailConfirmed, setEmailConfirmed] = useState(false);
+  // Email-Änderung erfolgreich bestätigt (zeigt Popup)
+  const [emailChangeConfirmed, setEmailChangeConfirmed] = useState(false);
   // Tab-Präferenzen für dynamisches Menü
   const [tabPrefs, setTabPrefs] = useState(null);
   // Mehr-Menü offen/geschlossen
@@ -301,6 +307,7 @@ function AppContent() {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const isEmailConfirmation = hashParams.get("type") === "signup" ||
                                  hashParams.get("type") === "email_confirmation";
+    const isEmailChange = hashParams.get("type") === "email_change";
 
     async function initSession() {
       const storedSession = localStorage.getItem(supabaseStorageKey);
@@ -322,6 +329,17 @@ function AppContent() {
           setLoading(false);
         }
         return;
+      }
+
+      // Bei Email-Änderung: User bleibt eingeloggt, aber Popup anzeigen
+      if (isEmailChange) {
+        // URL bereinigen
+        window.history.replaceState({}, "", window.location.pathname);
+
+        if (mounted) {
+          setEmailChangeConfirmed(true);
+        }
+        // Weiter mit normalem Session-Loading (User bleibt eingeloggt)
       }
 
       try {
@@ -705,6 +723,46 @@ function AppContent() {
     };
   }, [user]);
 
+  // Badge-Präferenzen laden (badge_enabled pro Kategorie)
+  useEffect(() => {
+    if (!user) {
+      setBadgePrefs({});
+      return;
+    }
+
+    async function loadBadgePrefs() {
+      try {
+        const { data, error } = await supabase
+          .from("notification_preferences")
+          .select("category, badge_enabled")
+          .eq("user_id", user.id);
+
+        if (error) throw error;
+
+        // Zu einem Object konvertieren: { news: true, chat: false, ... }
+        const prefsObj = {};
+        (data || []).forEach(p => {
+          // badge_enabled ist standardmäßig true wenn nicht gesetzt
+          prefsObj[p.category] = p.badge_enabled !== false;
+        });
+        setBadgePrefs(prefsObj);
+      } catch (err) {
+        console.error("Badge-Präferenzen laden fehlgeschlagen:", err);
+        setBadgePrefs({});
+      }
+    }
+
+    loadBadgePrefs();
+
+    // Event Listener für Änderungen aus ProfileNotifications
+    const handlePrefsChanged = () => loadBadgePrefs();
+    window.addEventListener("notificationPreferencesChanged", handlePrefsChanged);
+
+    return () => {
+      window.removeEventListener("notificationPreferencesChanged", handlePrefsChanged);
+    };
+  }, [user]);
+
   // Tab-Präferenzen laden
   useEffect(() => {
     if (!user) {
@@ -1074,10 +1132,19 @@ function AppContent() {
           setActiveTab={setActiveTab}
           user={user}
           badges={{
-            news: unreadLikesCount > 0 ? (unreadLikesCount > 9 ? "9+" : unreadLikesCount) : null,
-            group: hasBirthdays ? <Cake size={10} /> : null,
-            absence: unacknowledgedResponsesCount > 0 ? "!" : null,
-            chat: unreadChatCount > 0 ? "!" : null,
+            // Badges nur anzeigen wenn badge_enabled nicht explizit false ist
+            news: (badgePrefs.news !== false) && unreadLikesCount > 0
+              ? (unreadLikesCount > 9 ? "9+" : unreadLikesCount)
+              : null,
+            group: (badgePrefs.birthdays !== false) && hasBirthdays
+              ? <Cake size={10} />
+              : null,
+            absence: (badgePrefs.absence_response !== false) && unacknowledgedResponsesCount > 0
+              ? "!"
+              : null,
+            chat: (badgePrefs.chat !== false) && unreadChatCount > 0
+              ? "!"
+              : null,
           }}
           tabPrefs={tabPrefs}
           onOpenMore={() => setMoreMenuOpen(true)}
@@ -1091,10 +1158,18 @@ function AppContent() {
           setActiveTab={setActiveTab}
           user={user}
           badges={{
-            news: unreadLikesCount > 0 ? (unreadLikesCount > 9 ? "9+" : unreadLikesCount) : null,
-            group: hasBirthdays ? <Cake size={10} /> : null,
-            absence: unacknowledgedResponsesCount > 0 ? "!" : null,
-            chat: unreadChatCount > 0 ? "!" : null,
+            news: (badgePrefs.news !== false) && unreadLikesCount > 0
+              ? (unreadLikesCount > 9 ? "9+" : unreadLikesCount)
+              : null,
+            group: (badgePrefs.birthdays !== false) && hasBirthdays
+              ? <Cake size={10} />
+              : null,
+            absence: (badgePrefs.absence_response !== false) && unacknowledgedResponsesCount > 0
+              ? "!"
+              : null,
+            chat: (badgePrefs.chat !== false) && unreadChatCount > 0
+              ? "!"
+              : null,
           }}
         />
 
@@ -1104,6 +1179,39 @@ function AppContent() {
         {/* Willkommensscreen für neue User */}
         {showWelcome && (
           <WelcomeScreen user={user} onComplete={handleWelcomeComplete} />
+        )}
+
+        {/* Email-Änderung erfolgreich Popup */}
+        {emailChangeConfirmed && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50">
+            <div className="relative bg-white dark:bg-stone-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
+              <button
+                onClick={() => setEmailChangeConfirmed(false)}
+                className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="bg-green-100 dark:bg-green-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                <Mail className="text-green-600 dark:text-green-400" size={32} />
+              </div>
+
+              <h2 className="text-xl font-bold text-stone-800 dark:text-stone-100">
+                E-Mail geändert!
+              </h2>
+
+              <p className="text-stone-600 dark:text-stone-400">
+                Deine E-Mail-Adresse wurde erfolgreich geändert. Ab sofort meldest du dich mit der neuen Adresse an.
+              </p>
+
+              <button
+                onClick={() => setEmailChangeConfirmed(false)}
+                className="w-full bg-amber-500 text-white font-bold py-3 rounded-xl hover:bg-amber-600 transition-colors"
+              >
+                Verstanden
+              </button>
+            </div>
+          </div>
         )}
         </div>
       </GroupsProvider>

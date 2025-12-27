@@ -220,6 +220,7 @@ src/
   - absences: Bei Abwesenheitsmeldung → Team der Gruppe
   - food: Bei Speiseplan-Speicherung → Alle Eltern
 - [ ] iOS Projekt (benötigt Mac)
+- [ ] **App-Icon Badge** - Zahl/Punkt auf App-Icon (via @capacitor/badge + FCM badge count)
 - [ ] **Play Store Submission** - Wartet auf Klärung mit Kita/Träger (DSGVO, Verantwortlichkeiten)
 
 ### Phase 6: Production Infrastructure (PARTIALLY COMPLETE)
@@ -377,11 +378,13 @@ src/
 - [x] "Konto erstellen" Button: Nur Popup mit Hinweis "Einladungslink erforderlich"
 - [x] Rollenauswahl-Sektion entfernt (Rolle wird nur durch Einladungslink bestimmt)
 
-**Notification Screen Redesign**
-- [ ] Neues Design: On/Off Checkboxen für Email und App (getrennt)
-- [ ] "Beides" Option entfernen (Checkboxen können beide gewählt werden)
-- [ ] Badge-Einstellung pro Bereich hinzufügen (Tab-Badge an/aus)
-- [ ] Überlegen: Unterschiedliche Sets für Web vs. Native App?
+**Notification Screen Redesign** ✅ ERLEDIGT (2025-12-27)
+- [x] Neues Design: On/Off Toggle-Switches für Email und App (getrennt)
+- [x] "Beides" Option entfernt (Toggle-Switches sind unabhängig)
+- [x] Badge-Einstellung pro Bereich (Tab-Badge an/aus)
+- [x] Datenbank: Neue Spalten email_enabled, app_enabled, badge_enabled
+- [x] Edge Function send-push-notification auf app_enabled aktualisiert
+- [x] emailApi.js auf email_enabled umgestellt
 
 **UI/UX Verbesserungen**
 1. [ ] Email-Adresse im Profil ändern ermöglichen
@@ -442,8 +445,8 @@ Basierend auf "V2 Features der Monte.pdf" - siehe "NEUE THEMEN" Sektion oben.
 
 **Registrierung:** ✅ ERLEDIGT (2025-12-27)
 
-**Notification Screen Redesign:** ❌ OFFEN
-- On/Off Checkboxen für Email und App
+**Notification Screen Redesign:** ✅ ERLEDIGT (2025-12-27)
+- Toggle-Switches für Email/App (getrennt)
 - Badge-Einstellung pro Bereich
 
 **UI/UX Verbesserungen:** ❌ OFFEN
