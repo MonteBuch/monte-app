@@ -370,12 +370,12 @@ src/
 
 ---
 
-### NEUE THEMEN (aus UAT Feedback) ❌ OFFEN
+### NEUE THEMEN (aus UAT Feedback)
 
-**Registrierung**
-- [ ] "Vollständiger Name" → "Anzeigename" umbenennen
-- [ ] "Konto erstellen" Button: Nur Popup mit Hinweis "Einladungslink erforderlich" (nicht zum Registrierungsscreen)
-- [ ] Rollenauswahl-Sektion entfernen (nur noch Einladungslinks)
+**Registrierung** ✅ ERLEDIGT
+- [x] "Vollständiger Name" → "Anzeigename" umbenennen (mit Placeholder)
+- [x] "Konto erstellen" Button: Nur Popup mit Hinweis "Einladungslink erforderlich"
+- [x] Rollenauswahl-Sektion entfernt (Rolle wird nur durch Einladungslink bestimmt)
 
 **Notification Screen Redesign**
 - [ ] Neues Design: On/Off Checkboxen für Email und App (getrennt)
@@ -440,16 +440,13 @@ Ein Feature zur Dokumentation des Gruppenalltags:
 ### 0. NEUE THEMEN aus UAT Feedback (PRIORITÄT)
 Basierend auf "V2 Features der Monte.pdf" - siehe "NEUE THEMEN" Sektion oben.
 
-**Registrierung:**
-- "Vollständiger Name" → "Anzeigename"
-- "Konto erstellen" nur Popup (kein Registrierungsscreen)
-- Rollenauswahl-Sektion entfernen
+**Registrierung:** ✅ ERLEDIGT (2025-12-27)
 
-**Notification Screen Redesign:**
+**Notification Screen Redesign:** ❌ OFFEN
 - On/Off Checkboxen für Email und App
 - Badge-Einstellung pro Bereich
 
-**UI/UX Verbesserungen:**
+**UI/UX Verbesserungen:** ❌ OFFEN
 1. Email-Adresse ändern im Profil
 2. Info-Icon im Header (statt Menüpunkt im Profil)
 3. Logout-Icon im Header
